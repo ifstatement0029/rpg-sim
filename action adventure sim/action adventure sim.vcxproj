@@ -151,7 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cyberpunk-sim.cpp" />
+    <ClCompile Include="action adventure sim.cpp" />
     <ClCompile Include="commonfunctions.cpp" />
   </ItemGroup>
   <ItemGroup>
