@@ -1,0 +1,243 @@
+GENRE:
+sim
+procedural (levels, characters, items, etc.)
+cyberpunk
+
+GRAPHICS:
+2d
+top-down
+realistic 2d graphics
+
+AUDIO:
+
+
+CHARACTERS:
+have skills to interact with world objects - done
+have abilities to apply effects on target (ranged/melee attacks, electrical/fire/bio attack, etc.) - done
+can slot abilities in B, X, Y, LB, RB, LT, RT, dpad up/down/left/right; A button is used to interact with world objects - done
+have status effects - done
+have different immunity to status effects - done
+have a history of accomplishments
+combine different body parts to create character appearance - done
+each body part can be a different type (robot arm, lizard head, tiger legs, etc.) - done
+npcs follow a schedule - done
+player can access schedule of any npc with a device or by hacking (use slotted item on targetted npc) - 
+npc follows other npc, including controlled character (have that be a schedule task) - ;;
+have characer AI (allows live reaction to current situation; updates current goal to either follow schedule or something else depending on what is happening to the character) - 
+character schedule is set according to the organisation they belong to - done
+
+STATS:
+life
+stamina (consumed by abilities)
+energy (consumed by cyberwares)
+hunger
+thirst
+has current, modified and max values
+render stats in hud - done
+
+MISC:
+race: human, AI, mutant, alien, hybrid (determines starting skills and some interactions with other npcs)
+crypto (currency)
+
+SKILLS:
+has current, modified and max values - done
+max can only go up to 100
+interact with world objects (skill checks) - done
+some skills are native: base strength, defense, etc.
+has XP, the more skill is used the more XP is gained, when enough XP is gained (current = max) the skill max increases
+skill current + modified determines percentage of success when interacting with world object
+determines stat values
+can have skills that reduce status effects (immunity)
+can have negative immunity (weaknesses that boost status effects)
+
+STATUS EFFECTS:
+affects skills and stats
+
+ABILITIES:
+adds status effects to target - done
+can be equipped to quickslots - done
+can only be used from quickslot - done
+run melee animation when used - done
+run ranged animatin when used - done
+ranged animation should allow for multiple bullets being fired at the same time, have multiple animations per ability - done
+abilities consume stamina - done
+ranged abilities consume ammo - done
+when ranged ablity projectile hits target, add status effects to target - done
+can combo abilities
+have an ability that scans a target's stats, skills, abilities, items, gear, cyberware, weapons, etc.
+running/dashing is an ability that has to be quickslotted to be used
+
+CYBERWARES:
+adds abilities when equipped - done
+need to equip cyberware in slot - done
+can install more slots on body
+consumes energy
+can upgrade cyberware
+
+GEAR:
+modifies skills when equipped - done
+have different gear types
+need to be equipped in slots - done
+
+WEAPONS:
+adds abilities when equipped - done
+need to be equipped in slots - done
+display equipped melee weapon - done
+display equipped ranged weapon - done
+have a bar on top of equipped gun to indicate how many bullets left in magazine
+can customize weapons
+
+CONSUMABLE ITEMS:
+adds status effects to target
+can be equipped in quickslot and used
+can be used from menu
+
+MISC ITEMS:
+non-consumable
+to sell
+to collect (to give to character, etc.)
+
+AMMO:
+used by some ranged abilities - done
+render ammo count of slotted ability in hud - done
+
+AUGMENTED REALITY:
+need to have the skill by equipping relevant cyberware
+HUD
+
+VIRTUAL REALITY:
+connect to web/matrix
+
+VENDORS:
+can provide different services: buy/sell weapons, items, gear, cyberware, restore stats/skills, etc. 
+
+ORGANISATIONS:
+different types: gangs, companies, corporations, etc. - done
+hierarchy: people below report to those above
+people in an organisaton carry out different activities for the organisation (same activities that the player can do: buy weapons, kill npc, steal vehicle, etc.)
+can interact with people in the organisation to change their goals, etc
+if boss is defeated, become in charge of those below
+player can access diagram showing organisations and their structures and how they relate between themselves - done
+unlock diagram elements by scanning or talking to other characters
+can see story (list of decisions and accomplishments) of each character unlocked in organisation grid
+
+MULTIVERSE:
+is split into a grid of multiple universes
+
+UNIVERSE:
+is split into a grid of multiple planets
+
+PLANET:
+is split into a planet grid made up of overworlds
+
+OVERWORLD:
+overworld is split into a grid (city grid) - done
+city grid is made up of units - done
+each unit is made up of tiles - done
+city grid unit tiles are passed to overworld grid tiles when level is generated - done
+have overworld region position - done
+is procedurally generated based on seed - done
+seed can be defined by player
+seed can be randomly defined
+has various levels above and below ground - done
+
+BUILDINGS:
+has door to enter building - done
+has door to leave building - done
+interact with door - done
+door can have lock (requires misc item: key) - done
+list misc items required with skill levels on top of door - done
+have option on top of door to open door - done
+have option to close door - done
+have option to pick lock listed on top of door - done
+can pick lock - done
+door can have pad (requires code) - done
+have option to hack on top of door - done
+door can be forced open (have option on top of door or allow player to hit door) - done
+have features: cameras, network, etc. - 
+can buy items that allow tracking door codes (location on overworld and region)
+can buy items that allow hacking door codes
+has various levels above and below ground - done
+
+OBJECTS:
+can have various states - done
+each state has an animation (a static sprite can be an animation with only index 0 containing data)
+animation can run in a loop, or a specific number of times
+when animation is done running, it will keep displaying the last sprite
+can have multiple selectable options - done
+each option can have multiple requirements (skills, misc items, current object state, etc.) - done
+when selecting an option, if requirements are met then can update option misc items, current object state, etc. - done
+show required skills, misc items, etc. - done
+show option changes - done
+//press X to access keypad if code is required
+//press Y to access keyboard if code is required
+press X to access input device menu - done
+show required input device codes if found - done
+have one struct and one function for any type of input device (keypad, keyboard, etc.); each button needs to be an icon - done
+
+SCREENSHOTS:
+can take screenshots
+
+CONTROLS:
+A, B, X, Y, LB, RB, LT, RT, dpad up/down/left/right: ability slots - done
+A: interact with world objects - done
+start: character menu - done
+disable hud controls when in hover menu or regular menu - done
+hold start to pause
+pause menu contains option to exit game
+
+HUD:
+show current position in overworld region - done
+show current height - done
+show name of overworld region - done
+
+MAP:
+show overworld local map - done
+show overworld region map - done
+show minimap in upper-right corner - done
+show character positions on map - done
+destroy and init maps when switching overworld - done
+
+FAST TRAVEL:
+can fast travel using various transport types
+fast travel takes place in real time in the game, transport goes fast
+
+OPTIONS:
+add a global timer mod for when framerate is different than 60 fps - done
+give player ability to change fullscreen/window, window resolution, aspect ratio, vsync on/off and fps cap - done
+display controls (button icons) in displayMenu() - done
+
+NPC AI:
+the easier the game difficulty, the more errors characters make; the harder, the more perfect their execution of actions and decision making
+can learn from previous mistakes (has a learning speed)
+
+CRAFTING:
+have crafting stations to allow crafting - done
+can craft cyberware, gear, weapons, consumable items, ammos, misc items - done
+can switch between experiment and blueprint - done
+combine different crafting items to craft/experiment - done
+	list item icons in left handside
+	select three items one by one
+	after selecting each item, select quantity
+	selected items go on the right handside
+	highlight items on left that have been selected
+	can deselect selected item from the right hand side or modify quantity selected
+	can validate all items selected and craft item
+can have blueprints but they are not required to craft - done
+	list blueprints on left handside
+	select a blueprint
+	list items required for selected blueprint in right handside and the quantities required and available for each
+display item crafted - done
+
+IDEAS:
+when character dies
+	- their body can be controlled by other characters
+	- ambulance squad comes to take them to hospital
+when main character dies, player can choose to continue with same or new character in same or new world (different seed)
+have quest objectives pop up, also after you continue a game
+have an enemy that can change the rand seed (allow player to get back to original seed)
+have a world level chaos index that can be calculated taking into account various factors in the game
+
+
+
+

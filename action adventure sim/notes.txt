@@ -1,0 +1,13 @@
+game type:
+2d
+top down
+action adventure
+sim
+
+characters:
+modular approach (enable/disable what character can or cannot do)
+
+movement:
+walk
+run
+idle
