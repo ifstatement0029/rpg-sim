@@ -1412,3 +1412,23 @@ void convertPathCoordinates(vector<XYStruct>& path, int conversionFactor) {
 		path[pathCnt].y *= conversionFactor;
 	}
 }
+
+bool checkCollision(areaStruct area1, areaStruct area2) {
+	for (int area1XCnt = area1.x; area1XCnt < area1.x + area1.w; ++area1XCnt) {
+		for (int area1YCnt = area1.y; area1YCnt < area1.y + area1.h; ++area1YCnt) {
+
+			for (int area2XCnt = area2.x; area2XCnt < area2.x + area2.w; ++area2XCnt) {
+				for (int area2YCnt = area2.y; area2YCnt < area2.y + area2.h; ++area2YCnt) {
+
+					if (area1XCnt == area2XCnt && area1YCnt == area2YCnt) {
+						return true;
+					}
+
+				}
+			}
+
+		}
+	}
+	return false;
+}
+

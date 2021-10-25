@@ -182,3 +182,6 @@ void printVisualAStarPath(vector<vector<bool>>& maze, vector<XYStruct> path, XYS
 vector<XYStruct> getAStarPath(vector<vector<bool>>& maze, XYStruct start, XYStruct end);
 
 void convertPathCoordinates(vector<XYStruct>& path, int conversionFactor);
+
+bool checkCollision(areaStruct area1, areaStruct area2);
+

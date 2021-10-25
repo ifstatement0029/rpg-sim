@@ -4,10 +4,24 @@ top down
 action adventure
 sim
 
-characters:
-modular approach (enable/disable what character can or cannot do)
+character appearance:
 
-movement:
+
+character movements:
 walk
 run
 idle
+jump
+
+augmentations:
+
+
+weapons:
+
+
+gear:
+
+
+gadgets:
+
+
