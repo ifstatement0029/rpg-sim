@@ -268,7 +268,18 @@ namespace game {
 
 	//classes start
 
-	
+	struct characterParameters {
+		XYStruct position = { -1, -1 };
+		--;;
+	};
+
+	class Character {
+	public:
+		Character(struct newCharacterParameters);
+
+	private:
+		struct characterParameters;
+	};
 
 	//classes end
 

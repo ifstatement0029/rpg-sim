@@ -2840,7 +2840,9 @@ void createMazeAndGetAStarPath(areaStruct startPixelArea, areaStruct endPixelAre
 
 //class functions start
 
-
+Character::Character(struct newCharacterParameters) {
+	characterParameters = newCharacterParameters;
+};
 
 //class functions end
 
