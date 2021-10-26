@@ -16,7 +16,7 @@
 
 namespace fs = filesystem;
 
-namespace cyberpunkSim {
+namespace game {
 
 	bool fullscreen = false;
 	SDL_Window* window = NULL;
@@ -128,8 +128,6 @@ namespace cyberpunkSim {
 		XYUnsignedIntStruct position = { 0, 0 };
 	} regionGrid;
 
-	bool changeOverworldRegionBool = false;
-
 	struct gridStruct {
 		vector<vector<vector<gridTileStruct>>> gridTile; //layer, x, y
 		areaStruct camera = { -1, -1, -1, -1 }; //uses grid coordinates
@@ -137,11 +135,6 @@ namespace cyberpunkSim {
 		startEndStruct heightStartEnd = { -3, 3 };
 		int height = 0;
 	} overworldGrid;
-
-	bool currentlyInsideBuilding = false;
-	XYStruct buildingDoorEntryRelativePosition = { -1, -1 };
-
-	bool usedStairs = false;
 
 	areaStruct originalCameraArea; //Uses pixel coordinates
 	struct cameraStruct {
@@ -160,7 +153,6 @@ namespace cyberpunkSim {
 	int controlledCharacterIndex = 0;
 
 	struct renderOrderStruct {
-		//enum class typeEnum { character, skillBasedInteractableObject } type;
 		enum class typeEnum { character, object } type = typeEnum::character;
 		int layerIndex = -1, index = -1;
 		XYStruct position = { -1, -1 };
@@ -184,18 +176,7 @@ namespace cyberpunkSim {
 		string caption = "";
 	};
 
-	struct itemStruct {
-		string name = "", description = "";
-		iconStruct icon;
-		int quantity = -1;
-		float weight = -1;
-	};
-
 	vector<iconStruct> controllerButtonIcons;
-
-	struct durationStruct {
-		Uint32 startTicks = 0, delay = 0;
-	};
 
 	enum class headerStyleEnum { text, icon };
 
@@ -240,57 +221,6 @@ namespace cyberpunkSim {
 	enum class textBlockDisplayStyleEnum { vertical, horizontal };
 	enum class textBlockAlignmentEnum { centered, left };
 
-	bool quickslotSelectedItem = false, displayEquipMenu = false;
-
-	int tracker = 0;
-
-	struct barStruct {
-		struct barIconStruct {
-			iconStruct icon;
-			areaStruct dRect = { -1, -1, -1, -1 };
-			int totalIcons = -1;
-		} backIcon, foreIcon;
-	};
-
-	struct skillStruct {
-		string name = "", description = "";
-		int current = 0, modified = 0, max = 0;
-		iconStruct icon;
-		barStruct bar; //for experience
-		struct experienceStruct {
-			unsigned int min = 0, max = 0;
-		} experience;
-	};
-
-	struct createdObjectStruct {
-		string name = "";
-		areaStruct pixelArea = { -1, -1, -1, -1 }, gridArea = { -1, -1, -1, -1 };
-	};
-	vector< createdObjectStruct> createdObjects;
-	int totalCreatedObjects = 0;
-
-	struct rotationStruct {
-		double angle = 0;
-		SDL_Point centre = { -1, -1 };
-		SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE;
-	};
-
-	struct animationStruct {
-		string name = "";
-		int spriteSheetIndex = -1, spriteIndex = 0;
-		Uint32 startTicks = SDL_GetTicks(), delay = 100;
-		vector<SDL_Rect> spritesSRect;
-		XYStruct originalPosition = { -1, -1 };
-		SDL_Rect spriteDRect = { -1, -1, -1, -1 };
-		double startAngle = -1, endAngle = -1, currentAngle = -1;
-		int pixelIncrement = 1, distance = 0;
-		SDL_Point centre = { -1, -1 };
-		SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE;
-		string type = "";
-		bool running = false;
-		int currentLoops = 0, totalLoops = -1; //totalLoops: if == -1 then loop infinitely
-	};
-
 	struct cityGridUnitStruct {
 		string name = "";
 		vector<vector<gridTileStruct>> tiles; //x, y
@@ -326,37 +256,8 @@ namespace cyberpunkSim {
 		bool up = false, down = false, left = false, right = false, upRight = false, downRight = false, downLeft = false, upLeft = false;
 	};
 
-	areaStruct overworldDoorEnteredThroughArea = { -1, -1, -1, -1 };
-	int overworldBuildingEnteredThroughID = -1;
-
-	//struct stairPositionsStruct {
-	//	enum class typeEnum { none, up, down } type;
-	//	XYStruct position;
-	//};
-	//vector<vector<stairPositionsStruct>> stairsPositions; //building floors, stair positions
-
-	int activeMapIndex = -1;
-
-	struct blueprintStruct {
-		miscItemsStruct blueprint;
-		vector<miscItemsStruct> requiredMiscItems;
-	};
-
 	timeStruct gameClock;
 	int gameClockSpeedMultiplier = 10;
-
-	struct closestObjectStruct {
-		string objectType = "";
-		XYStruct position = { -1, -1 };
-		WHStruct size = { -1, -1 };
-		int heuristic = -1;
-		int ID = -1;
-		bool reached = false;
-	};
-
-	struct findObjectDataStruct {
-		int index = -1, heuristic = -1, ID = -1;
-	};
 
 	struct pathStruct {
 		vector<XYStruct> pathToFollow;
@@ -364,17 +265,6 @@ namespace cyberpunkSim {
 		int currentPathNode = 0;
 		int walkSpeed = -1;
 	} path;
-
-	enum class repositionCharactersRelativeToEnum { object, character };
-
-	struct scheduleStruct {
-		struct taskStruct {
-			timeStruct startTime, endTime;
-			string name = "", goal = ""; //goal: Sleep, Eat
-		};
-		vector<taskStruct> tasks;
-		int currentTask = 0;
-	};
 
 	//classes start
 
