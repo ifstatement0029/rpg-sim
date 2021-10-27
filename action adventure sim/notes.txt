@@ -26,3 +26,5 @@ gadgets:
 
 
 controls:
+left stick: move character (press lightly to walk; press all the way to run)
+A: jump

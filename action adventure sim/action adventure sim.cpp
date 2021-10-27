@@ -1364,6 +1364,7 @@ void initLevel() {
 }
 
 void initCharacters() {
+	controlledCharacterIndex = 0;
 	int characterID = 0;
 	for (int charactersCnt = 0; charactersCnt < 1; ++charactersCnt) {
 		characterParams currentCharacterParams;
@@ -1375,33 +1376,33 @@ void initCharacters() {
 		currentCharacterParams.size = { tileSize.w * 4, tileSize.h * 4 };
 
 		currentCharacterParams.sprites.spriteSheetIndex = getSpriteSheetIndex("main character");
-		currentCharacterParams.sprites.areas = getSpriteAreas({ 2, 10 }, { 32, 32 }, 8, 4, { 8, 18 });
-		//currentCharacterParams.sprites.areas = {
-		//	{
-		//		{ 526, 7, 29, 35 }, { 559, 7, 29, 35 }, { 590, 7, 29, 35 }, { 621, 7, 29, 35 } //up
-		//	},
-		//	{
-		//		{ 5, 7, 29, 35 }, { 45, 7, 29, 35 }, { 78, 7, 29, 35 }, { 117, 7, 29, 35 } //down
-		//	},
-		//	{
-		//		{ 147, 159, 29, 35 }, { 174, 159, 29, 35 }, { 199, 159, 29, 35 }, { 228, 159, 29, 35 } //left
-		//	},
-		//	{
-		//		{ 278, 7, 29, 35 }, { 301, 7, 29, 35 }, { 332, 7, 29, 35 }, { 356, 7, 29, 35 } //right
-		//	},
-		//	{
-		//		{ 388, 7, 29, 35 }, { 422, 7, 29, 35 }, { 461, 7, 29, 35 }, { 492, 7, 29, 35 } //up-right
-		//	},
-		//	{
-		//		{ 151, 7, 29, 35 }, { 181, 7, 29, 35 }, { 214, 7, 29, 35 }, { 246, 7, 29, 35 } //down-right
-		//	},
-		//	{
-		//		{ 255, 159, 29, 35 }, { 291, 159, 29, 35 }, { 321, 159, 29, 35 }, { 354, 159, 29, 35 } //down-left
-		//	},
-		//	{
-		//		{ 9, 159, 29, 35 }, { 40, 159, 29, 35 }, { 76, 159, 29, 35 }, { 114, 159, 29, 35 } //up-left
-		//	}
-		//};
+		//currentCharacterParams.sprites.areas = getSpriteAreas({ 2, 10 }, { 32, 32 }, 8, 4, { 8, 18 });
+		currentCharacterParams.sprites.areas = {
+			{
+				{ 526, 7, 29, 35 }, { 559, 7, 29, 35 }, { 590, 7, 29, 35 }, { 621, 7, 29, 35 } //up
+			},
+			{
+				{ 5, 7, 29, 35 }, { 45, 7, 29, 35 }, { 78, 7, 29, 35 }, { 117, 7, 29, 35 } //down
+			},
+			{
+				{ 147, 159, 29, 35 }, { 174, 159, 29, 35 }, { 199, 159, 29, 35 }, { 228, 159, 29, 35 } //left
+			},
+			{
+				{ 278, 7, 29, 35 }, { 301, 7, 29, 35 }, { 332, 7, 29, 35 }, { 356, 7, 29, 35 } //right
+			},
+			{
+				{ 388, 7, 29, 35 }, { 422, 7, 29, 35 }, { 461, 7, 29, 35 }, { 492, 7, 29, 35 } //up-right
+			},
+			{
+				{ 151, 7, 29, 35 }, { 181, 7, 29, 35 }, { 214, 7, 29, 35 }, { 246, 7, 29, 35 } //down-right
+			},
+			{
+				{ 255, 159, 29, 35 }, { 291, 159, 29, 35 }, { 321, 159, 29, 35 }, { 354, 159, 29, 35 } //down-left
+			},
+			{
+				{ 9, 159, 29, 35 }, { 40, 159, 29, 35 }, { 76, 159, 29, 35 }, { 114, 159, 29, 35 } //up-left
+			}
+		};
 
 		currentCharacterParams.layer = 1;
 
@@ -2392,25 +2393,23 @@ void playSoundEffect(string name) {
 	}
 }
 
-void centreCamera(areaStruct position) {
-	camera.area.x = position.x + roundDiv(position.w, 2) - roundDiv(camera.area.w, 2);
+void centreCamera(areaStruct position, int overGridLayerIndex) {
+	camera.area.x = (position.x + roundDiv(position.w, 2)) - roundDiv(camera.area.w, 2);
 
-	camera.area.y = position.y + roundDiv(position.h, 2) - roundDiv(camera.area.h, 2);
-
-	int layerIndex = 0;
+	camera.area.y = (position.y + roundDiv(position.h, 2)) - roundDiv(camera.area.h, 2);
 
 	if (camera.area.x < 0) {
 		camera.area.x = 0;
 	}
-	if (camera.area.x + camera.area.w - 1 > ((int)overworldGrid.gridTile[layerIndex].size() - 1) * tileSize.w) {
-		camera.area.x = (((int)overworldGrid.gridTile[layerIndex].size() - 1) * tileSize.w) - camera.area.w;
+	if (camera.area.x + camera.area.w - 1 > ((int)overworldGrid.gridTile[overGridLayerIndex].size() - 1) * tileSize.w) {
+		camera.area.x = (((int)overworldGrid.gridTile[overGridLayerIndex].size() - 1) * tileSize.w) - camera.area.w;
 	}
 
 	if (camera.area.y < 0) {
 		camera.area.y = 0;
 	}
-	if (camera.area.y + camera.area.h - 1 > ((int)overworldGrid.gridTile[layerIndex][0].size() - 1) * tileSize.h) {
-		camera.area.y = (((int)overworldGrid.gridTile[layerIndex][0].size() - 1) * tileSize.h) - camera.area.h;
+	if (camera.area.y + camera.area.h - 1 > ((int)overworldGrid.gridTile[overGridLayerIndex][0].size() - 1) * tileSize.h) {
+		camera.area.y = (((int)overworldGrid.gridTile[overGridLayerIndex][0].size() - 1) * tileSize.h) - camera.area.h;
 	}
 }
 
@@ -2913,6 +2912,12 @@ void createMazeAndGetAStarPath(areaStruct startPixelArea, areaStruct endPixelAre
 
 }
 
+void characterActions() {
+	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
+		characters[charactersCnt].move();
+	}
+}
+
 //functions end
 
 //class functions start
@@ -2929,14 +2934,85 @@ XYStruct Character::getPosition() {
 	return params.position;
 }
 
+WHStruct Character::getSize() {
+	return params.size;
+}
+
 void Character::render() {
-	SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[params.direction][params.frame]);
+	SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
 	SDL_Rect dRect = { params.position.x, params.position.y, params.size.w, params.size.h };
 	SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
 }
 
+void Character::swapFrame() {
+	if (SDL_GetTicks() - params.frameSwapStartTicks >= params.frameSwapDelay / FPSTimerMod) {
+		params.frameSwapStartTicks = SDL_GetTicks();
+		if (params.frame < (int)params.sprites.areas[(int)params.direction].size() - 1) {
+			++params.frame;
+		}
+		else {
+			params.frame = 0;
+		}
+	}
+}
+
 void Character::move() {
-	--;;
+	if (SDL_GetTicks() - params.moveSpeedStartTicks >= params.moveSpeedDelay / FPSTimerMod) {
+		params.moveSpeedStartTicks = SDL_GetTicks();
+
+		//Left
+		if (xDir == -1) {
+			--params.position.x;
+			params.direction = directionEnum::left;
+			swapFrame();
+			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
+		}
+
+		//Right
+		if (xDir == 1) {
+			++params.position.x;
+			params.direction = directionEnum::right;
+			swapFrame();
+			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
+		}
+
+		//Up
+		if (yDir == -1) {
+			--params.position.y;
+			params.direction = directionEnum::up;
+			swapFrame();
+			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
+		}
+
+		//Down
+		if (yDir == 1) {
+			++params.position.y;
+			params.direction = directionEnum::down;
+			swapFrame();
+			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
+		}
+
+		//Up-right
+		if (yDir == -1 && xDir == 1) {
+			params.direction = directionEnum::upRight;
+		}
+
+		//Down-right
+		if (yDir == 1 && xDir == 1) {
+			params.direction = directionEnum::downRight;
+		}
+
+		//Down-left
+		if (yDir == 1 && xDir == -1) {
+			params.direction = directionEnum::downLeft;
+		}
+
+		//Up-left
+		if (yDir == -1 && xDir == -1) {
+			params.direction = directionEnum::upLeft;
+		}
+
+	}
 }
 
 //class functions end
@@ -3011,6 +3087,12 @@ int main(int argc, char* args[]) {
 
 				//Actions
 				//moveCamera();
+				characterActions();
+
+				//Centre camera on controlled character
+				/*XYStruct characterPosition = characters[controlledCharacterIndex].getPosition();
+				WHStruct characterSize = characters[controlledCharacterIndex].getSize();
+				centreCamera({ characterPosition.x, characterPosition.y, characterSize.w, characterSize.h }, characters[controlledCharacterIndex].getLayer());*/
 
 				//Render
 				renderBackgroundCharactersAndObjects();

@@ -153,7 +153,7 @@ namespace game {
 	int controlledCharacterIndex = 0;
 
 	struct renderOrderStruct {
-		enum class typeEnum { character, object } type;
+		enum class typeEnum { character, object } type = typeEnum::character;
 		int layerIndex = -1, index = -1;
 		XYStruct position = { -1, -1 };
 	};
@@ -281,9 +281,12 @@ namespace game {
 		
 		spritesStruct sprites;
 
-		int direction = 0, frame = 0;
+		directionEnum direction = directionEnum::down;
+		int frame = 0;
 
 		int layer = 0;
+
+		Uint32 moveSpeedStartTicks = SDL_GetTicks(), moveSpeedDelay = 1, frameSwapStartTicks = SDL_GetTicks(), frameSwapDelay = 100;
 	};
 
 	class Character {
@@ -292,12 +295,15 @@ namespace game {
 		
 		int getLayer();
 		XYStruct getPosition();
+		WHStruct getSize();
 		
 		void render();
 		void move();
 
 	private:
 		characterParams params;
+
+		void swapFrame();
 	};
 
 	vector<Character> characters;
