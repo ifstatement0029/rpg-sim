@@ -266,19 +266,26 @@ namespace game {
 		int walkSpeed = -1;
 	} path;
 
+	struct spritesStruct {
+		int spriteSheetIndex = -1;
+		vector<vector<areaStruct>> areas; //directions (up, down, left, right, upRight, downRight, downLeft, upLeft), frames
+	};
+
 	//classes start
 
-	struct characterParameters {
+	struct characterParams {
 		XYStruct position = { -1, -1 };
-		--;;
+		WHStruct size = { -1, -1 };
+		
+		spritesStruct sprites;
 	};
 
 	class Character {
 	public:
-		Character(struct newCharacterParameters);
+		Character(characterParams newParams);
 
 	private:
-		struct characterParameters;
+		characterParams params;
 	};
 
 	//classes end

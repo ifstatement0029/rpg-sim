@@ -486,6 +486,14 @@ void initSpriteSheets() {
 	}
 }
 
+spritesStruct loadSprites(string spriteSheetName) {
+	spritesStruct sprites;
+
+	//--;;
+
+	return sprites;
+}
+
 void initGlobalSprites() {
 	selectedHeaderSprite = { getSpriteSheetIndex("UI"), { 21, 0, 8, 8 }, "" };
 	selectedIconSprite = { getSpriteSheetIndex("UI"), { 21, 0, 8, 8 }, "" };
@@ -1343,6 +1351,46 @@ void initLevel() {
 		}
 	}
 
+}
+
+void initCharacters(vector<Character>& characters) {
+	for (int charactersCnt = 0; charactersCnt < 1; ++charactersCnt) {
+		characterParams currentCharacterParams;
+
+		currentCharacterParams.position = { cameraLogicalSize.w / 2, cameraLogicalSize.h / 2 };
+		currentCharacterParams.size = { tileSize.w * 4, tileSize.h * 4 };
+
+		currentCharacterParams.sprites.spriteSheetIndex = getSpriteSheetIndex("main character");
+		currentCharacterParams.sprites.areas = {
+			{
+				{ 526, 7, 29, 35 }, { 559, 7, 29, 35 }, { 590, 7, 29, 35 }, { 621, 7, 29, 35 } //up
+			},
+			{
+				{ 5, 7, 29, 35 }, { 45, 7, 29, 35 }, { 78, 7, 29, 35 }, { 117, 7, 29, 35 } //down
+			},
+			{
+				{ 147, 159, 29, 35 }, { 174, 159, 29, 35 }, { 199, 159, 29, 35 }, { 228, 159, 29, 35 } //left
+			},
+			{
+				{ 278, 7, 29, 35 }, { 301, 7, 29, 35 }, { 332, 7, 29, 35 }, { 356, 7, 29, 35 } //right
+			},
+			{
+				{ 388, 7, 29, 35 }, { 422, 7, 29, 35 }, { 461, 7, 29, 35 }, { 492, 7, 29, 35 } //up-right
+			},
+			{
+				{ 151, 7, 29, 35 }, { 181, 7, 29, 35 }, { 214, 7, 29, 35 }, { 246, 7, 29, 35 } //down-right
+			},
+			{
+				{ 255, 159, 29, 35 }, { 291, 159, 29, 35 }, { 321, 159, 29, 35 }, { 354, 159, 29, 35 } //down-left
+			},
+			{
+				{ 9, 159, 29, 35 }, { 40, 159, 29, 35 }, { 76, 159, 29, 35 }, { 114, 159, 29, 35 } //up-left
+			}
+		};
+
+		Character currentCharacter(currentCharacterParams);
+		characters.push_back(currentCharacter);
+	}
 }
 
 //Maybe not a good idea to use this function if elements need to be decoupled for performance. E.g.: running SDL_RenderCopy in a loop and running SDL_SetRenderTarget and SDL_RenderSetLogicalSize outside of that loop
@@ -2840,8 +2888,8 @@ void createMazeAndGetAStarPath(areaStruct startPixelArea, areaStruct endPixelAre
 
 //class functions start
 
-Character::Character(struct newCharacterParameters) {
-	characterParameters = newCharacterParameters;
+Character::Character(characterParams newParams) {
+	params = newParams;
 };
 
 //class functions end
@@ -2882,6 +2930,10 @@ int main(int argc, char* args[]) {
 		initTiles();
 		initRegions();
 		initLevel();
+
+		//Init characters
+		vector<Character> characters;
+		initCharacters(characters);
 
 		float FPSCapMilliseconds = (float)lround((float)1000 / FPSCap);
 		selectedMenuLayer = 0;
