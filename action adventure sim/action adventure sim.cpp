@@ -486,12 +486,22 @@ void initSpriteSheets() {
 	}
 }
 
-spritesStruct loadSprites(string spriteSheetName) {
-	spritesStruct sprites;
+vector<vector<areaStruct>> getSpriteAreas(XYStruct startPosition, WHStruct spriteSize, int totalDirections, int totalSpritesPerDirection, WHStruct distanceBetweenSprites) {
+	vector<vector<areaStruct>> areas;
 
-	//--;;
+	XYStruct currentPosition = startPosition;
+	for (int directionsCnt = 0; directionsCnt < totalDirections; ++directionsCnt) {
+		vector<areaStruct> currentAreas;
+		currentPosition.x = startPosition.x;
+		for (int spritesCnt = 0; spritesCnt < totalSpritesPerDirection; ++spritesCnt) {
+			currentAreas.push_back({ currentPosition.x, currentPosition.y, spriteSize.w, spriteSize.h });
+			currentPosition.x += spriteSize.w + distanceBetweenSprites.w;
+		}
+		currentPosition.y += spriteSize.h + distanceBetweenSprites.h;
+		areas.push_back(currentAreas);
+	}
 
-	return sprites;
+	return areas;
 }
 
 void initGlobalSprites() {
@@ -1353,40 +1363,47 @@ void initLevel() {
 
 }
 
-void initCharacters(vector<Character>& characters) {
+void initCharacters() {
+	int characterID = 0;
 	for (int charactersCnt = 0; charactersCnt < 1; ++charactersCnt) {
 		characterParams currentCharacterParams;
 
-		currentCharacterParams.position = { cameraLogicalSize.w / 2, cameraLogicalSize.h / 2 };
+		currentCharacterParams.ID = characterID;
+		++characterID;
+
+		currentCharacterParams.position = { 0, 0 };
 		currentCharacterParams.size = { tileSize.w * 4, tileSize.h * 4 };
 
 		currentCharacterParams.sprites.spriteSheetIndex = getSpriteSheetIndex("main character");
-		currentCharacterParams.sprites.areas = {
-			{
-				{ 526, 7, 29, 35 }, { 559, 7, 29, 35 }, { 590, 7, 29, 35 }, { 621, 7, 29, 35 } //up
-			},
-			{
-				{ 5, 7, 29, 35 }, { 45, 7, 29, 35 }, { 78, 7, 29, 35 }, { 117, 7, 29, 35 } //down
-			},
-			{
-				{ 147, 159, 29, 35 }, { 174, 159, 29, 35 }, { 199, 159, 29, 35 }, { 228, 159, 29, 35 } //left
-			},
-			{
-				{ 278, 7, 29, 35 }, { 301, 7, 29, 35 }, { 332, 7, 29, 35 }, { 356, 7, 29, 35 } //right
-			},
-			{
-				{ 388, 7, 29, 35 }, { 422, 7, 29, 35 }, { 461, 7, 29, 35 }, { 492, 7, 29, 35 } //up-right
-			},
-			{
-				{ 151, 7, 29, 35 }, { 181, 7, 29, 35 }, { 214, 7, 29, 35 }, { 246, 7, 29, 35 } //down-right
-			},
-			{
-				{ 255, 159, 29, 35 }, { 291, 159, 29, 35 }, { 321, 159, 29, 35 }, { 354, 159, 29, 35 } //down-left
-			},
-			{
-				{ 9, 159, 29, 35 }, { 40, 159, 29, 35 }, { 76, 159, 29, 35 }, { 114, 159, 29, 35 } //up-left
-			}
-		};
+		currentCharacterParams.sprites.areas = getSpriteAreas({ 2, 10 }, { 32, 32 }, 8, 4, { 8, 18 });
+		//currentCharacterParams.sprites.areas = {
+		//	{
+		//		{ 526, 7, 29, 35 }, { 559, 7, 29, 35 }, { 590, 7, 29, 35 }, { 621, 7, 29, 35 } //up
+		//	},
+		//	{
+		//		{ 5, 7, 29, 35 }, { 45, 7, 29, 35 }, { 78, 7, 29, 35 }, { 117, 7, 29, 35 } //down
+		//	},
+		//	{
+		//		{ 147, 159, 29, 35 }, { 174, 159, 29, 35 }, { 199, 159, 29, 35 }, { 228, 159, 29, 35 } //left
+		//	},
+		//	{
+		//		{ 278, 7, 29, 35 }, { 301, 7, 29, 35 }, { 332, 7, 29, 35 }, { 356, 7, 29, 35 } //right
+		//	},
+		//	{
+		//		{ 388, 7, 29, 35 }, { 422, 7, 29, 35 }, { 461, 7, 29, 35 }, { 492, 7, 29, 35 } //up-right
+		//	},
+		//	{
+		//		{ 151, 7, 29, 35 }, { 181, 7, 29, 35 }, { 214, 7, 29, 35 }, { 246, 7, 29, 35 } //down-right
+		//	},
+		//	{
+		//		{ 255, 159, 29, 35 }, { 291, 159, 29, 35 }, { 321, 159, 29, 35 }, { 354, 159, 29, 35 } //down-left
+		//	},
+		//	{
+		//		{ 9, 159, 29, 35 }, { 40, 159, 29, 35 }, { 76, 159, 29, 35 }, { 114, 159, 29, 35 } //up-left
+		//	}
+		//};
+
+		currentCharacterParams.layer = 1;
 
 		Character currentCharacter(currentCharacterParams);
 		characters.push_back(currentCharacter);
@@ -1425,18 +1442,18 @@ void renderTexture(/*targetTypeEnum targetType, */WHStruct logicalSize, SDL_Text
 	}
 }
 
-vector<areaStruct> getSpriteAreas(XYStruct start, WHStruct spriteSize, int totalSprites) {
-
-	//Get areas of each sprite
-	vector<areaStruct> spriteAreas;
-	areaStruct currentSpriteArea = { start.x, start.y, spriteSize.w, spriteSize.h };
-	for (int spritesCnt = 0; spritesCnt < totalSprites; ++spritesCnt) {
-		spriteAreas.push_back(currentSpriteArea);
-		currentSpriteArea.x += spriteSize.w;
-	}
-
-	return spriteAreas;
-}
+//vector<areaStruct> getSpriteAreas(XYStruct start, WHStruct spriteSize, int totalSprites) {
+//
+//	//Get areas of each sprite
+//	vector<areaStruct> spriteAreas;
+//	areaStruct currentSpriteArea = { start.x, start.y, spriteSize.w, spriteSize.h };
+//	for (int spritesCnt = 0; spritesCnt < totalSprites; ++spritesCnt) {
+//		spriteAreas.push_back(currentSpriteArea);
+//		currentSpriteArea.x += spriteSize.w;
+//	}
+//
+//	return spriteAreas;
+//}
 
 vector<iconStruct> convertHeaderSringsToHeaderIcons(vector<string> headers) {
 	vector<iconStruct> headerIcons;
@@ -2245,7 +2262,16 @@ void renderBackgroundCharactersAndObjects() {
 	vector<renderOrderStruct> renderOrder;
 
 	//Insert characters in renderOrder vector
-	//;;
+	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
+		renderOrderStruct currentRenderOrderStruct;
+		
+		currentRenderOrderStruct.type = renderOrderStruct::typeEnum::character;
+		currentRenderOrderStruct.layerIndex = characters[charactersCnt].getLayer();
+		currentRenderOrderStruct.index = charactersCnt;
+		currentRenderOrderStruct.position = characters[charactersCnt].getPosition();
+
+		renderOrder.push_back(currentRenderOrderStruct);
+	}
 
 	//Sort renderOrder by x then by y, then by layerNum
 	if ((int)renderOrder.size() > 0) {
@@ -2301,7 +2327,10 @@ void renderBackgroundCharactersAndObjects() {
 			for (int renderOrderCnt = 0; renderOrderCnt < (int)renderOrder.size(); ++renderOrderCnt) {
 				if (renderOrder[renderOrderCnt].layerIndex == layersCnt) {
 					switch (renderOrder[renderOrderCnt].type) {
-						
+						case renderOrderStruct::typeEnum::character: {
+							characters[renderOrder[renderOrderCnt].index].render();
+							break;
+						}
 					}
 				}
 			}
@@ -2892,6 +2921,24 @@ Character::Character(characterParams newParams) {
 	params = newParams;
 };
 
+int Character::getLayer() {
+	return params.layer;
+}
+
+XYStruct Character::getPosition() {
+	return params.position;
+}
+
+void Character::render() {
+	SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[params.direction][params.frame]);
+	SDL_Rect dRect = { params.position.x, params.position.y, params.size.w, params.size.h };
+	SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
+}
+
+void Character::move() {
+	--;;
+}
+
 //class functions end
 
 //void test(int& functionNumber) {
@@ -2930,16 +2977,14 @@ int main(int argc, char* args[]) {
 		initTiles();
 		initRegions();
 		initLevel();
-
-		//Init characters
-		vector<Character> characters;
-		initCharacters(characters);
+		initCharacters();
 
 		float FPSCapMilliseconds = (float)lround((float)1000 / FPSCap);
 		selectedMenuLayer = 0;
 
 		//printStr(formatStr("level created in: {} seconds", { strUint32((SDL_GetTicks() - initTimerStartTicks) / 1000) }));
 
+		initGameClock();
 		Uint32 gameClockStartTicks = SDL_GetTicks();
 
 		while (exitMainLoop == false) {
@@ -2973,6 +3018,7 @@ int main(int argc, char* args[]) {
 				//Menus
 				setSDLRenderTarget(NULL);
 				setSDLLogicalSize(textLogicalSize);
+				//;;
 
 			}
 
