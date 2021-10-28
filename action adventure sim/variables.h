@@ -239,12 +239,11 @@ namespace game {
 		iconStruct icon;
 	};
 
-	struct collisionStruct {
+	struct collisionDataStruct {
 		bool collision = false;
-		enum class regionCornerEnum { up, right, down, left } regionCorner = regionCornerEnum::up;
+		//enum class tileHitCornerEnum { up, right, down, left } tileHitCorner = tileHitCornerEnum::up;
+		XYStruct tileHitGridPosition = { -1, -1 };
 	};
-
-	collisionStruct collisionData;
 
 	struct menuControlsStruct {
 		string buttonName = "", text = "";

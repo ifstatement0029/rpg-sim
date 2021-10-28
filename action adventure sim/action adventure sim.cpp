@@ -632,15 +632,23 @@ int getCityGridUnitIndex(string name) {
 	return -1;
 }
 
-bool checkCollisionWithOverworldGrid(areaStruct gridArea, int gridLayer) {
+collisionDataStruct checkCollisionWithOverworldGrid(areaStruct gridArea, int gridLayer) {
+	collisionDataStruct collisionData;
+
 	for (int areaXCnt = gridArea.x; areaXCnt < gridArea.x + gridArea.w; ++areaXCnt) {
 		for (int areaYCnt = gridArea.y; areaYCnt < gridArea.y + gridArea.h; ++areaYCnt) {
+			
 			if (gridLayer < (int)overworldGrid.gridTile.size() && areaXCnt < (int)overworldGrid.gridTile[gridLayer].size() && areaYCnt < (int)overworldGrid.gridTile[gridLayer][areaXCnt].size() && overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].collidable == true) {
-				return true;
+				collisionData.collision = true;
+				collisionData.tileHitGridPosition = { areaXCnt, areaYCnt };
+
+				return collisionData;
 			}
+
 		}
 	}
-	return false;
+	
+	return collisionData;
 }
 
 void displayLoadingMessage() {
@@ -1359,6 +1367,13 @@ void initLevel() {
 		for (int gridYCnt = 0; gridYCnt < (int)overworldGrid.gridTile[overworldGrid.groundLayerIndex][gridXCnt].size(); ++gridYCnt) {
 			overworldGrid.gridTile[overworldGrid.groundLayerIndex][gridXCnt][gridYCnt] = { getTileIndex("concrete floor"), false };
 		}
+	}
+
+	//Walls
+	for (int wallsCnt = 0; wallsCnt < randInt(1000, 2000); ++wallsCnt) {
+		XYStruct tilePosition = { randInt(0, (int)overworldGrid.gridTile[1].size() - 1), randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1) };
+		overworldGrid.gridTile[1][tilePosition.x][tilePosition.y].collidable = true;
+		overworldGrid.gridTile[1][tilePosition.x][tilePosition.y].tileIndex = getTileIndex("wall");
 	}
 
 }
@@ -2961,36 +2976,69 @@ void Character::move() {
 		params.moveSpeedStartTicks = SDL_GetTicks();
 
 		//Define move pixel increment based on how far left stick is tilted
-		--;;
+		if (abs(joystickAxisX) > ((joystickAxisMaxValue - deadZone) / 6) * 5 || abs(joystickAxisY) > ((joystickAxisMaxValue - deadZone) / 6) * 5) {
+			params.movePixelIncrement = 2;
+		}
+		else {
+			params.movePixelIncrement = 1;
+		}
 
 		//Left
 		if (xDir == -1) {
-			params.position.x -= params.movePixelIncrement;
 			params.direction = directionEnum::left;
+			params.position.x -= params.movePixelIncrement;
+
+			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
+			if (collisionData.collision == true) {
+				XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				params.position.x = tilePixelPosition.x + tileSize.w;
+			}
+
 			swapFrame();
 			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
 		}
 
 		//Right
 		if (xDir == 1) {
-			params.position.x += params.movePixelIncrement;
 			params.direction = directionEnum::right;
+			params.position.x += params.movePixelIncrement;
+			
+			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
+			if (collisionData.collision == true) {
+				XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				params.position.x = tilePixelPosition.x - params.size.w;
+			}
+
 			swapFrame();
 			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
 		}
 
 		//Up
 		if (yDir == -1) {
-			params.position.y -= params.movePixelIncrement;
 			params.direction = directionEnum::up;
+			params.position.y -= params.movePixelIncrement;
+			
+			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
+			if (collisionData.collision == true) {
+				XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				params.position.y = tilePixelPosition.y + tileSize.h;
+			}
+
 			swapFrame();
 			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
 		}
 
 		//Down
 		if (yDir == 1) {
-			params.position.y += params.movePixelIncrement;
 			params.direction = directionEnum::down;
+			params.position.y += params.movePixelIncrement;
+			
+			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
+			if (collisionData.collision == true) {
+				XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				params.position.y = tilePixelPosition.y - params.size.h;
+			}
+
 			swapFrame();
 			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
 		}

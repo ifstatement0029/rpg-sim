@@ -8,10 +8,11 @@ character appearance:
 
 
 character movements:
-walk
-run
+walk - done
+run - done
 idle
 jump
+collide with walls - ;;
 
 augmentations:
 
