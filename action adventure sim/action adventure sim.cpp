@@ -2940,7 +2940,7 @@ WHStruct Character::getSize() {
 
 void Character::render() {
 	SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
-	SDL_Rect dRect = { params.position.x, params.position.y, params.size.w, params.size.h };
+	SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h };
 	SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
 }
 
@@ -2960,9 +2960,12 @@ void Character::move() {
 	if (SDL_GetTicks() - params.moveSpeedStartTicks >= params.moveSpeedDelay / FPSTimerMod) {
 		params.moveSpeedStartTicks = SDL_GetTicks();
 
+		//Define move pixel increment based on how far left stick is tilted
+		--;;
+
 		//Left
 		if (xDir == -1) {
-			--params.position.x;
+			params.position.x -= params.movePixelIncrement;
 			params.direction = directionEnum::left;
 			swapFrame();
 			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
@@ -2970,7 +2973,7 @@ void Character::move() {
 
 		//Right
 		if (xDir == 1) {
-			++params.position.x;
+			params.position.x += params.movePixelIncrement;
 			params.direction = directionEnum::right;
 			swapFrame();
 			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
@@ -2978,7 +2981,7 @@ void Character::move() {
 
 		//Up
 		if (yDir == -1) {
-			--params.position.y;
+			params.position.y -= params.movePixelIncrement;
 			params.direction = directionEnum::up;
 			swapFrame();
 			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
@@ -2986,7 +2989,7 @@ void Character::move() {
 
 		//Down
 		if (yDir == 1) {
-			++params.position.y;
+			params.position.y += params.movePixelIncrement;
 			params.direction = directionEnum::down;
 			swapFrame();
 			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);

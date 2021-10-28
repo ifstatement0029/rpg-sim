@@ -25,6 +25,9 @@ gear:
 gadgets:
 
 
+destruction:
+can destroy environmental objects and character parts bit by bit
+
 controls:
 left stick: move character (press lightly to walk; press all the way to run)
 A: jump

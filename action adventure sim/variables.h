@@ -286,6 +286,7 @@ namespace game {
 
 		int layer = 0;
 
+		int movePixelIncrement = 2;
 		Uint32 moveSpeedStartTicks = SDL_GetTicks(), moveSpeedDelay = 1, frameSwapStartTicks = SDL_GetTicks(), frameSwapDelay = 100;
 	};
 
