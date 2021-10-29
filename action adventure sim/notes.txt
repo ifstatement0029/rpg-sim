@@ -5,14 +5,15 @@ action adventure
 sim
 
 character appearance:
-
+choose between male and female body
+can select body parts (head, left and right arm and leg, torso) of different types (organic, cybernetic, mutated)
 
 character movements:
 walk - done
 run - done
-idle
+idle - ;;
 jump
-collide with walls - ;;
+collide with walls - done
 
 augmentations:
 

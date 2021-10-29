@@ -299,6 +299,7 @@ namespace game {
 		
 		void render();
 		void move();
+		void idleAnimation();
 
 	private:
 		characterParams params;

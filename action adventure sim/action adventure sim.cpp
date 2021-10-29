@@ -2930,6 +2930,7 @@ void createMazeAndGetAStarPath(areaStruct startPixelArea, areaStruct endPixelAre
 void characterActions() {
 	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
 		characters[charactersCnt].move();
+		characters[charactersCnt].idleAnimation();
 	}
 }
 
@@ -2983,6 +2984,8 @@ void Character::move() {
 			params.movePixelIncrement = 1;
 		}
 
+		bool positionUpdated = false;
+
 		//Left
 		if (xDir == -1) {
 			params.direction = directionEnum::left;
@@ -2990,12 +2993,12 @@ void Character::move() {
 
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
 			if (collisionData.collision == true) {
-				XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
-				params.position.x = tilePixelPosition.x + tileSize.w;
+				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				params.position.x = tilePixelPosition.x + tileSize.w;*/
+				params.position.x += params.movePixelIncrement;
 			}
 
-			swapFrame();
-			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
+			positionUpdated = true;
 		}
 
 		//Right
@@ -3005,12 +3008,12 @@ void Character::move() {
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
 			if (collisionData.collision == true) {
-				XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
-				params.position.x = tilePixelPosition.x - params.size.w;
+				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				params.position.x = tilePixelPosition.x - params.size.w;*/
+				params.position.x -= params.movePixelIncrement;
 			}
 
-			swapFrame();
-			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
+			positionUpdated = true;
 		}
 
 		//Up
@@ -3020,12 +3023,12 @@ void Character::move() {
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
 			if (collisionData.collision == true) {
-				XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
-				params.position.y = tilePixelPosition.y + tileSize.h;
+				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				params.position.y = tilePixelPosition.y + tileSize.h;*/
+				params.position.y += params.movePixelIncrement;
 			}
 
-			swapFrame();
-			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
+			positionUpdated = true;
 		}
 
 		//Down
@@ -3035,12 +3038,12 @@ void Character::move() {
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
 			if (collisionData.collision == true) {
-				XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
-				params.position.y = tilePixelPosition.y - params.size.h;
+				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				params.position.y = tilePixelPosition.y - params.size.h;*/
+				params.position.y -= params.movePixelIncrement;
 			}
 
-			swapFrame();
-			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
+			positionUpdated = true;
 		}
 
 		//Up-right
@@ -3063,7 +3066,17 @@ void Character::move() {
 			params.direction = directionEnum::upLeft;
 		}
 
+		//Swap frame and centre camera
+		if (positionUpdated == true) {
+			swapFrame();
+			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
+		}
+
 	}
+}
+
+void Character::idleAnimation() {
+	--;;
 }
 
 //class functions end
