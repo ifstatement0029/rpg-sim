@@ -17,6 +17,10 @@ void pauseAtConsole() {
 	}
 }
 
+struct delayStruct {
+	Uint32 startTicks = 0, delay = 0;
+};
+
 int roundDiv(int firstNumber, int secondNumber) {
 	return lround((float)firstNumber / secondNumber);
 }

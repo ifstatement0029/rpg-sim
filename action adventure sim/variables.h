@@ -285,8 +285,15 @@ namespace game {
 
 		int layer = 0;
 
-		int movePixelIncrement = 2;
-		Uint32 moveSpeedStartTicks = SDL_GetTicks(), moveSpeedDelay = 1, frameSwapStartTicks = SDL_GetTicks(), frameSwapDelay = 100;
+		struct moveStruct {
+			int pixelIncrement = 2;
+			delayStruct speed = { SDL_GetTicks(), 1 }, frameSwap = { SDL_GetTicks(), 100 };
+		} move;
+
+		struct idleAnimationStruct {
+			delayStruct delayBeforeAnimation = { SDL_GetTicks(), 5000 };
+			bool animationRunning = false;
+		} idleAnimation;
 	};
 
 	class Character {

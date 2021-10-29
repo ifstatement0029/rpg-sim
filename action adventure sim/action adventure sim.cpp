@@ -2961,8 +2961,8 @@ void Character::render() {
 }
 
 void Character::swapFrame() {
-	if (SDL_GetTicks() - params.frameSwapStartTicks >= params.frameSwapDelay / FPSTimerMod) {
-		params.frameSwapStartTicks = SDL_GetTicks();
+	if (SDL_GetTicks() - params.move.frameSwap.startTicks >= params.move.frameSwap.delay / FPSTimerMod) {
+		params.move.frameSwap.startTicks = SDL_GetTicks();
 		if (params.frame < (int)params.sprites.areas[(int)params.direction].size() - 1) {
 			++params.frame;
 		}
@@ -2973,15 +2973,15 @@ void Character::swapFrame() {
 }
 
 void Character::move() {
-	if (SDL_GetTicks() - params.moveSpeedStartTicks >= params.moveSpeedDelay / FPSTimerMod) {
-		params.moveSpeedStartTicks = SDL_GetTicks();
+	if (SDL_GetTicks() - params.move.speed.startTicks >= params.move.speed.delay / FPSTimerMod) {
+		params.move.speed.startTicks = SDL_GetTicks();
 
 		//Define move pixel increment based on how far left stick is tilted
 		if (abs(joystickAxisX) > ((joystickAxisMaxValue - deadZone) / 6) * 5 || abs(joystickAxisY) > ((joystickAxisMaxValue - deadZone) / 6) * 5) {
-			params.movePixelIncrement = 2;
+			params.move.pixelIncrement = 2;
 		}
 		else {
-			params.movePixelIncrement = 1;
+			params.move.pixelIncrement = 1;
 		}
 
 		bool positionUpdated = false;
@@ -2989,13 +2989,13 @@ void Character::move() {
 		//Left
 		if (xDir == -1) {
 			params.direction = directionEnum::left;
-			params.position.x -= params.movePixelIncrement;
+			params.position.x -= params.move.pixelIncrement;
 
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
 			if (collisionData.collision == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.x = tilePixelPosition.x + tileSize.w;*/
-				params.position.x += params.movePixelIncrement;
+				params.position.x += params.move.pixelIncrement;
 			}
 
 			positionUpdated = true;
@@ -3004,13 +3004,13 @@ void Character::move() {
 		//Right
 		if (xDir == 1) {
 			params.direction = directionEnum::right;
-			params.position.x += params.movePixelIncrement;
+			params.position.x += params.move.pixelIncrement;
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
 			if (collisionData.collision == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.x = tilePixelPosition.x - params.size.w;*/
-				params.position.x -= params.movePixelIncrement;
+				params.position.x -= params.move.pixelIncrement;
 			}
 
 			positionUpdated = true;
@@ -3019,13 +3019,13 @@ void Character::move() {
 		//Up
 		if (yDir == -1) {
 			params.direction = directionEnum::up;
-			params.position.y -= params.movePixelIncrement;
+			params.position.y -= params.move.pixelIncrement;
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
 			if (collisionData.collision == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.y = tilePixelPosition.y + tileSize.h;*/
-				params.position.y += params.movePixelIncrement;
+				params.position.y += params.move.pixelIncrement;
 			}
 
 			positionUpdated = true;
@@ -3034,13 +3034,13 @@ void Character::move() {
 		//Down
 		if (yDir == 1) {
 			params.direction = directionEnum::down;
-			params.position.y += params.movePixelIncrement;
+			params.position.y += params.move.pixelIncrement;
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
 			if (collisionData.collision == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.y = tilePixelPosition.y - params.size.h;*/
-				params.position.y -= params.movePixelIncrement;
+				params.position.y -= params.move.pixelIncrement;
 			}
 
 			positionUpdated = true;
@@ -3072,11 +3072,26 @@ void Character::move() {
 			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
 		}
 
+		//Update idle animation state
+		if (xDir != 0 || yDir != 0) {
+			params.idleAnimation.animationRunning = false;
+		}
+
 	}
 }
 
 void Character::idleAnimation() {
-	--;;
+	
+	//Check if need to run idle animation
+	if (params.idleAnimation.animationRunning == false && SDL_GetTicks() - params.idleAnimation.delayBeforeAnimation.startTicks >= params.idleAnimation.delayBeforeAnimation.delay) {
+		params.idleAnimation.animationRunning = true;
+	}
+
+	//Run idle animation
+	if (params.idleAnimation.animationRunning == true) {
+		--;;
+	}
+
 }
 
 //class functions end
