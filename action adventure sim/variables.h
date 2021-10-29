@@ -291,7 +291,7 @@ namespace game {
 		} move;
 
 		struct idleAnimationStruct {
-			delayStruct delayBeforeAnimation = { SDL_GetTicks(), 5000 };
+			delayStruct delayBeforeAnimation = { SDL_GetTicks(), 3000 }, frameDuration = { 0, 0 };
 			bool animationRunning = false;
 		} idleAnimation;
 	};

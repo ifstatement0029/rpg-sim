@@ -3076,6 +3076,9 @@ void Character::move() {
 		if (xDir != 0 || yDir != 0) {
 			params.idleAnimation.animationRunning = false;
 		}
+		else {
+			params.idleAnimation.delayBeforeAnimation.startTicks = SDL_GetTicks(); --;;
+		}
 
 	}
 }
@@ -3085,11 +3088,22 @@ void Character::idleAnimation() {
 	//Check if need to run idle animation
 	if (params.idleAnimation.animationRunning == false && SDL_GetTicks() - params.idleAnimation.delayBeforeAnimation.startTicks >= params.idleAnimation.delayBeforeAnimation.delay) {
 		params.idleAnimation.animationRunning = true;
+		params.idleAnimation.frameDuration.startTicks = SDL_GetTicks();
+		params.idleAnimation.frameDuration.delay = randInt(1, 2) * 1000;
+
+		//Get random direction
+		params.direction = (directionEnum)randInt(0, 7);
+
 	}
 
 	//Run idle animation
-	if (params.idleAnimation.animationRunning == true) {
-		--;;
+	if (params.idleAnimation.animationRunning == true && SDL_GetTicks() - params.idleAnimation.frameDuration.startTicks >= params.idleAnimation.frameDuration.delay) {
+		params.idleAnimation.frameDuration.startTicks = SDL_GetTicks();
+		params.idleAnimation.frameDuration.delay = randInt(1, 2) * 1000;
+
+		//Get random direction
+		params.direction = (directionEnum)randInt(0, 7);
+
 	}
 
 }

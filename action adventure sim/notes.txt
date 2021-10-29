@@ -34,3 +34,9 @@ controls:
 left stick: move character (press lightly to walk; press all the way to run)
 A: jump
 LB: selection wheel for menus (weapon, items, etc. - at top of wheel) and quickslotted weapons, items, etc. at bottom of wheel
+
+crafting:
+
+
+modding:
+
