@@ -3072,12 +3072,10 @@ void Character::move() {
 			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
 		}
 
-		//Update idle animation state
+		//Reset 
 		if (xDir != 0 || yDir != 0) {
 			params.idleAnimation.animationRunning = false;
-		}
-		else {
-			params.idleAnimation.delayBeforeAnimation.startTicks = SDL_GetTicks(); --;;
+			params.idleAnimation.delayBeforeAnimation.startTicks = SDL_GetTicks();
 		}
 
 	}
@@ -3086,7 +3084,7 @@ void Character::move() {
 void Character::idleAnimation() {
 	
 	//Check if need to run idle animation
-	if (params.idleAnimation.animationRunning == false && SDL_GetTicks() - params.idleAnimation.delayBeforeAnimation.startTicks >= params.idleAnimation.delayBeforeAnimation.delay) {
+	if (xDir == 0 && yDir == 0 && params.idleAnimation.animationRunning == false && SDL_GetTicks() - params.idleAnimation.delayBeforeAnimation.startTicks >= params.idleAnimation.delayBeforeAnimation.delay) {
 		params.idleAnimation.animationRunning = true;
 		params.idleAnimation.frameDuration.startTicks = SDL_GetTicks();
 		params.idleAnimation.frameDuration.delay = randInt(1, 2) * 1000;
@@ -3106,6 +3104,10 @@ void Character::idleAnimation() {
 
 	}
 
+}
+
+void Character::jump() {
+	--;;
 }
 
 //class functions end

@@ -291,7 +291,7 @@ namespace game {
 		} move;
 
 		struct idleAnimationStruct {
-			delayStruct delayBeforeAnimation = { SDL_GetTicks(), 3000 }, frameDuration = { 0, 0 };
+			delayStruct delayBeforeAnimation = { SDL_GetTicks(), 5000 }, frameDuration = { 0, 0 };
 			bool animationRunning = false;
 		} idleAnimation;
 	};
@@ -307,6 +307,7 @@ namespace game {
 		void render();
 		void move();
 		void idleAnimation();
+		void jump();
 
 	private:
 		characterParams params;

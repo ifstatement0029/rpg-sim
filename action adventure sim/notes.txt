@@ -11,8 +11,8 @@ can select body parts (head, left and right arm and leg, torso) of different typ
 character movements:
 walk - done
 run - done
-idle - ;;
-jump
+idle - done
+jump - ;;
 collide with walls - done
 
 augmentations:
