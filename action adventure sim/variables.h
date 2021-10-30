@@ -270,12 +270,17 @@ namespace game {
 		vector<vector<areaStruct>> areas; //directions (up, down, left, right, upRight, downRight, downLeft, upLeft), frames
 	};
 
+	struct shadowSpriteStruct {
+		int spriteSheetIndex = -1;
+		SDL_Rect sRect = { -1, -1, -1, -1 };
+	} shadowSprite;
+
 	//classes start
 
 	struct characterParams {
 		int ID = -1;
 
-		XYStruct position = { -1, -1 };
+		XYStruct position = { -1, -1 }, groundPosition = position;
 		WHStruct size = { -1, -1 };
 		
 		spritesStruct sprites;
@@ -294,6 +299,13 @@ namespace game {
 			delayStruct delayBeforeAnimation = { SDL_GetTicks(), 5000 }, frameDuration = { 0, 0 };
 			bool animationRunning = false;
 		} idleAnimation;
+
+		struct jumpStruct {
+			bool jumping = false;
+			int currentHeight = 0, maxHeight = -1;
+			delayStruct move = { SDL_GetTicks(), 1 };
+			directionEnum direction = directionEnum::up;
+		} jump;
 	};
 
 	class Character {

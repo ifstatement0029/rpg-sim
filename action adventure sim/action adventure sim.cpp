@@ -514,6 +514,11 @@ void initGlobalSprites() {
 	blankIcon = { getSpriteSheetIndex("UI"), { 76, 0, 8, 8 }, "" };
 	UISpriteSheetIndex = getSpriteSheetIndex("UI");
 	controllerButtonsSpriteSheetIndex = getSpriteSheetIndex("controller buttons");
+
+	//Init shadow sprite
+	shadowSprite.spriteSheetIndex = getSpriteSheetIndex("shadow");
+	shadowSprite.sRect = { 0, 0, 32, 32 };
+
 }
 
 void destroySpriteSheets() {
@@ -1388,6 +1393,7 @@ void initCharacters() {
 		++characterID;
 
 		currentCharacterParams.position = { 0, 0 };
+		currentCharacterParams.groundPosition = currentCharacterParams.position;
 		currentCharacterParams.size = { tileSize.w * 4, tileSize.h * 4 };
 
 		currentCharacterParams.sprites.spriteSheetIndex = getSpriteSheetIndex("main character");
@@ -1420,6 +1426,9 @@ void initCharacters() {
 		};
 
 		currentCharacterParams.layer = 1;
+
+		//Init jump
+		currentCharacterParams.jump.maxHeight = currentCharacterParams.size.h;
 
 		Character currentCharacter(currentCharacterParams);
 		characters.push_back(currentCharacter);
@@ -2931,7 +2940,14 @@ void characterActions() {
 	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
 		characters[charactersCnt].move();
 		characters[charactersCnt].idleAnimation();
+		characters[charactersCnt].jump();
 	}
+}
+
+void renderShadow(areaStruct area) {
+	SDL_Rect sRect = shadowSprite.sRect;
+	SDL_Rect dRect = convertAreaToSDLRect(area);
+	SDL_RenderCopy(renderer, spriteSheets[shadowSprite.spriteSheetIndex].texture, &sRect, &dRect);
 }
 
 //functions end
@@ -2955,9 +2971,16 @@ WHStruct Character::getSize() {
 }
 
 void Character::render() {
+	
+	//Render shadow
+	WHStruct shadowSize = { params.size.w, params.size.h / 5 };
+	renderShadow({ params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h, shadowSize.w, shadowSize.h });
+	
+	//Render character
 	SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
-	SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h };
+	SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h };
 	SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
+
 }
 
 void Character::swapFrame() {
@@ -3068,7 +3091,9 @@ void Character::move() {
 
 		//Swap frame and centre camera
 		if (positionUpdated == true) {
-			swapFrame();
+			if (params.jump.jumping == false) {
+				swapFrame();
+			}
 			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
 		}
 
@@ -3107,7 +3132,38 @@ void Character::idleAnimation() {
 }
 
 void Character::jump() {
-	--;;
+	if (controllerButtons.A == true && params.jump.jumping == false) {
+		controllerButtons.A = false;
+		params.jump.jumping = true;
+		params.jump.currentHeight = 0;
+		params.jump.move.startTicks = SDL_GetTicks();
+		params.jump.direction = directionEnum::up;
+	}
+
+	if (params.jump.jumping == true && SDL_GetTicks() - params.jump.move.startTicks > params.jump.move.delay) {
+		params.jump.move.startTicks = SDL_GetTicks();
+		
+		switch (params.jump.direction) {
+			case directionEnum::up: {
+				if (params.jump.currentHeight < params.jump.maxHeight) {
+					++params.jump.currentHeight;
+				}
+				else {
+					params.jump.direction = directionEnum::down;
+				}
+				break;
+			}
+			case directionEnum::down: {
+				if (params.jump.currentHeight > 0) {
+					--params.jump.currentHeight;
+				}
+				else {
+					params.jump.jumping = false;
+				}
+				break;
+			}
+		}
+	}
 }
 
 //class functions end
