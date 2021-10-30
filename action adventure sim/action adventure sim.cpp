@@ -43,11 +43,29 @@ void destroySDLTexture(SDL_Texture* texture) {
 }
 
 void setSDLTextureTransparency(SDL_Texture* texture, int transparencyPercentage) {
+	/*SDL_BlendMode* blendMode = NULL;
+	SDL_GetTextureBlendMode(texture, blendMode);
+	if (*blendMode != SDL_BLENDMODE_BLEND) {
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+	}
+
+	Uint8* alpha = NULL;
+	SDL_GetTextureAlphaMod(texture, alpha);
+	if (*alpha != (255 * transparencyPercentage) / 100) {
+		SDL_SetTextureAlphaMod(texture, (255 * transparencyPercentage) / 100);
+	};*/
+
 	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 	SDL_SetTextureAlphaMod(texture, (255 * transparencyPercentage) / 100);
 }
 
 void removeSDLTextureTransparency(SDL_Texture* texture) {
+	/*SDL_BlendMode* blendMode = NULL;
+	SDL_GetTextureBlendMode(texture, blendMode);
+	if (*blendMode != SDL_BLENDMODE_NONE) {
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+	}*/
+
 	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
 }
 
@@ -1428,7 +1446,7 @@ void initCharacters() {
 		currentCharacterParams.layer = 1;
 
 		//Init jump
-		currentCharacterParams.jump.maxHeight = currentCharacterParams.size.h;
+		currentCharacterParams.jump.maxHeight = currentCharacterParams.size.h / 2;
 
 		Character currentCharacter(currentCharacterParams);
 		characters.push_back(currentCharacter);
@@ -2944,9 +2962,15 @@ void characterActions() {
 	}
 }
 
-void renderShadow(areaStruct area) {
+void renderShadow(areaStruct area, int transparencyPercentage) {
+
+	/*Update transparencyPercentage based on how lit up the area is.
+	The more light in an area, the darker the shadow. The less light, the lighter the shadow.*/
+	//;;
+
 	SDL_Rect sRect = shadowSprite.sRect;
 	SDL_Rect dRect = convertAreaToSDLRect(area);
+	setSDLTextureTransparency(spriteSheets[shadowSprite.spriteSheetIndex].texture, transparencyPercentage);
 	SDL_RenderCopy(renderer, spriteSheets[shadowSprite.spriteSheetIndex].texture, &sRect, &dRect);
 }
 
@@ -2974,7 +2998,7 @@ void Character::render() {
 	
 	//Render shadow
 	WHStruct shadowSize = { params.size.w, params.size.h / 5 };
-	renderShadow({ params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h, shadowSize.w, shadowSize.h });
+	renderShadow({ params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h, shadowSize.w, shadowSize.h }, 50);
 	
 	//Render character
 	SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
@@ -3132,6 +3156,7 @@ void Character::idleAnimation() {
 }
 
 void Character::jump() {
+	--;;the longer A is pressed, the higher the character jumps (increase jump max height the longer A is pressed)
 	if (controllerButtons.A == true && params.jump.jumping == false) {
 		controllerButtons.A = false;
 		params.jump.jumping = true;
@@ -3146,7 +3171,10 @@ void Character::jump() {
 		switch (params.jump.direction) {
 			case directionEnum::up: {
 				if (params.jump.currentHeight < params.jump.maxHeight) {
-					++params.jump.currentHeight;
+					params.jump.currentHeight += params.jump.pixelIncrement;
+					if (params.jump.currentHeight > params.jump.maxHeight) {
+						params.jump.currentHeight = params.jump.maxHeight;
+					}
 				}
 				else {
 					params.jump.direction = directionEnum::down;
@@ -3155,7 +3183,10 @@ void Character::jump() {
 			}
 			case directionEnum::down: {
 				if (params.jump.currentHeight > 0) {
-					--params.jump.currentHeight;
+					params.jump.currentHeight -= params.jump.pixelIncrement;
+					if (params.jump.currentHeight < 0) {
+						params.jump.currentHeight = 0;
+					}
 				}
 				else {
 					params.jump.jumping = false;

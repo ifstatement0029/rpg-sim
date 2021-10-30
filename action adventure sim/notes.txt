@@ -8,11 +8,15 @@ character appearance:
 choose between male and female body
 can select body parts (head, left and right arm and leg, torso) of different types (organic, cybernetic, mutated)
 
+character and object shadows: 
+Update transparencyPercentage based on how lit up the area is (the more light in an area, the darker the shadow. The less light, the lighter the shadow) - 
+
 character movements:
 walk - done
 run - done
 idle - done
 jump - ;;
+jump over wall - 
 collide with walls - done
 
 augmentations:
