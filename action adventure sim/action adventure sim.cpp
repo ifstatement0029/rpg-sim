@@ -588,15 +588,52 @@ void initTiles() {
 
 }
 
-void convertSpriteToTiles() {
-	--;;
+//void reSizeTexture(SDL_Texture* sTexture, SDL_Texture* resizedTexture, SDL_Rect sRect, SDL_Rect dRect) {
+//	setSDLRenderTarget(resizedTexture);
+//	SDL_RenderCopy(renderer, sTexture, &sRect, &dRect);
+//}
+
+vector<tileStruct> convertSpriteToTiles(int spriteSheetIndex, areaStruct spriteArea, string tileName) {
+
+	vector<tileStruct> tiles;
+
+	for (int tilesXCnt = spriteArea.x; tilesXCnt < spriteArea.x + spriteArea.w; tilesXCnt += tileSize.w) {
+		for (int tilesYCnt = spriteArea.y; tilesYCnt < spriteArea.y + spriteArea.h; tilesYCnt += tileSize.h) {
+			tileStruct currentTile;
+			
+			currentTile.spriteSheetIndex = spriteSheetIndex;
+			currentTile.tileName = tileName;
+			currentTile.spriteSheetArea = { tilesXCnt, tilesYCnt, tileSize.w, tileSize.h };
+
+			tiles.push_back(currentTile);
+		}
+	}
+
+	return tiles;
 }
 
-void addSpritesToTiles() {
+vector<vector<tileStruct>> convertSpriteToTilesMatrix(int spriteSheetIndex, areaStruct spriteArea, string tileName) {
+	vector<vector<tileStruct>> tilesMatrix;
 
-	//Split sprites into tiles and insert them in tiles vector
-	//;;
+	for (int tilesXCnt = spriteArea.x; tilesXCnt < spriteArea.x + spriteArea.w; tilesXCnt += tileSize.w) {
+		vector<tileStruct> tilesMatrixColumn;
+		for (int tilesYCnt = spriteArea.y; tilesYCnt < spriteArea.y + spriteArea.h; tilesYCnt += tileSize.h) {
+			tileStruct currentTile;
 
+			currentTile.spriteSheetIndex = spriteSheetIndex;
+			currentTile.tileName = tileName;
+			currentTile.spriteSheetArea = { tilesXCnt, tilesYCnt, tileSize.w, tileSize.h };
+
+			tilesMatrixColumn.push_back(currentTile);
+		}
+		tilesMatrix.push_back(tilesMatrixColumn);
+	}
+
+	return tilesMatrix;
+}
+
+void addNewTilesToTiles(vector<tileStruct>& tiles, vector<tileStruct>& newTiles) {
+	tiles.insert(tiles.end(), newTiles.begin(), newTiles.end());
 }
 
 void clearScreen(int r, int g, int b, int a) {
@@ -1365,11 +1402,18 @@ void pause() {
 	}
 }
 
-void insertSpriteInOverworldGrid(areaStruct spriteArea, int overworldGridLayer) {
-	for (int tilesXCnt = spriteArea.x; tilesXCnt < spriteArea.x + (spriteArea.w / tileSize.w); tilesXCnt += tileSize.w) {
-		for (int tilesYCnt = spriteArea.y; tilesYCnt < spriteArea.y + (spriteArea.h / tileSize.h); tilesYCnt += tileSize.h) {
-			//overworldGrid.gridTile[overworldGridLayer][]
+void insertTilesInOverworldGrid(XYStruct startGridPosition, vector<vector<tileStruct>> tilesMatrix, int overworldGridLayer, int tileHeight, bool tileCollidable, bool tileJumpable) {
+	XYStruct position = startGridPosition;
+	for (int tilesMatrixXCnt = 0; tilesMatrixXCnt < (int)tilesMatrix.size(); ++tilesMatrixXCnt) {
+		position.y = startGridPosition.y;
+		for (int tilesMatrixYCnt = 0; tilesMatrixYCnt < (int)tilesMatrix[tilesMatrixXCnt].size(); ++tilesMatrixYCnt) {
+			overworldGrid.gridTile[overworldGridLayer][position.x][position.y].tileIndex = getTileIndex(tilesMatrix[tilesMatrixXCnt][tilesMatrixYCnt].tileName);
+			overworldGrid.gridTile[overworldGridLayer][position.x][position.y].height = tileHeight;
+			overworldGrid.gridTile[overworldGridLayer][position.x][position.y].collidable = tileCollidable;
+			overworldGrid.gridTile[overworldGridLayer][position.x][position.y].jumpable = tileJumpable;
+			position.y += tileSize.h;
 		}
+		position.x = tileSize.w;
 	}
 }
 
@@ -1419,8 +1463,12 @@ void initLevel() {
 	}
 
 	//Tables (tiles)
+	WHStruct tableSpriteSize = { 24, 16 };
+	vector<tileStruct> newTiles = convertSpriteToTiles(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
+	addNewTilesToTiles(tiles, newTiles);
+	vector<vector<tileStruct>> tilesMatrix = convertSpriteToTilesMatrix(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
 	for (int tablesCnt = 0; tablesCnt < randInt(500, 1000); ++tablesCnt) {
-		insertSpriteInOverworldGrid({ randInt(0, (int)overworldGrid.gridTile[1].size() - 1), randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1), tileSize.w * 3, tileSize.h * 2 }, 1);
+		insertTilesInOverworldGrid({ lround((float)randInt(0, (int)overworldGrid.gridTile[1].size() - 1) / tileSize.w), lround((float)randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1) / tileSize.h) }, tilesMatrix, 1, tableSpriteSize.h / 2, true, true);
 	}
 
 }
@@ -3269,7 +3317,6 @@ int main(int argc, char* args[]) {
 		initSpriteSheets();
 		initGlobalSprites();
 		initTiles();
-		addSpritesToTiles();
 		initRegions();
 		initLevel();
 		initCharacters();
