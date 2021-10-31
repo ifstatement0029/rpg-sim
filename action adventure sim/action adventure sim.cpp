@@ -588,6 +588,17 @@ void initTiles() {
 
 }
 
+void convertSpriteToTiles() {
+	--;;
+}
+
+void addSpritesToTiles() {
+
+	//Split sprites into tiles and insert them in tiles vector
+	//;;
+
+}
+
 void clearScreen(int r, int g, int b, int a) {
 	SDL_SetRenderDrawColor(renderer, r, g, b, a);
 	SDL_RenderClear(renderer);
@@ -1354,6 +1365,14 @@ void pause() {
 	}
 }
 
+void insertSpriteInOverworldGrid(areaStruct spriteArea, int overworldGridLayer) {
+	for (int tilesXCnt = spriteArea.x; tilesXCnt < spriteArea.x + (spriteArea.w / tileSize.w); tilesXCnt += tileSize.w) {
+		for (int tilesYCnt = spriteArea.y; tilesYCnt < spriteArea.y + (spriteArea.h / tileSize.h); tilesYCnt += tileSize.h) {
+			//overworldGrid.gridTile[overworldGridLayer][]
+		}
+	}
+}
+
 void initLevel() {
 	displayLoadingMessage();
 
@@ -1397,6 +1416,11 @@ void initLevel() {
 		XYStruct tilePosition = { randInt(0, (int)overworldGrid.gridTile[1].size() - 1), randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1) };
 		overworldGrid.gridTile[1][tilePosition.x][tilePosition.y].collidable = true;
 		overworldGrid.gridTile[1][tilePosition.x][tilePosition.y].tileIndex = getTileIndex("wall");
+	}
+
+	//Tables (tiles)
+	for (int tablesCnt = 0; tablesCnt < randInt(500, 1000); ++tablesCnt) {
+		insertSpriteInOverworldGrid({ randInt(0, (int)overworldGrid.gridTile[1].size() - 1), randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1), tileSize.w * 3, tileSize.h * 2 }, 1);
 	}
 
 }
@@ -3245,6 +3269,7 @@ int main(int argc, char* args[]) {
 		initSpriteSheets();
 		initGlobalSprites();
 		initTiles();
+		addSpritesToTiles();
 		initRegions();
 		initLevel();
 		initCharacters();

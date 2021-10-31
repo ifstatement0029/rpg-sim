@@ -16,7 +16,8 @@ walk - done
 run - done
 idle - done
 jump - done
-jump over wall - ;;
+jump over walls (tiles) - ;;
+jump over objects (sprites) - 
 collide with walls - done
 
 augmentations:

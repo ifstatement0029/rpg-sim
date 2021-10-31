@@ -115,8 +115,8 @@ namespace game {
 	bool loadLevel = false;
 
 	struct gridTileStruct {
-		int tileIndex = -1;
-		bool collidable = false;
+		int tileIndex = -1, height = -1;
+		bool collidable = false, jumpable = false;
 	};
 
 	enum class regionTypeEnum { none, urban } regionType;
