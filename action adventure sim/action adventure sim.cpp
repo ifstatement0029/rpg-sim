@@ -3156,13 +3156,24 @@ void Character::idleAnimation() {
 }
 
 void Character::jump() {
-	--;;the longer A is pressed, the higher the character jumps (increase jump max height the longer A is pressed)
 	if (controllerButtons.A == true && params.jump.jumping == false) {
-		controllerButtons.A = false;
+		//controllerButtons.A = false;
 		params.jump.jumping = true;
 		params.jump.currentHeight = 0;
 		params.jump.move.startTicks = SDL_GetTicks();
 		params.jump.direction = directionEnum::up;
+		params.jump.jumpButtonPress.startTicks = SDL_GetTicks();
+	}
+
+	//If A is pressed for longer the character jumps higher
+	if (controllerButtons.A == true && SDL_GetTicks() - params.jump.jumpButtonPress.startTicks > params.jump.jumpButtonPress.delay) {
+		params.jump.jumpButtonPress.startTicks = SDL_GetTicks();
+		params.jump.addedMaxHeight = params.size.h / 2;
+	}
+
+	//Reset added max height
+	if (controllerButtons.A == false && params.jump.addedMaxHeight > 0) {
+		params.jump.addedMaxHeight = 0;
 	}
 
 	if (params.jump.jumping == true && SDL_GetTicks() - params.jump.move.startTicks > params.jump.move.delay) {
@@ -3170,10 +3181,10 @@ void Character::jump() {
 		
 		switch (params.jump.direction) {
 			case directionEnum::up: {
-				if (params.jump.currentHeight < params.jump.maxHeight) {
+				if (params.jump.currentHeight < params.jump.maxHeight + params.jump.addedMaxHeight) {
 					params.jump.currentHeight += params.jump.pixelIncrement;
-					if (params.jump.currentHeight > params.jump.maxHeight) {
-						params.jump.currentHeight = params.jump.maxHeight;
+					if (params.jump.currentHeight > params.jump.maxHeight + params.jump.addedMaxHeight) {
+						params.jump.currentHeight = params.jump.maxHeight + params.jump.addedMaxHeight;
 					}
 				}
 				else {
@@ -3190,6 +3201,7 @@ void Character::jump() {
 				}
 				else {
 					params.jump.jumping = false;
+					controllerButtons.A = false;
 				}
 				break;
 			}

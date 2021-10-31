@@ -302,8 +302,8 @@ namespace game {
 
 		struct jumpStruct {
 			bool jumping = false;
-			int currentHeight = 0, maxHeight = -1, pixelIncrement = 2;
-			delayStruct move = { SDL_GetTicks(), 1 };
+			int currentHeight = 0, maxHeight = -1, addedMaxHeight = 0, pixelIncrement = 2;
+			delayStruct move = { 0, 1 }, jumpButtonPress = { 0, 100 };
 			directionEnum direction = directionEnum::up;
 		} jump;
 	};

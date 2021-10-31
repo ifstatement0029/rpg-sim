@@ -15,8 +15,8 @@ character movements:
 walk - done
 run - done
 idle - done
-jump - ;;
-jump over wall - 
+jump - done
+jump over wall - ;;
 collide with walls - done
 
 augmentations:
@@ -43,4 +43,9 @@ crafting:
 
 
 modding:
+
+
+cyberchair:
+character can sit in chair and all their limbs and head are spread from their torso
+can replace/mod limbs, torso and head
 
