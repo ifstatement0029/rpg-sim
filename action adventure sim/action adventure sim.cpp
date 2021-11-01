@@ -3038,6 +3038,7 @@ void characterActions() {
 		characters[charactersCnt].move();
 		characters[charactersCnt].idleAnimation();
 		characters[charactersCnt].jump();
+		characters[charactersCnt].jumpOnTile();
 	}
 }
 
