@@ -280,7 +280,7 @@ namespace game {
 	struct characterParams {
 		int ID = -1;
 
-		XYStruct position = { -1, -1 }, groundPosition = position;
+		XYStruct position = { -1, -1 }, groundPosition = position, modifiedPosition = { 0, 0 };
 		WHStruct size = { -1, -1 };
 		
 		spritesStruct sprites;
@@ -320,6 +320,7 @@ namespace game {
 		void move();
 		void idleAnimation();
 		void jump();
+		void jumpOnTile();
 
 	private:
 		characterParams params;

@@ -597,12 +597,14 @@ vector<tileStruct> convertSpriteToTiles(int spriteSheetIndex, areaStruct spriteA
 
 	vector<tileStruct> tiles;
 
+	int tileCnt = 0;
 	for (int tilesXCnt = spriteArea.x; tilesXCnt < spriteArea.x + spriteArea.w; tilesXCnt += tileSize.w) {
 		for (int tilesYCnt = spriteArea.y; tilesYCnt < spriteArea.y + spriteArea.h; tilesYCnt += tileSize.h) {
 			tileStruct currentTile;
 			
 			currentTile.spriteSheetIndex = spriteSheetIndex;
-			currentTile.tileName = tileName;
+			currentTile.tileName = tileName + str(tileCnt);
+			++tileCnt;
 			currentTile.spriteSheetArea = { tilesXCnt, tilesYCnt, tileSize.w, tileSize.h };
 
 			tiles.push_back(currentTile);
@@ -615,13 +617,15 @@ vector<tileStruct> convertSpriteToTiles(int spriteSheetIndex, areaStruct spriteA
 vector<vector<tileStruct>> convertSpriteToTilesMatrix(int spriteSheetIndex, areaStruct spriteArea, string tileName) {
 	vector<vector<tileStruct>> tilesMatrix;
 
+	int tileCnt = 0;
 	for (int tilesXCnt = spriteArea.x; tilesXCnt < spriteArea.x + spriteArea.w; tilesXCnt += tileSize.w) {
 		vector<tileStruct> tilesMatrixColumn;
 		for (int tilesYCnt = spriteArea.y; tilesYCnt < spriteArea.y + spriteArea.h; tilesYCnt += tileSize.h) {
 			tileStruct currentTile;
 
 			currentTile.spriteSheetIndex = spriteSheetIndex;
-			currentTile.tileName = tileName;
+			currentTile.tileName = tileName + str(tileCnt);
+			++tileCnt;
 			currentTile.spriteSheetArea = { tilesXCnt, tilesYCnt, tileSize.w, tileSize.h };
 
 			tilesMatrixColumn.push_back(currentTile);
@@ -1403,17 +1407,17 @@ void pause() {
 }
 
 void insertTilesInOverworldGrid(XYStruct startGridPosition, vector<vector<tileStruct>> tilesMatrix, int overworldGridLayer, int tileHeight, bool tileCollidable, bool tileJumpable) {
-	XYStruct position = startGridPosition;
+	XYStruct gridPosition = startGridPosition;
 	for (int tilesMatrixXCnt = 0; tilesMatrixXCnt < (int)tilesMatrix.size(); ++tilesMatrixXCnt) {
-		position.y = startGridPosition.y;
+		gridPosition.y = startGridPosition.y;
 		for (int tilesMatrixYCnt = 0; tilesMatrixYCnt < (int)tilesMatrix[tilesMatrixXCnt].size(); ++tilesMatrixYCnt) {
-			overworldGrid.gridTile[overworldGridLayer][position.x][position.y].tileIndex = getTileIndex(tilesMatrix[tilesMatrixXCnt][tilesMatrixYCnt].tileName);
-			overworldGrid.gridTile[overworldGridLayer][position.x][position.y].height = tileHeight;
-			overworldGrid.gridTile[overworldGridLayer][position.x][position.y].collidable = tileCollidable;
-			overworldGrid.gridTile[overworldGridLayer][position.x][position.y].jumpable = tileJumpable;
-			position.y += tileSize.h;
+			overworldGrid.gridTile[overworldGridLayer][gridPosition.x][gridPosition.y].tileIndex = getTileIndex(tilesMatrix[tilesMatrixXCnt][tilesMatrixYCnt].tileName);
+			overworldGrid.gridTile[overworldGridLayer][gridPosition.x][gridPosition.y].height = tileHeight;
+			overworldGrid.gridTile[overworldGridLayer][gridPosition.x][gridPosition.y].collidable = tileCollidable;
+			overworldGrid.gridTile[overworldGridLayer][gridPosition.x][gridPosition.y].jumpable = tileJumpable;
+			++gridPosition.y;
 		}
-		position.x = tileSize.w;
+		++gridPosition.x;
 	}
 }
 
@@ -1467,8 +1471,11 @@ void initLevel() {
 	vector<tileStruct> newTiles = convertSpriteToTiles(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
 	addNewTilesToTiles(tiles, newTiles);
 	vector<vector<tileStruct>> tilesMatrix = convertSpriteToTilesMatrix(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
-	for (int tablesCnt = 0; tablesCnt < randInt(500, 1000); ++tablesCnt) {
-		insertTilesInOverworldGrid({ lround((float)randInt(0, (int)overworldGrid.gridTile[1].size() - 1) / tileSize.w), lround((float)randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1) / tileSize.h) }, tilesMatrix, 1, tableSpriteSize.h / 2, true, true);
+	for (int tablesCnt = 0; tablesCnt < randInt(2, 4); ++tablesCnt) {
+		//XYStruct position = { lround((float)randInt(0, (int)overworldGrid.gridTile[1].size() - 1) / tileSize.w), lround((float)randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1) / tileSize.h) };
+		XYStruct position = { lround((float)randInt(camera.area.x, camera.area.x + camera.area.w - 1) / tileSize.w), lround((float)randInt(camera.area.y, camera.area.y + camera.area.h - 1) / tileSize.h) };
+		insertTilesInOverworldGrid(position, tilesMatrix, 1, tableSpriteSize.h / 2, true, true);
+		//printIntL({ position.x, position.y, camera.area.x, camera.area.y, camera.area.x + camera.area.w - 1, camera.area.y + camera.area.h - 1 });
 	}
 
 }
@@ -3070,11 +3077,11 @@ void Character::render() {
 	
 	//Render shadow
 	WHStruct shadowSize = { params.size.w, params.size.h / 5 };
-	renderShadow({ params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h, shadowSize.w, shadowSize.h }, 50);
+	renderShadow({ params.position.x - params.modifiedPosition.x - camera.area.x, ((params.position.y - params.modifiedPosition.y - camera.area.y) + params.size.h - 1) - shadowSize.h, shadowSize.w, shadowSize.h }, 50);
 	
 	//Render character
 	SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
-	SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h };
+	SDL_Rect dRect = { params.position.x - params.modifiedPosition.x - camera.area.x, params.position.y - params.modifiedPosition.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h };
 	SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
 
 }
@@ -3279,6 +3286,29 @@ void Character::jump() {
 			}
 		}
 	}
+}
+
+void Character::jumpOnTile() {
+
+	//If character is jumping and is on way back down
+	if (params.jump.jumping == true && params.jump.direction == directionEnum::down) {
+
+		//If character is on top of tile object and has jumped higher than or equal to tile object height
+		collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }), params.layer);
+		if (collisionData.collision == true && params.jump.currentHeight >= overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].height) {
+
+			//Update character temp y position
+			params.modifiedPosition.y = overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].height;
+
+
+			//Stop jumping
+			params.jump.jumping = false;
+			params.jump.currentHeight = 0;
+
+		}
+
+	}
+
 }
 
 //class functions end
