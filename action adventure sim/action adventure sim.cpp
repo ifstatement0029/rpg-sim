@@ -660,6 +660,15 @@ int getTileIndex(string tileName) {
 	return -1;
 }
 
+string getTileName(int tileIndex) {
+	for (int tilesCnt = 0; tilesCnt < (int)tiles.size(); ++tilesCnt) {
+		if (tilesCnt == tileIndex) {
+			return tiles[tilesCnt].tileName;
+		}
+	}
+	return "";
+}
+
 XYStruct getGridPosition(XYStruct position) {
 	return { lround((float)position.x / tileSize.w), lround((float)position.y / tileSize.h) };
 }
@@ -1467,16 +1476,16 @@ void initLevel() {
 	}
 
 	//Tables (tiles)
-	WHStruct tableSpriteSize = { 24, 16 };
-	vector<tileStruct> newTiles = convertSpriteToTiles(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
-	addNewTilesToTiles(tiles, newTiles);
-	vector<vector<tileStruct>> tilesMatrix = convertSpriteToTilesMatrix(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
-	for (int tablesCnt = 0; tablesCnt < randInt(2, 4); ++tablesCnt) {
-		//XYStruct position = { lround((float)randInt(0, (int)overworldGrid.gridTile[1].size() - 1) / tileSize.w), lround((float)randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1) / tileSize.h) };
-		XYStruct position = { lround((float)randInt(camera.area.x, camera.area.x + camera.area.w - 1) / tileSize.w), lround((float)randInt(camera.area.y, camera.area.y + camera.area.h - 1) / tileSize.h) };
-		insertTilesInOverworldGrid(position, tilesMatrix, 1, tableSpriteSize.h / 2, true, true);
-		//printIntL({ position.x, position.y, camera.area.x, camera.area.y, camera.area.x + camera.area.w - 1, camera.area.y + camera.area.h - 1 });
-	}
+	//WHStruct tableSpriteSize = { 24, 16 };
+	//vector<tileStruct> newTiles = convertSpriteToTiles(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
+	//addNewTilesToTiles(tiles, newTiles);
+	//vector<vector<tileStruct>> tilesMatrix = convertSpriteToTilesMatrix(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
+	//for (int tablesCnt = 0; tablesCnt < randInt(2, 4); ++tablesCnt) {
+	//	//XYStruct position = { lround((float)randInt(0, (int)overworldGrid.gridTile[1].size() - 1) / tileSize.w), lround((float)randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1) / tileSize.h) };
+	//	XYStruct position = { lround((float)randInt(camera.area.x, camera.area.x + camera.area.w - 1) / tileSize.w), lround((float)randInt(camera.area.y, camera.area.y + camera.area.h - 1) / tileSize.h) };
+	//	
+	//	insertTilesInOverworldGrid(position, tilesMatrix, 1, tableSpriteSize.h / 2, true, true);
+	//}
 
 }
 
@@ -1529,6 +1538,18 @@ void initCharacters() {
 
 		Character currentCharacter(currentCharacterParams);
 		characters.push_back(currentCharacter);
+	}
+}
+
+void initTables() {
+	for (int tablesCnt = 0; tablesCnt < randInt(500, 1000); ++tablesCnt) {
+		tableParamsStruct newTableParams;
+
+		newTableParams.ID = tablesCnt;
+		newTableParams.position = { --;; };
+
+		Table newTable(newTableParams);
+		tables.push_back(newTable);
 	}
 }
 
@@ -3038,7 +3059,8 @@ void characterActions() {
 		characters[charactersCnt].move();
 		characters[charactersCnt].idleAnimation();
 		characters[charactersCnt].jump();
-		characters[charactersCnt].jumpOnTile();
+		//characters[charactersCnt].jumpOnTile();
+		characters[charactersCnt].jumpOnJumpableObject();
 	}
 }
 
@@ -3075,14 +3097,20 @@ WHStruct Character::getSize() {
 }
 
 void Character::render() {
+	if (params.modifiedPosition.x > 0 || params.modifiedPosition.y > 0) {
+		params.position = params.modifiedPosition;
+	}
+	else {
+		params.position = params.originalPosition;
+	}
 	
 	//Render shadow
 	WHStruct shadowSize = { params.size.w, params.size.h / 5 };
-	renderShadow({ params.position.x - params.modifiedPosition.x - camera.area.x, ((params.position.y - params.modifiedPosition.y - camera.area.y) + params.size.h - 1) - shadowSize.h, shadowSize.w, shadowSize.h }, 50);
+	renderShadow({ params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h, shadowSize.w, shadowSize.h }, 50);
 	
 	//Render character
 	SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
-	SDL_Rect dRect = { params.position.x - params.modifiedPosition.x - camera.area.x, params.position.y - params.modifiedPosition.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h };
+	SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h };
 	SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
 
 }
@@ -3289,27 +3317,65 @@ void Character::jump() {
 	}
 }
 
-void Character::jumpOnTile() {
+//void Character::jumpOnTile() {
+//
+//	//If character is jumping and is on way back down
+//	if (params.jump.jumping == true && params.jump.direction == directionEnum::down) {
+//
+//		//If character is on top of tile object and has jumped higher than or equal to tile object height
+//		collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }), params.layer);
+//		//;;collision is not detected because tile is collidable and cannot make tile not collidable because it is an object.
+//		if (collisionData.collision == true && params.jump.currentHeight >= overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].height) {
+//
+//			//Update character temp y position
+//			params.modifiedPosition.y = overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].height;
+//
+//			//Stop jumping
+//			params.jump.jumping = false;
+//			params.jump.currentHeight = 0;
+//
+//		}
+//
+//	}
+//
+//}
 
-	//If character is jumping and is on way back down
-	if (params.jump.jumping == true && params.jump.direction == directionEnum::down) {
-
-		//If character is on top of tile object and has jumped higher than or equal to tile object height
+void Character::jumpOnJumpableObject() {
+	
+	//Check if character in collision with jumpable object
+	bool characterOnObject = false;
+	for (int jumpableObjectsCnt = 0; jumpableObjectsCnt < (int)jumpableObjects.size(); ++jumpableObjectsCnt) {
 		collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }), params.layer);
-		if (collisionData.collision == true && params.jump.currentHeight >= overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].height) {
+
+		//If character is on top of object
+		if (collisionData.collision == true && params.position.y - params.jump.currentHeight >= jumpableObjects[jumpableObjectsCnt].area.y + jumpableObjects[jumpableObjectsCnt].area.h - jumpableObjects[jumpableObjectsCnt].height) {
 
 			//Update character temp y position
-			params.modifiedPosition.y = overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].height;
-
-
+			params.modifiedPosition.y = jumpableObjects[jumpableObjectsCnt].area.y + jumpableObjects[jumpableObjectsCnt].area.h - jumpableObjects[jumpableObjectsCnt].height;
+			
 			//Stop jumping
 			params.jump.jumping = false;
 			params.jump.currentHeight = 0;
 
+			characterOnObject = true;
+			break;
 		}
 
 	}
 
+	if (characterOnObject == false) {
+		params.modifiedPosition = { 0, 0 };
+	}
+}
+
+Table::Table(tableParamsStruct newParams) {
+	params = newParams;
+}
+
+void Table::render() {
+	SDL_Rect sRect = params.spriteSRect;
+	SDL_Rect dRect = convertAreaToSDLRect({ params.position.x, params.position.y, params.size.w, params.size.h });
+	SDL_RenderCopy(renderer, spriteSheets[params.spriteSheetIndex].texture, &sRect, &dRect);
 }
 
 //class functions end
@@ -3351,6 +3417,7 @@ int main(int argc, char* args[]) {
 		initRegions();
 		initLevel();
 		initCharacters();
+		initTables();
 
 		float FPSCapMilliseconds = (float)lround((float)1000 / FPSCap);
 		selectedMenuLayer = 0;

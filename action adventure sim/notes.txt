@@ -16,8 +16,8 @@ walk - done
 run - done
 idle - done
 jump - done
-jump on tile - ;;
-jump on object - 
+jump on tile - collision is not detected because tile is collidable and cannot make tile not collidable because it is an object
+jump on jumpable object - ;;
 collide with walls - done
 
 augmentations:

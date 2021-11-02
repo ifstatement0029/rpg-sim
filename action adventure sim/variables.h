@@ -275,12 +275,18 @@ namespace game {
 		SDL_Rect sRect = { -1, -1, -1, -1 };
 	} shadowSprite;
 
+	struct jumpableObjectStruct {
+		areaStruct area = { -1, -1, -1, -1 };
+		int height = -1;
+	};
+	vector<jumpableObjectStruct> jumpableObjects;
+
 	//classes start
 
 	struct characterParams {
 		int ID = -1;
 
-		XYStruct position = { -1, -1 }, groundPosition = position, modifiedPosition = { 0, 0 };
+		XYStruct position = { -1, -1 }, groundPosition = position, modifiedPosition = { 0, 0 }, originalPosition = position;
 		WHStruct size = { -1, -1 };
 		
 		spritesStruct sprites;
@@ -320,7 +326,8 @@ namespace game {
 		void move();
 		void idleAnimation();
 		void jump();
-		void jumpOnTile();
+		//void jumpOnTile();
+		void jumpOnJumpableObject();
 
 	private:
 		characterParams params;
@@ -329,6 +336,27 @@ namespace game {
 	};
 
 	vector<Character> characters;
+
+	struct tableParamsStruct {
+		int ID = -1;
+
+		XYStruct position = { -1, -1 };
+		WHStruct size = { -1, -1 };
+
+		int spriteSheetIndex = -1;
+		SDL_Rect spriteSRect;
+	};
+
+	class Table {
+	public:
+		Table(tableParamsStruct newParams);
+		void render();
+	
+	private:
+		tableParamsStruct params;
+	};
+
+	vector<Table> tables;
 
 	//classes end
 
