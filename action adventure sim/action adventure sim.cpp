@@ -1542,11 +1542,15 @@ void initCharacters() {
 }
 
 void initTables() {
-	for (int tablesCnt = 0; tablesCnt < randInt(500, 1000); ++tablesCnt) {
+	for (int tablesCnt = 0; tablesCnt < randInt(2, 4); ++tablesCnt) {
 		tableParamsStruct newTableParams;
 
 		newTableParams.ID = tablesCnt;
-		newTableParams.position = { --;; };
+		newTableParams.position = { randInt(0, camera.area.w), randInt(0, camera.area.h) };
+		newTableParams.size = { tileSize.w * 3, tileSize.h * 2 };
+		
+		newTableParams.spriteSheetIndex = getSpriteSheetIndex("table");
+		newTableParams.spriteSRect = { 0, 0, 24, 16 };
 
 		Table newTable(newTableParams);
 		tables.push_back(newTable);
@@ -2415,6 +2419,9 @@ void renderBackgroundCharactersAndObjects() {
 
 		renderOrder.push_back(currentRenderOrderStruct);
 	}
+
+	//Insert tables in renderOrder vector
+	--;;
 
 	//Sort renderOrder by x then by y, then by layerNum
 	if ((int)renderOrder.size() > 0) {
