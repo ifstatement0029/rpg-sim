@@ -1430,6 +1430,23 @@ void insertTilesInOverworldGrid(XYStruct startGridPosition, vector<vector<tileSt
 	}
 }
 
+void initTables(int layer) {
+	for (int tablesCnt = 0; tablesCnt < randInt(2, 4); ++tablesCnt) {
+		tableParamsStruct newTableParams;
+
+		newTableParams.ID = tablesCnt;
+		newTableParams.layer = layer;
+		newTableParams.position = { randInt(0, camera.area.w), randInt(0, camera.area.h) };
+		newTableParams.size = { tileSize.w * 3, tileSize.h * 2 };
+
+		newTableParams.spriteSheetIndex = getSpriteSheetIndex("table");
+		newTableParams.spriteSRect = { 0, 0, 24, 16 };
+
+		Table newTable(newTableParams);
+		tables.push_back(newTable);
+	}
+}
+
 void initLevel() {
 	displayLoadingMessage();
 
@@ -1487,6 +1504,8 @@ void initLevel() {
 	//	insertTilesInOverworldGrid(position, tilesMatrix, 1, tableSpriteSize.h / 2, true, true);
 	//}
 
+	initTables(1);
+
 }
 
 void initCharacters() {
@@ -1538,22 +1557,6 @@ void initCharacters() {
 
 		Character currentCharacter(currentCharacterParams);
 		characters.push_back(currentCharacter);
-	}
-}
-
-void initTables() {
-	for (int tablesCnt = 0; tablesCnt < randInt(2, 4); ++tablesCnt) {
-		tableParamsStruct newTableParams;
-
-		newTableParams.ID = tablesCnt;
-		newTableParams.position = { randInt(0, camera.area.w), randInt(0, camera.area.h) };
-		newTableParams.size = { tileSize.w * 3, tileSize.h * 2 };
-		
-		newTableParams.spriteSheetIndex = getSpriteSheetIndex("table");
-		newTableParams.spriteSRect = { 0, 0, 24, 16 };
-
-		Table newTable(newTableParams);
-		tables.push_back(newTable);
 	}
 }
 
@@ -2421,7 +2424,16 @@ void renderBackgroundCharactersAndObjects() {
 	}
 
 	//Insert tables in renderOrder vector
-	--;;
+	for (int tablesCnt = 0; tablesCnt < (int)tables.size(); ++tablesCnt) {
+		renderOrderStruct currentRenderOrderStruct;
+
+		currentRenderOrderStruct.type = renderOrderStruct::typeEnum::table;
+		currentRenderOrderStruct.layerIndex = tables[tablesCnt].getLayer();
+		currentRenderOrderStruct.index = tablesCnt;
+		currentRenderOrderStruct.position = tables[tablesCnt].getPosition();
+
+		renderOrder.push_back(currentRenderOrderStruct);
+	}
 
 	//Sort renderOrder by x then by y, then by layerNum
 	if ((int)renderOrder.size() > 0) {
@@ -2479,6 +2491,10 @@ void renderBackgroundCharactersAndObjects() {
 					switch (renderOrder[renderOrderCnt].type) {
 						case renderOrderStruct::typeEnum::character: {
 							characters[renderOrder[renderOrderCnt].index].render();
+							break;
+						}
+						case renderOrderStruct::typeEnum::table: {
+							tables[renderOrder[renderOrderCnt].index].render();
 							break;
 						}
 					}
@@ -3385,6 +3401,14 @@ void Table::render() {
 	SDL_RenderCopy(renderer, spriteSheets[params.spriteSheetIndex].texture, &sRect, &dRect);
 }
 
+int Table::getLayer() {
+	return params.layer;
+}
+
+XYStruct Table::getPosition() {
+	return params.position;
+}
+
 //class functions end
 
 //void test(int& functionNumber) {
@@ -3424,7 +3448,6 @@ int main(int argc, char* args[]) {
 		initRegions();
 		initLevel();
 		initCharacters();
-		initTables();
 
 		float FPSCapMilliseconds = (float)lround((float)1000 / FPSCap);
 		selectedMenuLayer = 0;

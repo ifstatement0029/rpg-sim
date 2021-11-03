@@ -153,7 +153,7 @@ namespace game {
 	int controlledCharacterIndex = 0;
 
 	struct renderOrderStruct {
-		enum class typeEnum { character, object } type = typeEnum::character;
+		enum class typeEnum { character, table } type = typeEnum::character;
 		int layerIndex = -1, index = -1;
 		XYStruct position = { -1, -1 };
 	};
@@ -338,7 +338,7 @@ namespace game {
 	vector<Character> characters;
 
 	struct tableParamsStruct {
-		int ID = -1;
+		int ID = -1, layer = 0;
 
 		XYStruct position = { -1, -1 };
 		WHStruct size = { -1, -1 };
@@ -350,6 +350,10 @@ namespace game {
 	class Table {
 	public:
 		Table(tableParamsStruct newParams);
+
+		int getLayer();
+		XYStruct getPosition();
+
 		void render();
 	
 	private:
