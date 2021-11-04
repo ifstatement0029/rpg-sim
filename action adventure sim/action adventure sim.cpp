@@ -738,11 +738,21 @@ collisionDataStruct checkCollisionWithOverworldGrid(areaStruct gridArea, int gri
 bool checkCollisionWithCollidableObject(areaStruct gridArea, int gridLayer) {
 	for (int collidableObjectsCnt = 0; collidableObjectsCnt < (int)collidableObjects.size(); ++collidableObjectsCnt) {
 		areaStruct collidableObjectGridArea = getGridAreaFromPixelArea(collidableObjects[collidableObjectsCnt]);
-		for (int collidableObjectGridAreaXCnt = --;;; collidableObjectGridAreaXCnt < ; ++collidableObjectGridAreaXCnt) {
-			for (int gridAreaXCnt = gridArea.x; gridAreaXCnt < gridArea.x + gridArea.w; ++gridAreaXCnt) {
-				for (int gridAreaYCnt = gridArea.y; gridAreaYCnt < gridArea.y + gridArea.h; ++gridAreaYCnt) {
+		
+		for (int collidableObjectGridAreaXCnt = collidableObjectGridArea.x; collidableObjectGridAreaXCnt < collidableObjectGridArea.x + collidableObjectGridArea.w; ++collidableObjectGridAreaXCnt) {
+			for (int collidableObjectGridAreaYCnt = collidableObjectGridArea.y; collidableObjectGridAreaYCnt < collidableObjectGridArea.y + collidableObjectGridArea.h; ++collidableObjectGridAreaYCnt) {
+				
+				for (int gridAreaXCnt = gridArea.x; gridAreaXCnt < gridArea.x + gridArea.w; ++gridAreaXCnt) {
+					for (int gridAreaYCnt = gridArea.y; gridAreaYCnt < gridArea.y + gridArea.h; ++gridAreaYCnt) {
+						
+						if (collidableObjectGridAreaXCnt == gridAreaXCnt && collidableObjectGridAreaYCnt == gridAreaYCnt) {
+							printIntL({ characters[controlledCharacterIndex].getPosition().x, characters[controlledCharacterIndex].getPosition().y, collidableObjectGridAreaXCnt, gridAreaXCnt, collidableObjectGridAreaYCnt, gridAreaYCnt }); --;;
+							return true;
+						}
 
+					}
 				}
+
 			}
 		}
 	}
