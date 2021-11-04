@@ -746,7 +746,6 @@ bool checkCollisionWithCollidableObject(areaStruct gridArea, int gridLayer) {
 					for (int gridAreaYCnt = gridArea.y; gridAreaYCnt < gridArea.y + gridArea.h; ++gridAreaYCnt) {
 						
 						if (collidableObjectGridAreaXCnt == gridAreaXCnt && collidableObjectGridAreaYCnt == gridAreaYCnt) {
-							printIntL({ characters[controlledCharacterIndex].getPosition().x, characters[controlledCharacterIndex].getPosition().y, collidableObjectGridAreaXCnt, gridAreaXCnt, collidableObjectGridAreaYCnt, gridAreaYCnt }); --;;
 							return true;
 						}
 
@@ -1470,6 +1469,11 @@ void initTables(int layer) {
 		tables.push_back(newTable);
 
 		collidableObjects.push_back({ newTableParams.position.x, newTableParams.position.y, newTableParams.size.w, newTableParams.size.h });
+
+		jumpableObjectStruct currentJumpableObject;
+		currentJumpableObject.area = { newTableParams.position.x, newTableParams.position.y, newTableParams.size.w, newTableParams.size.h };
+		currentJumpableObject.height = currentJumpableObject.area.h / 2;
+		jumpableObjects.push_back(currentJumpableObject);
 	}
 }
 
@@ -3197,7 +3201,7 @@ void Character::move() {
 			params.position.x -= params.move.pixelIncrement;
 
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
-			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h }), params.layer) == true) {
+			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }), params.layer) == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.x = tilePixelPosition.x + tileSize.w;*/
 				params.position.x += params.move.pixelIncrement;
@@ -3212,7 +3216,7 @@ void Character::move() {
 			params.position.x += params.move.pixelIncrement;
 
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
-			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h }), params.layer) == true) {
+			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }), params.layer) == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.x = tilePixelPosition.x - params.size.w;*/
 				params.position.x -= params.move.pixelIncrement;
@@ -3227,7 +3231,7 @@ void Character::move() {
 			params.position.y -= params.move.pixelIncrement;
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
-			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h }), params.layer) == true) {
+			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }), params.layer) == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.y = tilePixelPosition.y + tileSize.h;*/
 				params.position.y += params.move.pixelIncrement;
@@ -3242,7 +3246,7 @@ void Character::move() {
 			params.position.y += params.move.pixelIncrement;
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
-			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h }), params.layer) == true) {
+			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }), params.layer) == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.y = tilePixelPosition.y - params.size.h;*/
 				params.position.y -= params.move.pixelIncrement;

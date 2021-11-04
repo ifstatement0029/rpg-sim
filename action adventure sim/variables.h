@@ -276,7 +276,7 @@ namespace game {
 	} shadowSprite;
 
 	struct jumpableObjectStruct {
-		areaStruct area = { -1, -1, -1, -1 };
+		areaStruct area = { -1, -1, -1, -1 }; --;;need to be tiles, each with bool for whether collidable or not
 		int height = -1;
 	};
 	vector<jumpableObjectStruct> jumpableObjects;
