@@ -275,13 +275,12 @@ namespace game {
 		SDL_Rect sRect = { -1, -1, -1, -1 };
 	} shadowSprite;
 
-	struct jumpableObjectStruct {
-		areaStruct area = { -1, -1, -1, -1 }; --;;need to be tiles, each with bool for whether collidable or not
+	struct collidableObjectStruct {
+		areaStruct area = { -1, -1, -1, -1 };
 		int height = -1;
+		vector<vector<bool>> collidableGridArea;
 	};
-	vector<jumpableObjectStruct> jumpableObjects;
-
-	vector<areaStruct> collidableObjects;
+	vector<collidableObjectStruct> collidableObjects;
 
 	//classes start
 
@@ -329,7 +328,7 @@ namespace game {
 		void idleAnimation();
 		void jump();
 		//void jumpOnTile();
-		void jumpOnJumpableObject();
+		void jumpOnCollidableObject();
 
 	private:
 		characterParams params;

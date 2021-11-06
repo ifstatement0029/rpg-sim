@@ -1453,27 +1453,53 @@ void insertTilesInOverworldGrid(XYStruct startGridPosition, vector<vector<tileSt
 	}
 }
 
+void makeUpperPartOfObjectNonCollidable(vector<vector<bool>>& collidableGridArea, areaStruct objectArea, int objectHeight) {
+	areaStruct objectGridArea = getGridAreaFromPixelArea(objectArea);
+	int objectGridHeight = lround((float)objectHeight / tileSize.h);
+
+	for (int objectGridAreaXCnt = 0; objectGridAreaXCnt < objectGridArea.w; ++objectGridAreaXCnt) {
+		for (int objectGridAreaYCnt = 0; objectGridAreaYCnt < objectGridArea.h; ++objectGridAreaYCnt) {
+			if (objectGridAreaYCnt < objectGridArea.h - objectGridHeight) {
+				collidableGridArea[objectGridAreaXCnt][objectGridAreaYCnt] = false;
+			}
+		}
+	}
+}
+
+void initBoolGrid(vector<vector<bool>>& grid, WHStruct gridSize, bool boolValue) {
+	grid.clear();
+	for (int boolGridXCnt = 0; boolGridXCnt < gridSize.w; ++boolGridXCnt) {
+		grid.resize(boolGridXCnt + 1);
+		for (int boolGridYCnt = 0; boolGridYCnt < gridSize.h; ++boolGridYCnt) {
+			grid[boolGridXCnt].resize(boolGridYCnt + 1);
+			grid[boolGridXCnt][boolGridYCnt] = boolValue;
+		}
+	}
+}
+
 void initTables(int layer) {
 	for (int tablesCnt = 0; tablesCnt < randInt(2, 4); ++tablesCnt) {
+		
+		//Init table
 		tableParamsStruct newTableParams;
-
 		newTableParams.ID = tablesCnt;
 		newTableParams.layer = layer;
 		newTableParams.position = { randInt(0, camera.area.w), randInt(0, camera.area.h) };
 		newTableParams.size = { tileSize.w * 3, tileSize.h * 2 };
-
 		newTableParams.spriteSheetIndex = getSpriteSheetIndex("table");
 		newTableParams.spriteSRect = { 0, 0, 24, 16 };
-
 		Table newTable(newTableParams);
 		tables.push_back(newTable);
 
-		collidableObjects.push_back({ newTableParams.position.x, newTableParams.position.y, newTableParams.size.w, newTableParams.size.h });
+		//Init collidable object
+		collidableObjectStruct currentCollidableObject;
+		currentCollidableObject.area = { newTableParams.position.x, newTableParams.position.y, newTableParams.size.w, newTableParams.size.h };
+		currentCollidableObject.height = currentCollidableObject.area.h / 2;
+		areaStruct currentJumpableObjectGridArea = getGridAreaFromPixelArea(currentCollidableObject.area);
+		initBoolGrid(currentCollidableObject.collidableGridArea, { currentJumpableObjectGridArea.w, currentJumpableObjectGridArea.h }, true);
+		makeUpperPartOfObjectNonCollidable(currentCollidableObject.collidableGridArea, currentCollidableObject.area, currentCollidableObject.height);
+		collidableObjects.push_back(currentCollidableObject);
 
-		jumpableObjectStruct currentJumpableObject;
-		currentJumpableObject.area = { newTableParams.position.x, newTableParams.position.y, newTableParams.size.w, newTableParams.size.h };
-		currentJumpableObject.height = currentJumpableObject.area.h / 2;
-		jumpableObjects.push_back(currentJumpableObject);
 	}
 }
 
@@ -3394,11 +3420,11 @@ void Character::jump() {
 //
 //}
 
-void Character::jumpOnJumpableObject() {
+void Character::jumpOnCollidableObject() {
 	
 	//Check if character in collision with jumpable object
 	bool characterOnObject = false;
-	for (int jumpableObjectsCnt = 0; jumpableObjectsCnt < (int)jumpableObjects.size(); ++jumpableObjectsCnt) {
+	for (int jumpableObjectsCnt = 0; jumpableObjectsCnt < (int)--;; jumpableObjects.size(); ++jumpableObjectsCnt) {
 		collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }), params.layer);
 
 		//If character is on top of object
