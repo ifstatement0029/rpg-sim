@@ -735,7 +735,30 @@ collisionDataStruct checkCollisionWithOverworldGrid(areaStruct gridArea, int gri
 	return collisionData;
 }
 
-bool checkCollisionWithCollidableObject(areaStruct gridArea, int gridLayer, int height) {
+bool checkCollisionWithCollidableObject(areaStruct gridArea, int gridLayer) {
+	for (int collidableObjectsCnt = 0; collidableObjectsCnt < (int)collidableObjects.size(); ++collidableObjectsCnt) {
+		areaStruct collidableObjectGridArea = getGridAreaFromPixelArea(collidableObjects[collidableObjectsCnt].area);
+
+		for (int collidableObjectGridAreaXCnt = collidableObjectGridArea.x; collidableObjectGridAreaXCnt < collidableObjectGridArea.x + collidableObjectGridArea.w; ++collidableObjectGridAreaXCnt) {
+			for (int collidableObjectGridAreaYCnt = collidableObjectGridArea.y; collidableObjectGridAreaYCnt < collidableObjectGridArea.y + collidableObjectGridArea.h; ++collidableObjectGridAreaYCnt) {
+
+				for (int gridAreaXCnt = gridArea.x; gridAreaXCnt < gridArea.x + gridArea.w; ++gridAreaXCnt) {
+					for (int gridAreaYCnt = gridArea.y; gridAreaYCnt < gridArea.y + gridArea.h; ++gridAreaYCnt) {
+
+						if (collidableObjectGridAreaXCnt == gridAreaXCnt && collidableObjectGridAreaYCnt == gridAreaYCnt) {
+							return true;
+						}
+
+					}
+				}
+
+			}
+		}
+	}
+	return false;
+}
+
+bool checkCollisionWithCollidableObjectFactoringHeight(areaStruct gridArea, int gridLayer, int height) {
 	for (int collidableObjectsCnt = 0; collidableObjectsCnt < (int)collidableObjects.size(); ++collidableObjectsCnt) {
 		areaStruct collidableObjectGridArea = getGridAreaFromPixelArea(collidableObjects[collidableObjectsCnt].area);
 		
@@ -3222,7 +3245,7 @@ void Character::move() {
 			params.position.x -= params.move.pixelIncrement;
 
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
-			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer, params.jump.currentHeight) == true) {
+			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer, params.jump.currentHeight) == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.x = tilePixelPosition.x + tileSize.w;*/
 				params.position.x += params.move.pixelIncrement;
@@ -3237,7 +3260,7 @@ void Character::move() {
 			params.position.x += params.move.pixelIncrement;
 
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
-			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer, params.jump.currentHeight) == true) {
+			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer, params.jump.currentHeight) == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.x = tilePixelPosition.x - params.size.w;*/
 				params.position.x -= params.move.pixelIncrement;
@@ -3252,7 +3275,7 @@ void Character::move() {
 			params.position.y -= params.move.pixelIncrement;
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
-			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer, params.jump.currentHeight) == true) {
+			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer, params.jump.currentHeight) == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.y = tilePixelPosition.y + tileSize.h;*/
 				params.position.y += params.move.pixelIncrement;
@@ -3267,7 +3290,7 @@ void Character::move() {
 			params.position.y += params.move.pixelIncrement;
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
-			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer, params.jump.currentHeight) == true) {
+			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer, params.jump.currentHeight) == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.y = tilePixelPosition.y - params.size.h;*/
 				params.position.y -= params.move.pixelIncrement;
@@ -3397,16 +3420,13 @@ void Character::jumpOnCollidableObject() {
 	for (int collidableObjectsCnt = 0; collidableObjectsCnt < (int)collidableObjects.size(); ++collidableObjectsCnt) {
 		
 		//If character is on top of object
-		if (checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }), params.layer, params.jump.currentHeight) == true) {
-			if (params.position.y - params.jump.currentHeight + params.size.h - 1 >= collidableObjects[collidableObjectsCnt].area.y + collidableObjects[collidableObjectsCnt].area.h - collidableObjects[collidableObjectsCnt].height) {
+		if (--;; checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.jump.currentHeight + params.size.h - tileSize.h, params.size.w, params.size.h }), params.layer) == true) {
+			if (params.jump.direction == directionEnum::down && params.jump.currentHeight > 0 && params.jump.currentHeight <= collidableObjects[collidableObjectsCnt].height) {
 
 				//Stop jumping
 				params.jump.jumping = false;
 
-				//Set character position
-				--;; params.position.y = collidableObjects[collidableObjectsCnt].area.y + collidableObjects[collidableObjectsCnt].area.h + params.size.h - 1;
 				params.jump.currentHeight = collidableObjects[collidableObjectsCnt].height;
-
 				characterOnObject = true;
 				break;
 			}
