@@ -3250,7 +3250,6 @@ void Character::move() {
 		if (yDir == -1) {
 			params.direction = directionEnum::up;
 			params.position.y -= params.move.pixelIncrement;
-			params.jump.originalYPosition -= params.move.pixelIncrement;
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
 			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer) == true) {
@@ -3266,7 +3265,6 @@ void Character::move() {
 		if (yDir == 1) {
 			params.direction = directionEnum::down;
 			params.position.y += params.move.pixelIncrement;
-			params.jump.originalYPosition += params.move.pixelIncrement;
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
 			if (collisionData.collision == true || checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer) == true) {
