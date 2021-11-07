@@ -278,7 +278,6 @@ namespace game {
 	struct collidableObjectStruct {
 		areaStruct area = { -1, -1, -1, -1 };
 		int height = -1;
-		vector<vector<bool>> collidableGridArea;
 	};
 	vector<collidableObjectStruct> collidableObjects;
 
@@ -287,15 +286,14 @@ namespace game {
 	struct characterParams {
 		int ID = -1;
 
-		XYStruct position = { -1, -1 }, groundPosition = { -1, -1 }, modifiedPosition = { 0, 0 }, originalPosition = { -1, -1 };
+		XYStruct position = { -1, -1 }, groundPosition = { -1, -1 };
 		WHStruct size = { -1, -1 };
+		int layer = 0;
 		
 		spritesStruct sprites;
 
 		directionEnum direction = directionEnum::down;
 		int frame = 0;
-
-		int layer = 0;
 
 		struct moveStruct {
 			int pixelIncrement = 2;
@@ -327,7 +325,6 @@ namespace game {
 		void move();
 		void idleAnimation();
 		void jump();
-		//void jumpOnTile();
 		void jumpOnCollidableObject();
 
 	private:
