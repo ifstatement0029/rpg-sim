@@ -742,9 +742,8 @@ bool checkCollisionWithCollidableObject(areaStruct gridArea, int gridLayer) {
 		for (int collidableObjectGridAreaXCnt = collidableObjectGridArea.x; collidableObjectGridAreaXCnt < collidableObjectGridArea.x + collidableObjectGridArea.w; ++collidableObjectGridAreaXCnt) {
 			for (int collidableObjectGridAreaYCnt = collidableObjectGridArea.y; collidableObjectGridAreaYCnt < collidableObjectGridArea.y + collidableObjectGridArea.h; ++collidableObjectGridAreaYCnt) {
 
-				//Only check bottom two rows of tiles
 				for (int gridAreaXCnt = gridArea.x; gridAreaXCnt < gridArea.x + gridArea.w; ++gridAreaXCnt) {
-					for (int gridAreaYCnt = gridArea.y + gridArea.h - 2; gridAreaYCnt < gridArea.y + gridArea.h; ++gridAreaYCnt) {
+					for (int gridAreaYCnt = gridArea.y; gridAreaYCnt < gridArea.y + gridArea.h; ++gridAreaYCnt) {
 
 						if (collidableObjectGridAreaXCnt == gridAreaXCnt && collidableObjectGridAreaYCnt == gridAreaYCnt) {
 							return true;
@@ -768,9 +767,8 @@ bool checkCollisionWithCollidableObjectFactoringHeight(areaStruct gridArea, int 
 			for (int collidableObjectGridAreaXCnt = collidableObjectGridArea.x; collidableObjectGridAreaXCnt < collidableObjectGridArea.x + collidableObjectGridArea.w; ++collidableObjectGridAreaXCnt) {
 				for (int collidableObjectGridAreaYCnt = collidableObjectGridArea.y; collidableObjectGridAreaYCnt < collidableObjectGridArea.y + collidableObjectGridArea.h; ++collidableObjectGridAreaYCnt) {
 
-					//Only check bottom two rows of tiles
 					for (int gridAreaXCnt = gridArea.x; gridAreaXCnt < gridArea.x + gridArea.w; ++gridAreaXCnt) {
-						for (int gridAreaYCnt = gridArea.y + gridArea.h - 2; gridAreaYCnt < gridArea.y + gridArea.h; ++gridAreaYCnt) {
+						for (int gridAreaYCnt = gridArea.y; gridAreaYCnt < gridArea.y + gridArea.h; ++gridAreaYCnt) {
 
 							if (collidableObjectGridAreaXCnt == gridAreaXCnt && collidableObjectGridAreaYCnt == gridAreaYCnt) {
 								return true;
@@ -1601,7 +1599,7 @@ void initCharacters() {
 		currentCharacterParams.ID = characterID;
 		++characterID;
 
-		currentCharacterParams.position = { 189, 61 };
+		currentCharacterParams.position = { 191, 193 };
 		currentCharacterParams.groundPosition = currentCharacterParams.position;
 		currentCharacterParams.size = { tileSize.w * 4, tileSize.h * 4 };
 
@@ -3327,7 +3325,7 @@ void Character::move() {
 			if (params.jump.jumping == false) {
 				swapFrame();
 			}
-			centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
+			//centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
 		}
 
 		//Reset 
@@ -3423,7 +3421,7 @@ void Character::jumpOnCollidableObject() {
 	for (int collidableObjectsCnt = 0; collidableObjectsCnt < (int)collidableObjects.size(); ++collidableObjectsCnt) {
 		
 		//If character is on top of object
-		if (checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.jump.currentHeight + params.size.h - tileSize.h, params.size.w, params.size.h }), params.layer) == true) {
+		if (checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.jump.currentHeight + params.size.h, params.size.w, params.size.h }), params.layer) == true) {
 			if (params.jump.direction == directionEnum::down && params.jump.currentHeight > 0 && params.jump.currentHeight <= collidableObjects[collidableObjectsCnt].height) {
 
 				//Stop jumping
@@ -3540,9 +3538,9 @@ int main(int argc, char* args[]) {
 				characterActions();
 
 				//Centre camera on controlled character
-				/*XYStruct characterPosition = characters[controlledCharacterIndex].getPosition();
+				XYStruct characterPosition = characters[controlledCharacterIndex].getPosition();
 				WHStruct characterSize = characters[controlledCharacterIndex].getSize();
-				centreCamera({ characterPosition.x, characterPosition.y, characterSize.w, characterSize.h }, characters[controlledCharacterIndex].getLayer());*/
+				centreCamera({ characterPosition.x, characterPosition.y, characterSize.w, characterSize.h }, characters[controlledCharacterIndex].getLayer());
 
 				//Render
 				renderBackgroundCharactersAndObjects();
