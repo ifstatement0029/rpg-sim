@@ -3433,7 +3433,7 @@ void Character::jumpOnCollidableObject() {
 	for (int collidableObjectsCnt = 0; collidableObjectsCnt < (int)collidableObjects.size(); ++collidableObjectsCnt) {
 		
 		//If character is on top of object
-		if (checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.jump.currentHeight + params.size.h, params.size.w, params.size.h }), params.layer) == true) {
+		if (checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer) == true) {
 			if (params.jump.direction == directionEnum::down && params.jump.currentHeight > 0 && params.jump.currentHeight <= collidableObjects[collidableObjectsCnt].height) {
 
 				//Stop jumping
