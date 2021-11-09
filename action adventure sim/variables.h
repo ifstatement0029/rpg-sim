@@ -306,7 +306,7 @@ namespace game {
 		} idleAnimation;
 
 		struct jumpStruct {
-			bool jumping = false;
+			bool jumping = false, onObject = false;
 			int currentHeight = 0, maxHeight = -1, addedMaxHeight = 0, pixelIncrement = 2;
 			delayStruct move = { 0, 1 }, jumpButtonPress = { 0, 100 };
 			directionEnum direction = directionEnum::up;
@@ -327,6 +327,7 @@ namespace game {
 		void idleAnimation();
 		void jump();
 		void jumpOnCollidableObject();
+		void jumpOnTile();
 
 	private:
 		characterParams params;

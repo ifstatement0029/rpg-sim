@@ -1636,7 +1636,7 @@ void initCharacters() {
 		currentCharacterParams.layer = 1;
 
 		//Init jump
-		currentCharacterParams.jump.maxHeight = currentCharacterParams.size.h / 2;
+		//currentCharacterParams.jump.maxHeight = currentCharacterParams.size.h / 2;
 
 		Character currentCharacter(currentCharacterParams);
 		characters.push_back(currentCharacter);
@@ -3218,7 +3218,11 @@ void Character::render() {
 	//Render shadow
 	WHStruct shadowSize = { params.size.w, params.size.h / 5 };
 	XYStruct shadowPosition = { params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h };
-	renderShadow({ shadowPosition.x, shadowPosition.y, shadowSize.w, shadowSize.h }, 50);
+	int shadowHeight = 0;
+	if (params.jump.onObject == true) {
+		shadowHeight = params.jump.currentHeight;
+	}
+	renderShadow({ shadowPosition.x, shadowPosition.y - shadowHeight, shadowSize.w, shadowSize.h }, 50);
 	
 	//Render character
 	SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
@@ -3381,6 +3385,7 @@ void Character::jump() {
 		params.jump.move.startTicks = SDL_GetTicks();
 		params.jump.direction = directionEnum::up;
 		params.jump.jumpButtonPress.startTicks = SDL_GetTicks();
+		params.jump.maxHeight = (params.size.h / 2) + params.jump.currentHeight;
 	}
 
 	//If A is pressed for longer the character jumps higher
@@ -3430,7 +3435,8 @@ void Character::jump() {
 void Character::jumpOnCollidableObject() {
 
 	//Check if character in collision with jumpable object
-	bool characterOnObject = false, collidedWithObject = false;
+	params.jump.onObject = false;
+	bool collidedWithObject = false;
 	for (int collidableObjectsCnt = 0; collidableObjectsCnt < (int)collidableObjects.size(); ++collidableObjectsCnt) {
 		
 		//If character is on top of object
@@ -3441,7 +3447,7 @@ void Character::jumpOnCollidableObject() {
 				params.jump.jumping = false;
 
 				params.jump.currentHeight = collidableObjects[collidableObjectsCnt].height;
-				characterOnObject = true;
+				params.jump.onObject = true;
 				break;
 			}
 			else {
@@ -3452,10 +3458,14 @@ void Character::jumpOnCollidableObject() {
 	}
 
 	//Fall
-	if (characterOnObject == false && params.jump.jumping == false && params.jump.currentHeight > 0 && collidedWithObject == false) {
+	if (params.jump.onObject == false && params.jump.jumping == false && params.jump.currentHeight > 0 && collidedWithObject == false) {
 		params.jump.jumping = true;
 	}
 
+}
+
+void Character::jumpOnTile() {
+	--;;
 }
 
 Table::Table(tableParamsStruct newParams) {
