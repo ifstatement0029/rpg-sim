@@ -1514,6 +1514,7 @@ void initTables(int layer) {
 		areaStruct gridArea = alignPixelAreaToGrid({ randInt(0, camera.area.w), randInt(0, camera.area.h), tileSize.w * 3, tileSize.h * 2 });
 		newTableParams.position = { gridArea.x, gridArea.y };
 		newTableParams.size = { gridArea.w, gridArea.h };
+		newTableParams.height = newTableParams.size.h / 2;
 		newTableParams.spriteSheetIndex = getSpriteSheetIndex("table");
 		newTableParams.spriteSRect = { 0, 0, 24, 16 };
 		Table newTable(newTableParams);
@@ -1522,7 +1523,7 @@ void initTables(int layer) {
 		//Init collidable object
 		collidableObjectStruct currentCollidableObject;
 		currentCollidableObject.area = { newTableParams.position.x, newTableParams.position.y, newTableParams.size.w, newTableParams.size.h };
-		currentCollidableObject.height = currentCollidableObject.area.h / 2;
+		currentCollidableObject.height = newTableParams.height;
 		areaStruct currentJumpableObjectGridArea = getGridAreaFromPixelArea(currentCollidableObject.area);
 		collidableObjects.push_back(currentCollidableObject);
 
@@ -2483,6 +2484,10 @@ bool compareRenderOrderStructByY(const renderOrderStruct& renderOrderA, const re
 	return renderOrderA.position.y < renderOrderB.position.y;
 }
 
+bool compareRenderOrderStructByHeight(const renderOrderStruct& renderOrderA, const renderOrderStruct& renderOrderB) {
+	return renderOrderA.height < renderOrderB.height;
+}
+
 bool compareRenderOrderStructByLayerNum(const renderOrderStruct& renderOrderA, const renderOrderStruct& renderOrderB) {
 	return renderOrderA.layerIndex < renderOrderB.layerIndex;
 }
@@ -2501,6 +2506,7 @@ void renderBackgroundCharactersAndObjects() {
 		currentRenderOrderStruct.layerIndex = characters[charactersCnt].getLayer();
 		currentRenderOrderStruct.index = charactersCnt;
 		currentRenderOrderStruct.position = characters[charactersCnt].getPosition();
+		currentRenderOrderStruct.height = characters[charactersCnt].getCurrentHeight();
 
 		renderOrder.push_back(currentRenderOrderStruct);
 	}
@@ -2513,6 +2519,7 @@ void renderBackgroundCharactersAndObjects() {
 		currentRenderOrderStruct.layerIndex = tables[tablesCnt].getLayer();
 		currentRenderOrderStruct.index = tablesCnt;
 		currentRenderOrderStruct.position = tables[tablesCnt].getPosition();
+		//currentRenderOrderStruct.height = tables[tablesCnt].getHeight(); //height of non-character needs to be 0 so character can appear on top of them if jumped on them
 
 		renderOrder.push_back(currentRenderOrderStruct);
 	}
@@ -2521,6 +2528,7 @@ void renderBackgroundCharactersAndObjects() {
 	if ((int)renderOrder.size() > 0) {
 		sort(renderOrder.begin(), renderOrder.end(), compareRenderOrderStructByX);
 		sort(renderOrder.begin(), renderOrder.end(), compareRenderOrderStructByY);
+		sort(renderOrder.begin(), renderOrder.end(), compareRenderOrderStructByHeight);
 		sort(renderOrder.begin(), renderOrder.end(), compareRenderOrderStructByLayerNum);
 	}
 
@@ -3200,6 +3208,10 @@ WHStruct Character::getSize() {
 	return params.size;
 }
 
+int Character::getCurrentHeight() {
+	return params.jump.currentHeight;
+}
+
 void Character::render() {
 	
 	//Render shadow
@@ -3461,6 +3473,10 @@ int Table::getLayer() {
 
 XYStruct Table::getPosition() {
 	return params.position;
+}
+
+int Table::getHeight() {
+	return params.height;
 }
 
 //class functions end

@@ -154,7 +154,7 @@ namespace game {
 
 	struct renderOrderStruct {
 		enum class typeEnum { character, table } type = typeEnum::character;
-		int layerIndex = -1, index = -1;
+		int layerIndex = -1, index = -1, height = 0;
 		XYStruct position = { -1, -1 };
 	};
 
@@ -320,6 +320,7 @@ namespace game {
 		int getLayer();
 		XYStruct getPosition();
 		WHStruct getSize();
+		int getCurrentHeight();
 		
 		void render();
 		void move();
@@ -340,6 +341,7 @@ namespace game {
 
 		XYStruct position = { -1, -1 };
 		WHStruct size = { -1, -1 };
+		int height = -1;
 
 		int spriteSheetIndex = -1;
 		SDL_Rect spriteSRect;
@@ -351,6 +353,7 @@ namespace game {
 
 		int getLayer();
 		XYStruct getPosition();
+		int getHeight();
 
 		void render();
 	
