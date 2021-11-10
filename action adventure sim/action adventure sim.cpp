@@ -735,6 +735,25 @@ collisionDataStruct checkCollisionWithOverworldGrid(areaStruct gridArea, int gri
 	return collisionData;
 }
 
+collisionDataStruct checkCollisionWithOverworldGridFactoringHeight(areaStruct gridArea, int gridLayer, int height) {
+	collisionDataStruct collisionData;
+
+	for (int areaXCnt = gridArea.x; areaXCnt < gridArea.x + gridArea.w; ++areaXCnt) {
+		for (int areaYCnt = gridArea.y; areaYCnt < gridArea.y + gridArea.h; ++areaYCnt) {
+
+			if (gridLayer < (int)overworldGrid.gridTile.size() && areaXCnt < (int)overworldGrid.gridTile[gridLayer].size() && areaYCnt < (int)overworldGrid.gridTile[gridLayer][areaXCnt].size() && overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].collidable == true && height < overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].height) {
+				collisionData.collision = true;
+				collisionData.tileHitGridPosition = { areaXCnt, areaYCnt };
+
+				return collisionData;
+			}
+
+		}
+	}
+
+	return collisionData;
+}
+
 bool checkCollisionWithCollidableObject(areaStruct gridArea, int gridLayer) {
 	for (int collidableObjectsCnt = 0; collidableObjectsCnt < (int)collidableObjects.size(); ++collidableObjectsCnt) {
 		areaStruct collidableObjectGridArea = getGridAreaFromPixelArea(collidableObjects[collidableObjectsCnt].area);
@@ -1576,19 +1595,18 @@ void initLevel() {
 	}
 
 	//Tables (tiles)
-	//WHStruct tableSpriteSize = { 24, 16 };
-	//vector<tileStruct> newTiles = convertSpriteToTiles(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
-	//addNewTilesToTiles(tiles, newTiles);
-	//vector<vector<tileStruct>> tilesMatrix = convertSpriteToTilesMatrix(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
-	//for (int tablesCnt = 0; tablesCnt < randInt(2, 4); ++tablesCnt) {
-	//	//XYStruct position = { lround((float)randInt(0, (int)overworldGrid.gridTile[1].size() - 1) / tileSize.w), lround((float)randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1) / tileSize.h) };
-	//	XYStruct position = { lround((float)randInt(camera.area.x, camera.area.x + camera.area.w - 1) / tileSize.w), lround((float)randInt(camera.area.y, camera.area.y + camera.area.h - 1) / tileSize.h) };
-	//	
-	//	insertTilesInOverworldGrid(position, tilesMatrix, 1, tableSpriteSize.h / 2, true, true);
-	//}
+	WHStruct tableSpriteSize = { 24, 16 };
+	vector<tileStruct> newTiles = convertSpriteToTiles(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
+	addNewTilesToTiles(tiles, newTiles);
+	vector<vector<tileStruct>> tilesMatrix = convertSpriteToTilesMatrix(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
+	for (int tablesCnt = 0; tablesCnt < randInt(2, 4); ++tablesCnt) {
+		//XYStruct position = { lround((float)randInt(0, (int)overworldGrid.gridTile[1].size() - 1) / tileSize.w), lround((float)randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1) / tileSize.h) };
+		XYStruct position = { lround((float)randInt(camera.area.x, camera.area.x + camera.area.w - 1) / tileSize.w), lround((float)randInt(camera.area.y, camera.area.y + camera.area.h - 1) / tileSize.h) };
+		
+		insertTilesInOverworldGrid(position, tilesMatrix, 1, tableSpriteSize.h / 2, true, true);
+	}
 
-	initTables(1);
-
+	//initTables(1);
 }
 
 void initCharacters() {
@@ -3262,7 +3280,7 @@ void Character::move() {
 			params.direction = directionEnum::left;
 			params.position.x -= params.move.pixelIncrement;
 
-			collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer);
+			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer, --;;);
 			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.x = tilePixelPosition.x + tileSize.w;*/
@@ -3465,7 +3483,7 @@ void Character::jumpOnCollidableObject() {
 }
 
 void Character::jumpOnTile() {
-	--;;
+	//--;;
 }
 
 Table::Table(tableParamsStruct newParams) {
