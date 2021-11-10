@@ -115,7 +115,7 @@ namespace game {
 	bool loadLevel = false;
 
 	struct gridTileStruct {
-		int tileIndex = -1, height = -1;
+		int tileIndex = -1, height = 0;
 		bool collidable = false, jumpable = false;
 	};
 
