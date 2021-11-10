@@ -16,10 +16,11 @@ walk - done
 run - done
 idle - done
 jump - done
-jump on tile - ;;
+jump on tile - done
 jump on jumpable object - done
 need to allow character to jump from top of object - done
 collide with walls - done
+when jumping down from an object/tile, shadow is not reset under character - ;;
 
 augmentations:
 

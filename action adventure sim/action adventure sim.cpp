@@ -3192,6 +3192,7 @@ void characterActions() {
 		characters[charactersCnt].idleAnimation();
 		characters[charactersCnt].jump();
 		characters[charactersCnt].jumpOnCollidableObject();
+		characters[charactersCnt].jumpOnTile();
 	}
 }
 
@@ -3236,11 +3237,7 @@ void Character::render() {
 	//Render shadow
 	WHStruct shadowSize = { params.size.w, params.size.h / 5 };
 	XYStruct shadowPosition = { params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h };
-	int shadowHeight = 0;
-	if (params.jump.onObject == true) {
-		shadowHeight = params.jump.currentHeight;
-	}
-	renderShadow({ shadowPosition.x, shadowPosition.y - shadowHeight, shadowSize.w, shadowSize.h }, 50);
+	renderShadow({ shadowPosition.x, shadowPosition.y - params.shadowHeight, shadowSize.w, shadowSize.h }, 50);
 	
 	//Render character
 	SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
@@ -3280,7 +3277,7 @@ void Character::move() {
 			params.direction = directionEnum::left;
 			params.position.x -= params.move.pixelIncrement;
 
-			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer, params.jump.currentHeight);
+			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight);
 			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.x = tilePixelPosition.x + tileSize.w;*/
@@ -3295,7 +3292,7 @@ void Character::move() {
 			params.direction = directionEnum::right;
 			params.position.x += params.move.pixelIncrement;
 
-			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer, params.jump.currentHeight);
+			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight);
 			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.x = tilePixelPosition.x - params.size.w;*/
@@ -3310,7 +3307,7 @@ void Character::move() {
 			params.direction = directionEnum::up;
 			params.position.y -= params.move.pixelIncrement;
 			
-			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer, params.jump.currentHeight);
+			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight);
 			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.y = tilePixelPosition.y + tileSize.h;*/
@@ -3325,7 +3322,7 @@ void Character::move() {
 			params.direction = directionEnum::down;
 			params.position.y += params.move.pixelIncrement;
 			
-			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y, params.size.w, params.size.h }), params.layer, params.jump.currentHeight);
+			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight);
 			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
 				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 				params.position.y = tilePixelPosition.y - params.size.h;*/
@@ -3451,39 +3448,70 @@ void Character::jump() {
 }
 
 void Character::jumpOnCollidableObject() {
+	if (params.jump.onTileObject == false) {
 
-	//Check if character in collision with jumpable object
-	params.jump.onObject = false;
-	bool collidedWithObject = false;
-	for (int collidableObjectsCnt = 0; collidableObjectsCnt < (int)collidableObjects.size(); ++collidableObjectsCnt) {
-		
-		//If character is on top of object
-		if (checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer) == true) {
-			if (params.jump.direction == directionEnum::down && params.jump.currentHeight > 0 && params.jump.currentHeight <= collidableObjects[collidableObjectsCnt].height) {
+		//Check if character in collision with jumpable object
+		params.jump.onObject = false;
+		bool collidedWithObject = false;
+		for (int collidableObjectsCnt = 0; collidableObjectsCnt < (int)collidableObjects.size(); ++collidableObjectsCnt) {
+
+			//If character is on top of object
+			if (checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer) == true) {
+				if (params.jump.direction == directionEnum::down && params.jump.currentHeight > 0 && params.jump.currentHeight <= collidableObjects[collidableObjectsCnt].height) {
+
+					//Stop jumping
+					params.jump.jumping = false;
+
+					params.jump.currentHeight = collidableObjects[collidableObjectsCnt].height;
+					params.jump.onObject = true;
+					params.shadowHeight = params.jump.currentHeight;
+					break;
+				}
+				else {
+					collidedWithObject = true;
+				}
+			}
+
+		}
+
+		//Fall
+		if (params.jump.onObject == false && params.jump.jumping == false && params.jump.currentHeight > 0 && collidedWithObject == false) {
+			params.jump.jumping = true;
+			params.shadowHeight = 0;
+		}
+
+	}
+}
+
+void Character::jumpOnTile() {
+	if (params.jump.onObject == false) {
+
+		//If character in collision with tile object and on top of object
+		params.jump.onTileObject = false;
+		bool collidedWithObject = false;
+		collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer);
+		if (collisionData.collision == true) {
+			if (params.jump.direction == directionEnum::down && params.jump.currentHeight > 0 && params.jump.currentHeight <= overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].height) {
 
 				//Stop jumping
 				params.jump.jumping = false;
 
-				params.jump.currentHeight = collidableObjects[collidableObjectsCnt].height;
-				params.jump.onObject = true;
-				break;
+				params.jump.currentHeight = overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].height;
+				params.jump.onTileObject = true;
+				params.shadowHeight = params.jump.currentHeight;
 			}
 			else {
 				collidedWithObject = true;
 			}
 		}
 
+		//Fall
+		if (params.jump.onTileObject == false && params.jump.jumping == false && params.jump.currentHeight > 0 && collidedWithObject == false) {
+			params.jump.jumping = true;
+			params.shadowHeight = 0;
+		}
+
 	}
-
-	//Fall
-	if (params.jump.onObject == false && params.jump.jumping == false && params.jump.currentHeight > 0 && collidedWithObject == false) {
-		params.jump.jumping = true;
-	}
-
-}
-
-void Character::jumpOnTile() {
-	--;;
 }
 
 Table::Table(tableParamsStruct newParams) {

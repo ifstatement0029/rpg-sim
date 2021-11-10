@@ -288,7 +288,7 @@ namespace game {
 
 		XYStruct position = { -1, -1 }, groundPosition = { -1, -1 };
 		WHStruct size = { -1, -1 };
-		int layer = 0;
+		int layer = 0, shadowHeight = 0;
 		
 		spritesStruct sprites;
 
@@ -306,7 +306,7 @@ namespace game {
 		} idleAnimation;
 
 		struct jumpStruct {
-			bool jumping = false, onObject = false;
+			bool jumping = false, onObject = false, onTileObject = false;
 			int currentHeight = 0, maxHeight = -1, addedMaxHeight = 0, pixelIncrement = 2;
 			delayStruct move = { 0, 1 }, jumpButtonPress = { 0, 100 };
 			directionEnum direction = directionEnum::up;
