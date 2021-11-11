@@ -1595,18 +1595,18 @@ void initLevel() {
 	}
 
 	//Tables (tiles)
-	WHStruct tableSpriteSize = { 24, 16 };
-	vector<tileStruct> newTiles = convertSpriteToTiles(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
-	addNewTilesToTiles(tiles, newTiles);
-	vector<vector<tileStruct>> tilesMatrix = convertSpriteToTilesMatrix(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
-	for (int tablesCnt = 0; tablesCnt < randInt(2, 4); ++tablesCnt) {
-		//XYStruct position = { lround((float)randInt(0, (int)overworldGrid.gridTile[1].size() - 1) / tileSize.w), lround((float)randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1) / tileSize.h) };
-		XYStruct position = { lround((float)randInt(camera.area.x, camera.area.x + camera.area.w - 1) / tileSize.w), lround((float)randInt(camera.area.y, camera.area.y + camera.area.h - 1) / tileSize.h) };
-		
-		insertTilesInOverworldGrid(position, tilesMatrix, 1, tableSpriteSize.h / 2, true, true);
-	}
+	//WHStruct tableSpriteSize = { 24, 16 };
+	//vector<tileStruct> newTiles = convertSpriteToTiles(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
+	//addNewTilesToTiles(tiles, newTiles);
+	//vector<vector<tileStruct>> tilesMatrix = convertSpriteToTilesMatrix(getSpriteSheetIndex("table"), { 0, 0, tableSpriteSize.w, tableSpriteSize.h }, "table");
+	//for (int tablesCnt = 0; tablesCnt < randInt(2, 4); ++tablesCnt) {
+	//	//XYStruct position = { lround((float)randInt(0, (int)overworldGrid.gridTile[1].size() - 1) / tileSize.w), lround((float)randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1) / tileSize.h) };
+	//	XYStruct position = { lround((float)randInt(camera.area.x, camera.area.x + camera.area.w - 1) / tileSize.w), lround((float)randInt(camera.area.y, camera.area.y + camera.area.h - 1) / tileSize.h) };
+	//	
+	//	insertTilesInOverworldGrid(position, tilesMatrix, 1, tableSpriteSize.h / 2, true, true);
+	//}
 
-	//initTables(1);
+	initTables(1);
 }
 
 void initCharacters() {
@@ -3472,6 +3472,11 @@ void Character::jumpOnCollidableObject() {
 				}
 			}
 
+			//Set shadow height to 0 if no collision with tile object underneath character
+			if (checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2) + params.jump.currentHeight, params.size.w, params.size.h / 2 }), params.layer) == false && params.shadowHeight > 0) {
+				params.shadowHeight = 0;
+			}
+
 		}
 
 		//Fall
@@ -3508,6 +3513,12 @@ void Character::jumpOnTile() {
 		//Fall
 		if (params.jump.onTileObject == false && params.jump.jumping == false && params.jump.currentHeight > 0 && collidedWithObject == false) {
 			params.jump.jumping = true;
+			params.shadowHeight = 0;
+		}
+
+		//Set shadow height to 0 if no collision with tile object underneath character
+		collisionDataStruct underCharacterCollisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2) + params.jump.currentHeight, params.size.w, params.size.h / 2 }), params.layer);
+		if (underCharacterCollisionData.collision == false && params.shadowHeight > 0) {
 			params.shadowHeight = 0;
 		}
 
