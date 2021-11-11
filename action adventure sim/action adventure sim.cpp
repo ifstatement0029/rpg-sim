@@ -741,9 +741,11 @@ collisionDataStruct checkCollisionWithOverworldGridFactoringHeight(areaStruct gr
 	for (int areaXCnt = gridArea.x; areaXCnt < gridArea.x + gridArea.w; ++areaXCnt) {
 		for (int areaYCnt = gridArea.y; areaYCnt < gridArea.y + gridArea.h; ++areaYCnt) {
 
-			if (gridLayer < (int)overworldGrid.gridTile.size() && areaXCnt < (int)overworldGrid.gridTile[gridLayer].size() && areaYCnt < (int)overworldGrid.gridTile[gridLayer][areaXCnt].size() && overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].collidable == true && height < overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].height) {
-				collisionData.collision = true;
-				collisionData.tileHitGridPosition = { areaXCnt, areaYCnt };
+			if (gridLayer < (int)overworldGrid.gridTile.size() && areaXCnt < (int)overworldGrid.gridTile[gridLayer].size() && areaYCnt < (int)overworldGrid.gridTile[gridLayer][areaXCnt].size() && overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].collidable == true) {
+				if ((overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].jumpable == true && height < overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].height) || overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].jumpable == false) {
+					collisionData.collision = true;
+					collisionData.tileHitGridPosition = { areaXCnt, areaYCnt };
+				}
 
 				return collisionData;
 			}
@@ -1583,7 +1585,8 @@ void initLevel() {
 	//Floor
 	for (int gridXCnt = 0; gridXCnt < (int)overworldGrid.gridTile[overworldGrid.groundLayerIndex].size(); ++gridXCnt) {
 		for (int gridYCnt = 0; gridYCnt < (int)overworldGrid.gridTile[overworldGrid.groundLayerIndex][gridXCnt].size(); ++gridYCnt) {
-			overworldGrid.gridTile[overworldGrid.groundLayerIndex][gridXCnt][gridYCnt] = { getTileIndex("concrete floor"), false };
+			overworldGrid.gridTile[overworldGrid.groundLayerIndex][gridXCnt][gridYCnt].tileIndex = getTileIndex("concrete floor");
+			overworldGrid.gridTile[overworldGrid.groundLayerIndex][gridXCnt][gridYCnt].collidable = false;
 		}
 	}
 

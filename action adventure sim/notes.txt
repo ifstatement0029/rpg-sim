@@ -20,10 +20,13 @@ jump on tile - done
 jump on jumpable object - done
 need to allow character to jump from top of object - done
 collide with walls - done
-when jumping down from an object/tile, shadow is not reset under character - ;;
 
-augmentations:
-
+cybernetics:
+characters can replace limbs, torso and head with cybernetic counterparts
+head cybernetics: 
+torso cybernetics:
+arms cybernetics:
+legs cybernetics:
 
 weapons:
 
@@ -49,6 +52,6 @@ modding:
 
 
 cyberchair:
-character can sit in chair and all their limbs and head are spread from their torso
+character can sit in chair and all their cybernetic limbs and head are spread from their torso
 can replace/mod limbs, torso and head
 
