@@ -268,6 +268,9 @@ namespace game {
 	struct spritesStruct {
 		int spriteSheetIndex = -1;
 		vector<vector<areaStruct>> areas; //directions (up, down, left, right, upRight, downRight, downLeft, upLeft), frames
+		double angle = 0;
+		SDL_Point* center = NULL;
+		SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE;
 	};
 
 	struct shadowSpriteStruct {
@@ -301,7 +304,7 @@ namespace game {
 		} move;
 
 		struct idleAnimationStruct {
-			delayStruct delayBeforeAnimation = { SDL_GetTicks(), 5000 }, frameDuration = { 0, 0 };
+			delayStruct delayBeforeAnimation = { SDL_GetTicks(), 60000 }, frameDuration = { 0, 0 };
 			bool animationRunning = false;
 		} idleAnimation;
 
@@ -311,6 +314,13 @@ namespace game {
 			delayStruct move = { 0, 1 }, jumpButtonPress = { 0, 100 };
 			directionEnum direction = directionEnum::up;
 		} jump;
+
+		struct equippedWeaponStruct {
+			enum class weaponTypeEnum { ranged, melee } type = weaponTypeEnum::ranged;
+			XYStruct position = { -1, -1 };
+			WHStruct size = { -1, -1 };
+			spritesStruct sprite;
+		} equippedWeapon;
 	};
 
 	class Character {
@@ -323,6 +333,7 @@ namespace game {
 		int getCurrentHeight();
 		
 		void render();
+		void renderEquippedWeapon();
 		void move();
 		void idleAnimation();
 		void jump();

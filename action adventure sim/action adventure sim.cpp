@@ -1656,8 +1656,13 @@ void initCharacters() {
 
 		currentCharacterParams.layer = 1;
 
-		//Init jump
-		//currentCharacterParams.jump.maxHeight = currentCharacterParams.size.h / 2;
+		//Init equipped weapon
+		currentCharacterParams.equippedWeapon.type = characterParams::equippedWeaponStruct::weaponTypeEnum::ranged;
+		currentCharacterParams.equippedWeapon.size = { tileSize.w * 4, tileSize.h * 2 };
+		currentCharacterParams.equippedWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
+		vector<areaStruct> areas;
+		areas.push_back({ 2, 21, 21, 8 });
+		currentCharacterParams.equippedWeapon.sprite.areas.push_back(areas);
 
 		Character currentCharacter(currentCharacterParams);
 		characters.push_back(currentCharacter);
@@ -2603,6 +2608,7 @@ void renderBackgroundCharactersAndObjects() {
 					switch (renderOrder[renderOrderCnt].type) {
 						case renderOrderStruct::typeEnum::character: {
 							characters[renderOrder[renderOrderCnt].index].render();
+							characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
 							break;
 						}
 						case renderOrderStruct::typeEnum::table: {
@@ -3211,6 +3217,10 @@ void renderShadow(areaStruct area, int transparencyPercentage) {
 	SDL_RenderCopy(renderer, spriteSheets[shadowSprite.spriteSheetIndex].texture, &sRect, &dRect);
 }
 
+const double convertCoordinatesToAngle(int x, int y) {
+	return (atan2(y, x)) * (180 / M_PI);
+}
+
 //functions end
 
 //class functions start
@@ -3236,17 +3246,47 @@ int Character::getCurrentHeight() {
 }
 
 void Character::render() {
-	
+
 	//Render shadow
 	WHStruct shadowSize = { params.size.w, params.size.h / 5 };
 	XYStruct shadowPosition = { params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h };
-	renderShadow({ shadowPosition.x, shadowPosition.y - params.shadowHeight, shadowSize.w, shadowSize.h }, 50);
+	areaStruct shadowArea = { shadowPosition.x, shadowPosition.y - params.shadowHeight, shadowSize.w, shadowSize.h };
+	if (areaWithinCameraView(shadowArea) == true) {
+		renderShadow(shadowArea, 50);
+	}
 	
 	//Render character
 	SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
 	SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h };
-	SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
+	if (areaWithinCameraView({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }) == true) {
+		SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
+	}
 
+}
+
+void Character::renderEquippedWeapon() {
+	switch (params.equippedWeapon.type) {
+		case characterParams::equippedWeaponStruct::weaponTypeEnum::ranged: {
+			params.equippedWeapon.position = { params.position.x, params.position.y + (params.size.h / 2) - (params.equippedWeapon.sprite.areas[0][0].h / 2) };
+			params.equippedWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+			printInt(params.equippedWeapon.sprite.angle);
+			//-90 - 90: right
+			//else: left
+			params.equippedWeapon.sprite.flip = --;;
+
+			SDL_Rect sRect = convertAreaToSDLRect(params.equippedWeapon.sprite.areas[0][0]);
+			SDL_Rect dRect = { params.equippedWeapon.position.x - camera.area.x, params.equippedWeapon.position.y - camera.area.y, params.equippedWeapon.size.w, params.equippedWeapon.size.h };
+			
+			if (areaWithinCameraView({ params.equippedWeapon.position.x, params.equippedWeapon.position.y, params.equippedWeapon.size.w, params.equippedWeapon.size.h }) == true) {
+				SDL_RenderCopyEx(renderer, spriteSheets[params.equippedWeapon.sprite.spriteSheetIndex].texture, &sRect, &dRect, params.equippedWeapon.sprite.angle, params.equippedWeapon.sprite.center, params.equippedWeapon.sprite.flip);
+			}
+			break;
+		}
+		case characterParams::equippedWeaponStruct::weaponTypeEnum::melee: {
+
+			break;
+		}
+	}
 }
 
 void Character::swapFrame() {
@@ -3535,7 +3575,10 @@ Table::Table(tableParamsStruct newParams) {
 void Table::render() {
 	SDL_Rect sRect = params.spriteSRect;
 	SDL_Rect dRect = convertAreaToSDLRect({ params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h });
-	SDL_RenderCopy(renderer, spriteSheets[params.spriteSheetIndex].texture, &sRect, &dRect);
+
+	if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h }) == true) {
+		SDL_RenderCopy(renderer, spriteSheets[params.spriteSheetIndex].texture, &sRect, &dRect);
+	}
 }
 
 int Table::getLayer() {

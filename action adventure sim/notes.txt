@@ -29,7 +29,9 @@ arms cybernetics:
 legs cybernetics:
 
 weapons:
-
+ranged weapon:
+	- can aim 360 degrees - ;;
+melee weapon: 
 
 gear:
 
