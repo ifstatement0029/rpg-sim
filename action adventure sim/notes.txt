@@ -30,7 +30,11 @@ legs cybernetics:
 
 weapons:
 ranged weapon:
-	- can aim 360 degrees - ;;
+	- can aim 360 degrees - done
+	- can shoot bullets with different modes
+		- semi auto (one shot) - ;;
+		- burst (a few shots at a time)
+		- full auto (continuous shots)
 melee weapon: 
 
 gear:

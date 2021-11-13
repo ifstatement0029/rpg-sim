@@ -315,11 +315,16 @@ namespace game {
 			directionEnum direction = directionEnum::up;
 		} jump;
 
-		struct equippedWeaponStruct {
+		struct weaponStruct {
 			enum class weaponTypeEnum { ranged, melee } type = weaponTypeEnum::ranged;
 			XYStruct position = { -1, -1 };
 			WHStruct size = { -1, -1 };
 			spritesStruct sprite;
+			enum class fireModeEnum { semiAuto, burst, fullAuto } fireMode = characterParams::weaponStruct::fireModeEnum::semiAuto;
+			struct magazineStruct {
+				string ammoName = "";
+				int capacity = 20, currentLoad = 10;
+			} magazine;
 		} equippedWeapon;
 	};
 
@@ -331,6 +336,7 @@ namespace game {
 		XYStruct getPosition();
 		WHStruct getSize();
 		int getCurrentHeight();
+		directionEnum getDirection();
 		
 		void render();
 		void renderEquippedWeapon();

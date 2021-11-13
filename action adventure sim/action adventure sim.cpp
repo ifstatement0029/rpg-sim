@@ -1657,11 +1657,12 @@ void initCharacters() {
 		currentCharacterParams.layer = 1;
 
 		//Init equipped weapon
-		currentCharacterParams.equippedWeapon.type = characterParams::equippedWeaponStruct::weaponTypeEnum::ranged;
+		currentCharacterParams.equippedWeapon.type = characterParams::weaponStruct::weaponTypeEnum::ranged;
 		currentCharacterParams.equippedWeapon.size = { tileSize.w * 4, tileSize.h * 2 };
 		currentCharacterParams.equippedWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
 		vector<areaStruct> areas;
 		areas.push_back({ 2, 21, 21, 8 });
+		currentCharacterParams.equippedWeapon.magazine.ammoName = "Blank";
 		currentCharacterParams.equippedWeapon.sprite.areas.push_back(areas);
 
 		Character currentCharacter(currentCharacterParams);
@@ -2607,8 +2608,21 @@ void renderBackgroundCharactersAndObjects() {
 				if (renderOrder[renderOrderCnt].layerIndex == layersCnt) {
 					switch (renderOrder[renderOrderCnt].type) {
 						case renderOrderStruct::typeEnum::character: {
+
+							//If character is facing up then render weapon before character
+							directionEnum characterDirection = characters[renderOrder[renderOrderCnt].index].getDirection();
+							if (characterDirection == directionEnum::up || characterDirection == directionEnum::upLeft || characterDirection == directionEnum::upRight || characterDirection == directionEnum::left) {
+								characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
+							}
+							
+							//Render character
 							characters[renderOrder[renderOrderCnt].index].render();
-							characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
+							
+							//If character if facing down then render weapon after character
+							if (characterDirection == directionEnum::down || characterDirection == directionEnum::downLeft || characterDirection == directionEnum::downRight || characterDirection == directionEnum::right) {
+								characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
+							}
+							
 							break;
 						}
 						case renderOrderStruct::typeEnum::table: {
@@ -2629,6 +2643,13 @@ void renderBackgroundCharactersAndObjects() {
 	dRect = { 0, 0, preRenderTextureSize.w, preRenderTextureSize.h };
 	SDL_RenderCopy(renderer, preRenderTexture, &sRect, &dRect);
 	clearTexture(preRenderTexture, 0, 0, 0, 255);
+
+}
+
+void renderUI() {
+
+	//Render equipped weapon magazine
+	--;;
 
 }
 
@@ -3245,6 +3266,10 @@ int Character::getCurrentHeight() {
 	return params.jump.currentHeight;
 }
 
+directionEnum Character::getDirection() {
+	return params.direction;
+}
+
 void Character::render() {
 
 	//Render shadow
@@ -3266,7 +3291,7 @@ void Character::render() {
 
 void Character::renderEquippedWeapon() {
 	switch (params.equippedWeapon.type) {
-		case characterParams::equippedWeaponStruct::weaponTypeEnum::ranged: {
+		case characterParams::weaponStruct::weaponTypeEnum::ranged: {
 			params.equippedWeapon.position = { params.position.x, params.position.y + (params.size.h / 2) - (params.equippedWeapon.sprite.areas[0][0].h / 2) };
 
 			//Get weapon angle
@@ -3301,7 +3326,7 @@ void Character::renderEquippedWeapon() {
 			}
 			break;
 		}
-		case characterParams::equippedWeaponStruct::weaponTypeEnum::melee: {
+		case characterParams::weaponStruct::weaponTypeEnum::melee: {
 
 			break;
 		}
@@ -3723,6 +3748,7 @@ int main(int argc, char* args[]) {
 
 				//Render
 				renderBackgroundCharactersAndObjects();
+				renderUI();
 
 				//Menus
 				setSDLRenderTarget(NULL);
