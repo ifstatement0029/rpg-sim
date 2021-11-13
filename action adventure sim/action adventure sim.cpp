@@ -3268,11 +3268,30 @@ void Character::renderEquippedWeapon() {
 	switch (params.equippedWeapon.type) {
 		case characterParams::equippedWeaponStruct::weaponTypeEnum::ranged: {
 			params.equippedWeapon.position = { params.position.x, params.position.y + (params.size.h / 2) - (params.equippedWeapon.sprite.areas[0][0].h / 2) };
-			params.equippedWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
-			printInt(params.equippedWeapon.sprite.angle);
-			//-90 - 90: right
-			//else: left
-			params.equippedWeapon.sprite.flip = --;;
+
+			//Get weapon angle
+			if (rightStickXDir != 0 || rightStickYDir != 0) {
+				params.equippedWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+			}
+			else {
+				params.equippedWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+			}
+			
+			//Flip weapon and adjust position
+			if (params.equippedWeapon.sprite.angle >= -90 && params.equippedWeapon.sprite.angle <= 90) {
+				
+				//Weapon is facing right
+				params.equippedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+				params.equippedWeapon.position.x += params.size.w / 4;
+
+			}
+			else {
+
+				//Weapon is facing left
+				params.equippedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
+				params.equippedWeapon.position.x -= params.size.w / 4;
+
+			}
 
 			SDL_Rect sRect = convertAreaToSDLRect(params.equippedWeapon.sprite.areas[0][0]);
 			SDL_Rect dRect = { params.equippedWeapon.position.x - camera.area.x, params.equippedWeapon.position.y - camera.area.y, params.equippedWeapon.size.w, params.equippedWeapon.size.h };
@@ -3393,6 +3412,36 @@ void Character::move() {
 		//Up-left
 		if (yDir == -1 && xDir == -1) {
 			params.direction = directionEnum::upLeft;
+		}
+
+		//Face where weapon is aimed if aiming weapon
+		if (rightStickYDir != 0 || rightStickXDir != 0) {
+			int angle = (int)params.equippedWeapon.sprite.angle;
+			int selectionAngle = 45, halfSelectionAngle = selectionAngle / 2;
+			if (angle >= -90 - halfSelectionAngle && angle <= -90 + halfSelectionAngle) {
+				params.direction = directionEnum::up;
+			}
+			else if (angle >= 90 - halfSelectionAngle && angle <= 90 + halfSelectionAngle) {
+				params.direction = directionEnum::down;
+			}
+			else if ((angle >= -180 && angle <= -180 + halfSelectionAngle) || (angle >= 180 - halfSelectionAngle && angle <= 180)) {
+				params.direction = directionEnum::left;
+			}
+			else if (angle >= -halfSelectionAngle && angle <= halfSelectionAngle) {
+				params.direction = directionEnum::right;
+			}
+			else if (angle >= -90 - halfSelectionAngle - selectionAngle && angle <= -90 - halfSelectionAngle) {
+				params.direction = directionEnum::upLeft;
+			}
+			else if (angle >= -90 + halfSelectionAngle && angle <= -90 + halfSelectionAngle + selectionAngle) {
+				params.direction = directionEnum::upRight;
+			}
+			else if (angle >= 90 + halfSelectionAngle && angle <= 90 + halfSelectionAngle + selectionAngle) {
+				params.direction = directionEnum::downLeft;
+			}
+			else if (angle >= 90 - halfSelectionAngle - selectionAngle && angle <= 90 - halfSelectionAngle) {
+				params.direction = directionEnum::downRight;
+			}
 		}
 
 		//Swap frame and centre camera

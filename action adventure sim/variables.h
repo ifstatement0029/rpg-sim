@@ -356,7 +356,7 @@ namespace game {
 		int height = -1;
 
 		int spriteSheetIndex = -1;
-		SDL_Rect spriteSRect;
+		SDL_Rect spriteSRect = { -1, -1, -1, -1 };
 	};
 
 	class Table {
