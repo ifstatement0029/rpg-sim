@@ -2647,9 +2647,14 @@ void renderBackgroundCharactersAndObjects() {
 }
 
 void renderUI() {
+	setSDLRenderTarget(NULL);
+	setSDLLogicalSize(textLogicalSize);
 
-	//Render equipped weapon magazine
-	--;;
+	WHStruct textSize = getTextSize("Z", defaultFont);
+
+	//Render equipped weapon magazine ammo
+	characterParams::weaponStruct::magazineStruct magazine = characters[controlledCharacterIndex].getMagazine();
+	renderText(formatStr("{}/{}", { str(magazine.currentLoad), str(magazine.capacity) }), defaultFont, defaultColour, { 0, textLogicalSize.h - (textSize.h * 2) });
 
 }
 
@@ -3223,6 +3228,7 @@ void characterActions() {
 		characters[charactersCnt].jump();
 		characters[charactersCnt].jumpOnCollidableObject();
 		characters[charactersCnt].jumpOnTile();
+		characters[charactersCnt].useEquippedWeapon();
 	}
 }
 
@@ -3240,6 +3246,20 @@ void renderShadow(areaStruct area, int transparencyPercentage) {
 
 const double convertCoordinatesToAngle(int x, int y) {
 	return (atan2(y, x)) * (180 / M_PI);
+}
+
+vector<int> getBulletIDs() {
+	vector<int> bulletIDs;
+
+	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
+		bulletIDs.push_back(bullets[bulletsCnt].getID());
+	}
+
+	return bulletIDs;
+}
+
+void initBullet(bulletParamsStruct newParams) {
+	//--;;
 }
 
 //functions end
@@ -3268,6 +3288,10 @@ int Character::getCurrentHeight() {
 
 directionEnum Character::getDirection() {
 	return params.direction;
+}
+
+characterParams::weaponStruct::magazineStruct Character::getMagazine() {
+	return params.equippedWeapon.magazine;
 }
 
 void Character::render() {
@@ -3642,6 +3666,31 @@ void Character::jumpOnTile() {
 	}
 }
 
+void Character::useEquippedWeapon() {
+	if (controllerButtons.RB == true) {
+		if (params.equippedWeapon.fireMode == characterParams::weaponStruct::fireModeEnum::semiAuto) {
+			controllerButtons.RB = false;
+		}
+
+		switch (params.equippedWeapon.type) {
+		case characterParams::weaponStruct::weaponTypeEnum::ranged: {
+			
+			//Fire bullet
+			bulletParamsStruct bulletParams;
+			bulletParams.ID = getFreeID(getBulletIDs());
+			bulletParams.position = --;;
+			initBullet(bulletParams);
+
+			break;
+		}
+		case characterParams::weaponStruct::weaponTypeEnum::melee: {
+
+			break;
+		}
+		}
+	}
+}
+
 Table::Table(tableParamsStruct newParams) {
 	params = newParams;
 }
@@ -3665,6 +3714,14 @@ XYStruct Table::getPosition() {
 
 int Table::getHeight() {
 	return params.height;
+}
+
+Bullet::Bullet(bulletParamsStruct newParams) {
+	params = newParams;
+}
+
+int Bullet::getID() {
+	return params.ID;
 }
 
 //class functions end

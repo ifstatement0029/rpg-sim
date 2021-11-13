@@ -316,7 +316,7 @@ namespace game {
 		} jump;
 
 		struct weaponStruct {
-			enum class weaponTypeEnum { ranged, melee } type = weaponTypeEnum::ranged;
+			enum class weaponTypeEnum { ranged, melee } type = characterParams::weaponStruct::weaponTypeEnum::ranged;
 			XYStruct position = { -1, -1 };
 			WHStruct size = { -1, -1 };
 			spritesStruct sprite;
@@ -337,6 +337,7 @@ namespace game {
 		WHStruct getSize();
 		int getCurrentHeight();
 		directionEnum getDirection();
+		characterParams::weaponStruct::magazineStruct getMagazine();
 		
 		void render();
 		void renderEquippedWeapon();
@@ -345,6 +346,7 @@ namespace game {
 		void jump();
 		void jumpOnCollidableObject();
 		void jumpOnTile();
+		void useEquippedWeapon();
 
 	private:
 		characterParams params;
@@ -380,6 +382,27 @@ namespace game {
 	};
 
 	vector<Table> tables;
+
+	struct bulletParamsStruct {
+		int ID = -1;
+
+		XYStruct position = { -1, -1 };
+		WHStruct size = { -1, -1 };
+
+		spritesStruct sprite;
+	};
+
+	class Bullet {
+	public:
+		Bullet(bulletParamsStruct newParams);
+
+		int getID();
+
+	private:
+		bulletParamsStruct params;
+	};
+
+	vector<Bullet> bullets;
 
 	//classes end
 
