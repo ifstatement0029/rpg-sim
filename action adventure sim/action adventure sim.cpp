@@ -882,10 +882,10 @@ void initRegions() {
 }
 
 bool areaWithinGrid(areaStruct gridArea, int gridLayer) {
-	if (gridArea.x < 0 || gridArea.x + gridArea.w - 1 >(int)overworldGrid.gridTile[gridLayer].size() - 1 || gridArea.y < 0 || gridArea.y + gridArea.h - 1 >(int)overworldGrid.gridTile[gridLayer][gridArea.x].size() - 1) {
-		return false;
+	if (gridArea.x + gridArea.w - 1 >= 0 && gridArea.x <= (int)overworldGrid.gridTile[gridLayer].size() - 1 && gridArea.y + gridArea.h - 1 >= 0 && gridArea.y <= (int)overworldGrid.gridTile[gridLayer][gridArea.x].size() - 1) {
+		return true;
 	}
-	return true;
+	return false;
 }
 
 void initGameClock() {
@@ -3237,22 +3237,6 @@ void createMazeAndGetAStarPath(areaStruct startPixelArea, areaStruct endPixelAre
 
 }
 
-int getBulletIndexByID(int ID) {
-	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
-		if (bullets[bulletsCnt].getID() == ID) {
-			return bulletsCnt;
-		}
-	}
-
-	return -1;
-}
-
-void destroyBullets() {
-	for (int bulletsToDestroyIDsCnt = 0; bulletsToDestroyIDsCnt < (int)bulletsToDestroyIDs.size(); ++bulletsToDestroyIDsCnt) {
-		bullets.erase(bullets.begin() + bulletsToDestroyIDsCnt);
-	}
-}
-
 void characterActions() {
 	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
 		characters[charactersCnt].move();
@@ -3267,7 +3251,27 @@ void characterActions() {
 void bulletActions() {
 	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
 		bullets[bulletsCnt].move();
+		bullets[bulletsCnt].markForDestruction();
 	}
+}
+
+int getBulletIndexByID(int ID) {
+	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
+		if (bullets[bulletsCnt].getID() == ID) {
+			return bulletsCnt;
+		}
+	}
+
+	return -1;
+}
+
+void destroyBullets() {
+	for (int bulletsToDestroyIDsCnt = 0; bulletsToDestroyIDsCnt < (int)bulletsToDestroyIDs.size(); ++bulletsToDestroyIDsCnt) {
+		int bulletIndex = getBulletIndexByID(bulletsToDestroyIDs[bulletsToDestroyIDsCnt]);
+		bullets.erase(bullets.begin() + bulletIndex);
+	}
+
+	bulletsToDestroyIDs.clear();
 }
 
 void renderShadow(areaStruct area, int transparencyPercentage) {
@@ -3811,8 +3815,11 @@ void Bullet::move() {
 void Bullet::markForDestruction() {
 
 	//If bullet goes outside of overworld grid then destroy it
-	if (areaWithinArea({ params.position.x, params.position.y, params.size.w, params.size.h }, { 0, (int)overworldGrid.gridTile[params.layer].size() - 1, 0, (int)overworldGrid.gridTile[params.layer][0].size() - 1 }) == false) {
+	if (areaWithinArea({ params.position.x, params.position.y, params.size.w, params.size.h }, { 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, 0, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false) {
 		bulletsToDestroyIDs.push_back(params.ID);
+		/*printStr("");
+		printAreaL({ { params.position.x, params.position.y, params.size.w, params.size.h }, { 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, 0, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h } });
+		printInt(params.ID);*/
 	}
 
 }
@@ -3887,13 +3894,13 @@ int main(int argc, char* args[]) {
 			}
 			else {
 
-				//Object destructions
-				destroyBullets();
-
 				//Actions
 				//moveCamera();
 				characterActions();
 				bulletActions();
+
+				//Object destructions
+				destroyBullets();
 
 				//Centre camera on controlled character
 				XYStruct characterPosition = characters[controlledCharacterIndex].getPosition();

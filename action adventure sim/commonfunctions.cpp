@@ -449,10 +449,10 @@ int getHeuristic(XYStruct startPosition, XYStruct endPosition) {
 }
 
 bool areaWithinArea(areaStruct sourceArea, areaStruct targetArea) {
-	if (sourceArea.x + sourceArea.w - 1 < targetArea.x || sourceArea.x > targetArea.x + targetArea.w - 1 || sourceArea.y + sourceArea.h - 1 < targetArea.y || sourceArea.y > targetArea.y + targetArea.h - 1) {
-		return false;
+	if (sourceArea.x + sourceArea.w - 1 >= targetArea.x && sourceArea.x <= targetArea.x + targetArea.w - 1 && sourceArea.y + sourceArea.h - 1 >= targetArea.y && sourceArea.y <= targetArea.y + targetArea.h - 1) {
+		return true;
 	}
-	return true;
+	return false;
 }
 
 struct timeStruct {
