@@ -69,6 +69,10 @@ void removeSDLTextureTransparency(SDL_Texture* texture) {
 	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
 }
 
+void setSDLDrawColour() {
+	--;;
+}
+
 //int roundDiv(int firstNumber, int secondNumber) {
 //	return lround((float)firstNumber / secondNumber);
 //}
@@ -1668,8 +1672,14 @@ void initCharacters() {
 		currentCharacterParams.equippedWeapon.magazine.ammoName = "Blank";
 		currentCharacterParams.equippedWeapon.magazine.capacity = 100;
 		currentCharacterParams.equippedWeapon.magazine.currentLoad = 90;
-		currentCharacterParams.equippedWeapon.reload.delay.delay = 500;
-		currentCharacterParams.equippedWeapon.reload.sprites.spriteSheetIndex = getSpriteSheetIndex(--;;)
+		currentCharacterParams.equippedWeapon.reload.delay.delay = 1000;
+		currentCharacterParams.equippedWeapon.reload.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
+		currentCharacterParams.equippedWeapon.reload.sprite.areas = {
+			{
+				{ 41, 168, 8, 8 },
+				{ 52, 168, 8, 8 }
+			}
+		};
 
 		Character currentCharacter(currentCharacterParams);
 		characters.push_back(currentCharacter);
@@ -2633,8 +2643,8 @@ void renderBackgroundCharactersAndObjects() {
 								characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
 							}
 							
-							//Render character
 							characters[renderOrder[renderOrderCnt].index].render();
+							characters[renderOrder[renderOrderCnt].index].renderReloadAnimation();
 							
 							//If character if facing down then render weapon after character
 							if (characterDirection == directionEnum::down || characterDirection == directionEnum::downLeft || characterDirection == directionEnum::downRight || characterDirection == directionEnum::right) {
@@ -3422,7 +3432,23 @@ void Character::renderEquippedWeapon() {
 void Character::renderReloadAnimation() {
 	if (params.equippedWeapon.reload.reloading == true) {
 
-		//areaWithinCameraView
+		//Position animation on top of character
+		if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h / 6 }) == true) {
+
+			//Render background bar
+			SDL_Rect backgroundSRect = { convertAreaToSDLRect(params.equippedWeapon.reload.sprite.areas[0][0]) };
+			SDL_Rect backgroundDRect = { params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, 3 };
+			//SDL_RenderCopy(renderer, spriteSheets[params.equippedWeapon.reload.sprite.spriteSheetIndex].texture, &backgroundSRect, &backgroundDRect);
+			
+
+			//Render foreground bar
+			SDL_Rect foregroundSRect = { convertAreaToSDLRect(params.equippedWeapon.reload.sprite.areas[0][1]) };
+			int delayPercentage = (int)(((SDL_GetTicks() - params.equippedWeapon.reload.delay.startTicks) * 100) / params.equippedWeapon.reload.delay.delay);
+			SDL_Rect foregroundDRect = { params.position.x - camera.area.x, params.position.y + 1 - camera.area.y, (params.size.w * delayPercentage) / 100, 1 };
+			SDL_RenderCopy(renderer, spriteSheets[params.equippedWeapon.reload.sprite.spriteSheetIndex].texture, &foregroundSRect, &foregroundDRect);
+
+		}
+
 	}
 }
 

@@ -336,7 +336,7 @@ namespace game {
 			struct reloadStruct {
 				bool reloading = false;
 				delayStruct delay;
-				spritesStruct sprites;
+				spritesStruct sprite;
 			} reload;
 		} equippedWeapon;
 	};
