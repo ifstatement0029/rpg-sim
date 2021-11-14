@@ -2534,7 +2534,7 @@ void renderBackgroundCharactersAndObjects() {
 		currentRenderOrderStruct.index = charactersCnt;
 		XYStruct characterPosition = characters[charactersCnt].getPosition();
 		currentRenderOrderStruct.position = { characterPosition.x, characterPosition.y + characters[charactersCnt].getSize().h / 2 };
-		currentRenderOrderStruct.height = characters[charactersCnt].getCurrentHeight();
+		//currentRenderOrderStruct.height = characters[charactersCnt].getCurrentHeight();
 
 		renderOrder.push_back(currentRenderOrderStruct);
 	}
@@ -2553,13 +2553,19 @@ void renderBackgroundCharactersAndObjects() {
 	}
 
 	//Insert bullets in renderOrder vector
-	--;;
+	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
+		renderOrderStruct newRenderOrderStruct;
+		newRenderOrderStruct.type = renderOrderStruct::typeEnum::bullet;
+		newRenderOrderStruct.layerIndex = bullets[bulletsCnt].getLayer();
+		newRenderOrderStruct.index = bulletsCnt;
+		newRenderOrderStruct.position = bullets[bulletsCnt].getPosition();
+	}
 
 	//Sort renderOrder by x then by y, then by layerNum
 	if ((int)renderOrder.size() > 0) {
 		sort(renderOrder.begin(), renderOrder.end(), compareRenderOrderStructByX);
 		sort(renderOrder.begin(), renderOrder.end(), compareRenderOrderStructByY);
-		sort(renderOrder.begin(), renderOrder.end(), compareRenderOrderStructByHeight);
+		//sort(renderOrder.begin(), renderOrder.end(), compareRenderOrderStructByHeight);
 		sort(renderOrder.begin(), renderOrder.end(), compareRenderOrderStructByLayerNum);
 	}
 
@@ -2630,6 +2636,10 @@ void renderBackgroundCharactersAndObjects() {
 						}
 						case renderOrderStruct::typeEnum::table: {
 							tables[renderOrder[renderOrderCnt].index].render();
+							break;
+						}
+						case renderOrderStruct::typeEnum::bullet: {
+							bullets[renderOrder[renderOrderCnt].index].render();
 							break;
 						}
 					}
@@ -3237,7 +3247,7 @@ void characterActions() {
 
 void bulletActions() {
 	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
-		bullets[bulletsCnt].moveBullet();
+		bullets[bulletsCnt].move();
 	}
 }
 
@@ -3695,6 +3705,7 @@ void Character::useEquippedWeapon() {
 			//Fire bullet
 			bulletParamsStruct bulletParams;
 			bulletParams.ID = getFreeID(getBulletIDs());
+			bulletParams.layer = params.layer;
 			bulletParams.position = params.equippedWeapon.position;
 			bulletParams.size = tileSize;
 			bulletParams.sprite.spriteSheetIndex = getSpriteSheetIndex("bullets");
@@ -3750,6 +3761,14 @@ Bullet::Bullet(bulletParamsStruct newParams) {
 
 int Bullet::getID() {
 	return params.ID;
+}
+
+int Bullet::getLayer() {
+	return params.layer;
+}
+
+XYStruct Bullet::getPosition() {
+	return params.position;
 }
 
 void Bullet::render() {

@@ -153,7 +153,7 @@ namespace game {
 	int controlledCharacterIndex = 0;
 
 	struct renderOrderStruct {
-		enum class typeEnum { character, table } type = typeEnum::character;
+		enum class typeEnum { character, table, bullet } type = typeEnum::character;
 		int layerIndex = -1, index = -1, height = 0;
 		XYStruct position = { -1, -1 };
 	};
@@ -384,7 +384,7 @@ namespace game {
 	vector<Table> tables;
 
 	struct bulletParamsStruct {
-		int ID = -1;
+		int ID = -1, layer = -1;
 
 		XYStruct position = { -1, -1 };
 		WHStruct size = { -1, -1 };
@@ -402,6 +402,8 @@ namespace game {
 		Bullet(bulletParamsStruct newParams);
 
 		int getID();
+		int getLayer();
+		XYStruct getPosition();
 
 		void render();
 		void move();
