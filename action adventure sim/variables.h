@@ -390,6 +390,11 @@ namespace game {
 		WHStruct size = { -1, -1 };
 
 		spritesStruct sprite;
+
+		delayStruct speed;
+		int movePixelIncrement = 1;
+
+		int distanceTravelled = 0;
 	};
 
 	class Bullet {
@@ -397,6 +402,9 @@ namespace game {
 		Bullet(bulletParamsStruct newParams);
 
 		int getID();
+
+		void render();
+		void move();
 
 	private:
 		bulletParamsStruct params;

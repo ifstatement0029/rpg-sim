@@ -2552,6 +2552,9 @@ void renderBackgroundCharactersAndObjects() {
 		renderOrder.push_back(currentRenderOrderStruct);
 	}
 
+	//Insert bullets in renderOrder vector
+	--;;
+
 	//Sort renderOrder by x then by y, then by layerNum
 	if ((int)renderOrder.size() > 0) {
 		sort(renderOrder.begin(), renderOrder.end(), compareRenderOrderStructByX);
@@ -3232,6 +3235,12 @@ void characterActions() {
 	}
 }
 
+void bulletActions() {
+	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
+		bullets[bulletsCnt].moveBullet();
+	}
+}
+
 void renderShadow(areaStruct area, int transparencyPercentage) {
 
 	/*Update transparencyPercentage based on how lit up the area is.
@@ -3248,6 +3257,13 @@ const double convertCoordinatesToAngle(int x, int y) {
 	return (atan2(y, x)) * (180 / M_PI);
 }
 
+XYStruct convertAngleToCoordinates(double angle, int radius) {
+	XYStruct coordinates = { -1, -1 };
+	coordinates.x = radius * cos(angle);
+	coordinates.y = radius * sin(angle);
+	return coordinates;
+}
+
 vector<int> getBulletIDs() {
 	vector<int> bulletIDs;
 
@@ -3259,7 +3275,8 @@ vector<int> getBulletIDs() {
 }
 
 void initBullet(bulletParamsStruct newParams) {
-	//--;;
+	Bullet newBullet(newParams);
+	bullets.push_back(newBullet);
 }
 
 //functions end
@@ -3678,7 +3695,18 @@ void Character::useEquippedWeapon() {
 			//Fire bullet
 			bulletParamsStruct bulletParams;
 			bulletParams.ID = getFreeID(getBulletIDs());
-			bulletParams.position = --;;
+			bulletParams.position = params.equippedWeapon.position;
+			bulletParams.size = tileSize;
+			bulletParams.sprite.spriteSheetIndex = getSpriteSheetIndex("bullets");
+			bulletParams.sprite.areas = {
+				{
+					{ 11, 360, 16, 16 }
+				}
+			};
+			bulletParams.sprite.angle = params.equippedWeapon.sprite.angle;
+			bulletParams.speed.startTicks = SDL_GetTicks();
+			bulletParams.speed.delay = 100;
+			bulletParams.movePixelIncrement = 2;
 			initBullet(bulletParams);
 
 			break;
@@ -3722,6 +3750,20 @@ Bullet::Bullet(bulletParamsStruct newParams) {
 
 int Bullet::getID() {
 	return params.ID;
+}
+
+void Bullet::render() {
+	SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
+	SDL_Rect dRect = { params.position.x, params.position.y, params.size.w, params.size.h };
+	SDL_RenderCopyEx(renderer, spriteSheets[params.sprite.spriteSheetIndex].texture, &sRect, &dRect, params.sprite.angle, params.sprite.center, params.sprite.flip);
+}
+
+void Bullet::move() {
+	if (SDL_GetTicks() - params.speed.startTicks >= params.speed.delay) {
+		params.speed.startTicks = SDL_GetTicks();
+		++params.distanceTravelled;
+		params.position = convertAngleToCoordinates(params.sprite.angle, params.distanceTravelled);
+	}
 }
 
 //class functions end
@@ -3797,6 +3839,7 @@ int main(int argc, char* args[]) {
 				//Actions
 				//moveCamera();
 				characterActions();
+				bulletActions();
 
 				//Centre camera on controlled character
 				XYStruct characterPosition = characters[controlledCharacterIndex].getPosition();
