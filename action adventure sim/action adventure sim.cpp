@@ -1658,12 +1658,18 @@ void initCharacters() {
 
 		//Init equipped weapon
 		currentCharacterParams.equippedWeapon.type = characterParams::weaponStruct::weaponTypeEnum::ranged;
+		currentCharacterParams.equippedWeapon.name = "Gun";
 		currentCharacterParams.equippedWeapon.size = { tileSize.w * 4, tileSize.h * 2 };
 		currentCharacterParams.equippedWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
 		vector<areaStruct> areas;
 		areas.push_back({ 2, 21, 21, 8 });
-		currentCharacterParams.equippedWeapon.magazine.ammoName = "Blank";
 		currentCharacterParams.equippedWeapon.sprite.areas.push_back(areas);
+		currentCharacterParams.equippedWeapon.fireMode = characterParams::weaponStruct::fireModeEnum::fullAuto;
+		currentCharacterParams.equippedWeapon.magazine.ammoName = "Blank";
+		currentCharacterParams.equippedWeapon.magazine.capacity = 100;
+		currentCharacterParams.equippedWeapon.magazine.currentLoad = 90;
+		currentCharacterParams.equippedWeapon.reload.delay.delay = 500;
+		currentCharacterParams.equippedWeapon.reload.sprites.spriteSheetIndex = getSpriteSheetIndex(--;;)
 
 		Character currentCharacter(currentCharacterParams);
 		characters.push_back(currentCharacter);
@@ -2670,6 +2676,8 @@ void renderUI() {
 
 	//Render equipped weapon magazine ammo
 	characterParams::weaponStruct::magazineStruct magazine = characters[controlledCharacterIndex].getMagazine();
+	renderText(characters[controlledCharacterIndex].getEquippedWeaponName(), defaultFont, defaultColour, { 0, textLogicalSize.h - (textSize.h * 6) });
+	renderText(magazine.ammoName, defaultFont, defaultColour, {0, textLogicalSize.h - (textSize.h * 4)});
 	renderText(formatStr("{}/{}", { str(magazine.currentLoad), str(magazine.capacity) }), defaultFont, defaultColour, { 0, textLogicalSize.h - (textSize.h * 2) });
 
 }
@@ -3344,6 +3352,10 @@ characterParams::weaponStruct::magazineStruct Character::getMagazine() {
 	return params.equippedWeapon.magazine;
 }
 
+string Character::getEquippedWeaponName() {
+	return params.equippedWeapon.name;
+}
+
 void Character::render() {
 
 	//Render shadow
@@ -3404,6 +3416,13 @@ void Character::renderEquippedWeapon() {
 
 			break;
 		}
+	}
+}
+
+void Character::renderReloadAnimation() {
+	if (params.equippedWeapon.reload.reloading == true) {
+
+		//areaWithinCameraView
 	}
 }
 
@@ -3717,40 +3736,60 @@ void Character::jumpOnTile() {
 }
 
 void Character::useEquippedWeapon() {
+
+	//Use equipped weapon
 	if (controllerButtons.RB == true) {
 		if (params.equippedWeapon.fireMode == characterParams::weaponStruct::fireModeEnum::semiAuto) {
 			controllerButtons.RB = false;
 		}
 
 		switch (params.equippedWeapon.type) {
-		case characterParams::weaponStruct::weaponTypeEnum::ranged: {
-			
-			//Fire bullet
-			bulletParamsStruct bulletParams;
-			bulletParams.ID = getFreeID(getBulletIDs());
-			bulletParams.layer = params.layer;
-			bulletParams.position = params.equippedWeapon.position;
-			bulletParams.originalPosition = bulletParams.position;
-			bulletParams.size = { tileSize.w / 2, tileSize.h / 2 };
-			bulletParams.sprite.spriteSheetIndex = getSpriteSheetIndex("bullets");
-			bulletParams.sprite.areas = {
-				{
-					{ 11, 360, 16, 16 }
+			case characterParams::weaponStruct::weaponTypeEnum::ranged: {
+				if (params.equippedWeapon.magazine.currentLoad > 0) {
+
+					//Fire bullet
+					bulletParamsStruct bulletParams;
+					bulletParams.ID = getFreeID(getBulletIDs());
+					bulletParams.layer = params.layer;
+					bulletParams.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+					bulletParams.originalPosition = bulletParams.position;
+					bulletParams.size = { tileSize.w / 2, tileSize.h / 2 };
+					bulletParams.sprite.spriteSheetIndex = getSpriteSheetIndex("bullets");
+					bulletParams.sprite.areas = {
+						{
+							{ 11, 360, 16, 16 }
+						}
+					};
+					bulletParams.sprite.angle = params.equippedWeapon.sprite.angle;
+					bulletParams.speed.startTicks = SDL_GetTicks();
+					bulletParams.speed.delay = 1;
+					bulletParams.movePixelIncrement = 2;
+					initBullet(bulletParams);
+
+					//Update magazin current load
+					if (params.equippedWeapon.magazine.currentLoad > 0) {
+						--params.equippedWeapon.magazine.currentLoad;
+					}
+
 				}
-			};
-			bulletParams.sprite.angle = params.equippedWeapon.sprite.angle;
-			bulletParams.speed.startTicks = SDL_GetTicks();
-			bulletParams.speed.delay = 1;
-			bulletParams.movePixelIncrement = 2;
-			initBullet(bulletParams);
+				break;
+			}
+			case characterParams::weaponStruct::weaponTypeEnum::melee: {
 
-			break;
+				break;
+			}
 		}
-		case characterParams::weaponStruct::weaponTypeEnum::melee: {
+	}
 
-			break;
-		}
-		}
+	//Reload equipped ranged weapon
+	if (controllerButtons.X == true && params.equippedWeapon.reload.reloading == false && params.equippedWeapon.magazine.currentLoad < params.equippedWeapon.magazine.capacity) {
+		controllerButtons.X = false;
+		params.equippedWeapon.reload.reloading = true;
+		params.equippedWeapon.reload.delay.startTicks = SDL_GetTicks();
+	}
+	if (params.equippedWeapon.reload.reloading == true && SDL_GetTicks() - params.equippedWeapon.reload.delay.startTicks >= params.equippedWeapon.reload.delay.delay) {
+		params.equippedWeapon.reload.reloading = false;
+		params.equippedWeapon.magazine.currentLoad = params.equippedWeapon.magazine.capacity;
 	}
 }
 
@@ -3815,11 +3854,10 @@ void Bullet::move() {
 void Bullet::markForDestruction() {
 
 	//If bullet goes outside of overworld grid then destroy it
-	if (areaWithinArea({ params.position.x, params.position.y, params.size.w, params.size.h }, { 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, 0, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false) {
+	if (areaWithinArea({ params.position.x, params.position.y, params.size.w, params.size.h }, { 0, 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false) {
+		/*printStr("\nmark:");
+		printAreaL({ { params.position.x, params.position.y, params.size.w, params.size.h }, { 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, 0, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h } });*/
 		bulletsToDestroyIDs.push_back(params.ID);
-		/*printStr("");
-		printAreaL({ { params.position.x, params.position.y, params.size.w, params.size.h }, { 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, 0, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h } });
-		printInt(params.ID);*/
 	}
 
 }
