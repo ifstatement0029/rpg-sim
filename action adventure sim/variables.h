@@ -286,6 +286,10 @@ namespace game {
 
 	vector<int> bulletsToDestroyIDs;
 
+	struct colourStruct {
+		Uint8 r = 0, g = 0, b = 0, a = 0;
+	};
+
 	//classes start
 
 	struct characterParams {
@@ -327,6 +331,12 @@ namespace game {
 			spritesStruct sprite;
 
 			enum class fireModeEnum { semiAuto, burst, fullAuto } fireMode = characterParams::weaponStruct::fireModeEnum::semiAuto;
+
+			struct burstStruct {
+				bool pause = false;
+				int bulletsFired = 0, maxBulletsBeforePause = -1;
+				delayStruct delay;
+			} burst;
 
 			struct magazineStruct {
 				string ammoName = "";

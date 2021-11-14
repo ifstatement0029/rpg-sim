@@ -69,8 +69,12 @@ void removeSDLTextureTransparency(SDL_Texture* texture) {
 	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
 }
 
-void setSDLDrawColour() {
-	--;;
+void setSDLDrawColour(colourStruct newColour) {
+	colourStruct colour;
+	SDL_GetRenderDrawColor(renderer, &colour.r, &colour.g, &colour.b, &colour.a);
+	if (colour.r != newColour.r || colour.g != newColour.g || colour.b != newColour.b || colour.a != newColour.a) {
+		SDL_SetRenderDrawColor(renderer, newColour.r, newColour.g, newColour.b, newColour.a);
+	}
 }
 
 //int roundDiv(int firstNumber, int secondNumber) {
@@ -1668,7 +1672,9 @@ void initCharacters() {
 		vector<areaStruct> areas;
 		areas.push_back({ 2, 21, 21, 8 });
 		currentCharacterParams.equippedWeapon.sprite.areas.push_back(areas);
-		currentCharacterParams.equippedWeapon.fireMode = characterParams::weaponStruct::fireModeEnum::fullAuto;
+		currentCharacterParams.equippedWeapon.fireMode = characterParams::weaponStruct::fireModeEnum::burst;
+		currentCharacterParams.equippedWeapon.burst.maxBulletsBeforePause = 3;
+		currentCharacterParams.equippedWeapon.burst.delay.delay = 200;
 		currentCharacterParams.equippedWeapon.magazine.ammoName = "Blank";
 		currentCharacterParams.equippedWeapon.magazine.capacity = 100;
 		currentCharacterParams.equippedWeapon.magazine.currentLoad = 90;
@@ -3439,13 +3445,18 @@ void Character::renderReloadAnimation() {
 			SDL_Rect backgroundSRect = { convertAreaToSDLRect(params.equippedWeapon.reload.sprite.areas[0][0]) };
 			SDL_Rect backgroundDRect = { params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, 3 };
 			//SDL_RenderCopy(renderer, spriteSheets[params.equippedWeapon.reload.sprite.spriteSheetIndex].texture, &backgroundSRect, &backgroundDRect);
-			
+			colourStruct newColour = { 255, 255, 255, 255 };
+			setSDLDrawColour(newColour);
+			SDL_RenderDrawLine(renderer, backgroundDRect.x, backgroundDRect.y - 1, backgroundDRect.x, backgroundDRect.y + 1); //left vertical bar
+			SDL_RenderDrawLine(renderer, backgroundDRect.x, backgroundDRect.y, backgroundDRect.x + backgroundDRect.w - 1, backgroundDRect.y); //horizontal bar
+			SDL_RenderDrawLine(renderer, backgroundDRect.x + backgroundDRect.w, backgroundDRect.y - 1, backgroundDRect.x + backgroundDRect.w, backgroundDRect.y + 1); //right vertical bar
 
 			//Render foreground bar
 			SDL_Rect foregroundSRect = { convertAreaToSDLRect(params.equippedWeapon.reload.sprite.areas[0][1]) };
 			int delayPercentage = (int)(((SDL_GetTicks() - params.equippedWeapon.reload.delay.startTicks) * 100) / params.equippedWeapon.reload.delay.delay);
 			SDL_Rect foregroundDRect = { params.position.x - camera.area.x, params.position.y + 1 - camera.area.y, (params.size.w * delayPercentage) / 100, 1 };
-			SDL_RenderCopy(renderer, spriteSheets[params.equippedWeapon.reload.sprite.spriteSheetIndex].texture, &foregroundSRect, &foregroundDRect);
+			//SDL_RenderCopy(renderer, spriteSheets[params.equippedWeapon.reload.sprite.spriteSheetIndex].texture, &foregroundSRect, &foregroundDRect);
+			SDL_RenderDrawLine(renderer, foregroundDRect.x + foregroundDRect.w - 1, foregroundDRect.y - 3, foregroundDRect.x + foregroundDRect.w - 1, foregroundDRect.y + 1);
 
 		}
 
@@ -3771,30 +3782,51 @@ void Character::useEquippedWeapon() {
 
 		switch (params.equippedWeapon.type) {
 			case characterParams::weaponStruct::weaponTypeEnum::ranged: {
-				if (params.equippedWeapon.magazine.currentLoad > 0) {
+				if (params.equippedWeapon.magazine.currentLoad > 0 && params.equippedWeapon.reload.reloading == false) {
 
-					//Fire bullet
-					bulletParamsStruct bulletParams;
-					bulletParams.ID = getFreeID(getBulletIDs());
-					bulletParams.layer = params.layer;
-					bulletParams.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
-					bulletParams.originalPosition = bulletParams.position;
-					bulletParams.size = { tileSize.w / 2, tileSize.h / 2 };
-					bulletParams.sprite.spriteSheetIndex = getSpriteSheetIndex("bullets");
-					bulletParams.sprite.areas = {
-						{
-							{ 11, 360, 16, 16 }
+					if (params.equippedWeapon.fireMode != characterParams::weaponStruct::fireModeEnum::burst || (params.equippedWeapon.fireMode == characterParams::weaponStruct::fireModeEnum::burst && params.equippedWeapon.burst.pause == false)) {
+						
+						//Fire bullet
+						bulletParamsStruct bulletParams;
+						bulletParams.ID = getFreeID(getBulletIDs());
+						bulletParams.layer = params.layer;
+						bulletParams.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+						bulletParams.originalPosition = bulletParams.position;
+						bulletParams.size = { tileSize.w / 2, tileSize.h / 2 };
+						bulletParams.sprite.spriteSheetIndex = getSpriteSheetIndex("bullets");
+						bulletParams.sprite.areas = {
+							{
+								{ 11, 360, 16, 16 }
+							}
+						};
+						bulletParams.sprite.angle = params.equippedWeapon.sprite.angle;
+						bulletParams.speed.startTicks = SDL_GetTicks();
+						bulletParams.speed.delay = 1;
+						bulletParams.movePixelIncrement = 6;
+						initBullet(bulletParams);
+
+						//Update magazin current load
+						if (params.equippedWeapon.magazine.currentLoad > 0) {
+							--params.equippedWeapon.magazine.currentLoad;
 						}
-					};
-					bulletParams.sprite.angle = params.equippedWeapon.sprite.angle;
-					bulletParams.speed.startTicks = SDL_GetTicks();
-					bulletParams.speed.delay = 1;
-					bulletParams.movePixelIncrement = 2;
-					initBullet(bulletParams);
 
-					//Update magazin current load
-					if (params.equippedWeapon.magazine.currentLoad > 0) {
-						--params.equippedWeapon.magazine.currentLoad;
+					}
+
+					//Make weapon fire in bursts
+					if (params.equippedWeapon.fireMode == characterParams::weaponStruct::fireModeEnum::burst) {
+						if (params.equippedWeapon.burst.pause == false) {
+							if (params.equippedWeapon.burst.bulletsFired < params.equippedWeapon.burst.maxBulletsBeforePause) {
+								++params.equippedWeapon.burst.bulletsFired;
+							}
+							else {
+								params.equippedWeapon.burst.pause = true;
+								params.equippedWeapon.burst.delay.startTicks = SDL_GetTicks();
+							}
+						}
+						else if (SDL_GetTicks() - params.equippedWeapon.burst.delay.startTicks >= params.equippedWeapon.burst.delay.delay) {
+							params.equippedWeapon.burst.pause = false;
+							params.equippedWeapon.burst.bulletsFired = 0;
+						}
 					}
 
 				}

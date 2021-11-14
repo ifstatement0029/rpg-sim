@@ -33,9 +33,9 @@ ranged weapon:
 	- can aim 360 degrees - done
 	- can shoot bullets with different modes
 		- semi auto (one shot at a time) - done
-		- burst (a few shots at a time) -
+		- burst (a few shots at a time) - done
 		- full auto (continuous shots) - done
-	- have a delay when reloading - ;;
+	- have a delay when reloading - done
 melee weapon: 
 
 gear:
