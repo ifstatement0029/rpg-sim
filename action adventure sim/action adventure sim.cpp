@@ -2554,11 +2554,14 @@ void renderBackgroundCharactersAndObjects() {
 
 	//Insert bullets in renderOrder vector
 	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
-		renderOrderStruct newRenderOrderStruct;
-		newRenderOrderStruct.type = renderOrderStruct::typeEnum::bullet;
-		newRenderOrderStruct.layerIndex = bullets[bulletsCnt].getLayer();
-		newRenderOrderStruct.index = bulletsCnt;
-		newRenderOrderStruct.position = bullets[bulletsCnt].getPosition();
+		renderOrderStruct newRenderOrderElement;
+		
+		newRenderOrderElement.type = renderOrderStruct::typeEnum::bullet;
+		newRenderOrderElement.layerIndex = bullets[bulletsCnt].getLayer();
+		newRenderOrderElement.index = bulletsCnt;
+		newRenderOrderElement.position = bullets[bulletsCnt].getPosition();
+		
+		renderOrder.push_back(newRenderOrderElement);
 	}
 
 	//Sort renderOrder by x then by y, then by layerNum
@@ -3234,6 +3237,22 @@ void createMazeAndGetAStarPath(areaStruct startPixelArea, areaStruct endPixelAre
 
 }
 
+int getBulletIndexByID(int ID) {
+	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
+		if (bullets[bulletsCnt].getID() == ID) {
+			return bulletsCnt;
+		}
+	}
+
+	return -1;
+}
+
+void destroyBullets() {
+	for (int bulletsToDestroyIDsCnt = 0; bulletsToDestroyIDsCnt < (int)bulletsToDestroyIDs.size(); ++bulletsToDestroyIDsCnt) {
+		bullets.erase(bullets.begin() + bulletsToDestroyIDsCnt);
+	}
+}
+
 void characterActions() {
 	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
 		characters[charactersCnt].move();
@@ -3707,7 +3726,8 @@ void Character::useEquippedWeapon() {
 			bulletParams.ID = getFreeID(getBulletIDs());
 			bulletParams.layer = params.layer;
 			bulletParams.position = params.equippedWeapon.position;
-			bulletParams.size = tileSize;
+			bulletParams.originalPosition = bulletParams.position;
+			bulletParams.size = { tileSize.w / 2, tileSize.h / 2 };
 			bulletParams.sprite.spriteSheetIndex = getSpriteSheetIndex("bullets");
 			bulletParams.sprite.areas = {
 				{
@@ -3716,7 +3736,7 @@ void Character::useEquippedWeapon() {
 			};
 			bulletParams.sprite.angle = params.equippedWeapon.sprite.angle;
 			bulletParams.speed.startTicks = SDL_GetTicks();
-			bulletParams.speed.delay = 100;
+			bulletParams.speed.delay = 1;
 			bulletParams.movePixelIncrement = 2;
 			initBullet(bulletParams);
 
@@ -3773,16 +3793,28 @@ XYStruct Bullet::getPosition() {
 
 void Bullet::render() {
 	SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
-	SDL_Rect dRect = { params.position.x, params.position.y, params.size.w, params.size.h };
-	SDL_RenderCopyEx(renderer, spriteSheets[params.sprite.spriteSheetIndex].texture, &sRect, &dRect, params.sprite.angle, params.sprite.center, params.sprite.flip);
+	SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h };
+
+	if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h }) == true) {
+		SDL_RenderCopyEx(renderer, spriteSheets[params.sprite.spriteSheetIndex].texture, &sRect, &dRect, params.sprite.angle, params.sprite.center, params.sprite.flip);
+	}
 }
 
 void Bullet::move() {
 	if (SDL_GetTicks() - params.speed.startTicks >= params.speed.delay) {
 		params.speed.startTicks = SDL_GetTicks();
-		++params.distanceTravelled;
-		params.position = convertAngleToCoordinates(params.sprite.angle, params.distanceTravelled);
+		params.distanceTravelled += params.movePixelIncrement;
+		params.position = { lround((double)params.originalPosition.x + (params.distanceTravelled * cos(((params.sprite.angle) * M_PI) / 180))), lround((double)params.originalPosition.y + (params.distanceTravelled * sin(((params.sprite.angle) * M_PI) / 180))) };
 	}
+}
+
+void Bullet::markForDestruction() {
+
+	//If bullet goes outside of overworld grid then destroy it
+	if (areaWithinArea({ params.position.x, params.position.y, params.size.w, params.size.h }, { 0, (int)overworldGrid.gridTile[params.layer].size() - 1, 0, (int)overworldGrid.gridTile[params.layer][0].size() - 1 }) == false) {
+		bulletsToDestroyIDs.push_back(params.ID);
+	}
+
 }
 
 //class functions end
@@ -3854,6 +3886,9 @@ int main(int argc, char* args[]) {
 				mainMenu();
 			}
 			else {
+
+				//Object destructions
+				destroyBullets();
 
 				//Actions
 				//moveCamera();

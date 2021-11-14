@@ -284,6 +284,8 @@ namespace game {
 	};
 	vector<collidableObjectStruct> collidableObjects;
 
+	vector<int> bulletsToDestroyIDs;
+
 	//classes start
 
 	struct characterParams {
@@ -323,7 +325,7 @@ namespace game {
 			enum class fireModeEnum { semiAuto, burst, fullAuto } fireMode = characterParams::weaponStruct::fireModeEnum::semiAuto;
 			struct magazineStruct {
 				string ammoName = "";
-				int capacity = 20, currentLoad = 10;
+				int currentLoad = 10, capacity = 20;
 			} magazine;
 		} equippedWeapon;
 	};
@@ -386,7 +388,7 @@ namespace game {
 	struct bulletParamsStruct {
 		int ID = -1, layer = -1;
 
-		XYStruct position = { -1, -1 };
+		XYStruct position = { -1, -1 }, originalPosition = { -1, -1 };
 		WHStruct size = { -1, -1 };
 
 		spritesStruct sprite;
@@ -407,6 +409,7 @@ namespace game {
 
 		void render();
 		void move();
+		void markForDestruction();
 
 	private:
 		bulletParamsStruct params;
