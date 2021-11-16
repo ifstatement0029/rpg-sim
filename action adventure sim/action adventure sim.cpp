@@ -1691,7 +1691,16 @@ void initCharacters() {
 				break;
 			}
 			case characterParams::equippedWeaponTypeEnum::melee: {
-				currentCharacterParams.equippedMeleeWeapon.name = --;;
+				currentCharacterParams.equippedMeleeWeapon.name = "Katana";
+				currentCharacterParams.equippedMeleeWeapon.position = currentCharacterParams.position;
+				currentCharacterParams.equippedMeleeWeapon.size = { tileSize.w * 4, tileSize.h * 2 };
+				currentCharacterParams.equippedMeleeWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
+				currentCharacterParams.equippedMeleeWeapon.sprite.areas = {
+					{
+						{ 522, 9, 29, 6 }
+					}
+				};
+				currentCharacterParams.equippedMeleeWeapon.sprite.center = { --;; lround((float)currentCharacterParams.equippedMeleeWeapon.size.w / 2), lround((float)currentCharacterParams.equippedMeleeWeapon.size.h / 2) };
 				break;
 			}
 		}
@@ -3325,8 +3334,8 @@ const double convertCoordinatesToAngle(int x, int y) {
 
 XYStruct convertAngleToCoordinates(double angle, int radius) {
 	XYStruct coordinates = { -1, -1 };
-	coordinates.x = (int)radius * cos(angle);
-	coordinates.y = (int)radius * sin(angle);
+	coordinates.x = (int)(radius * cos(angle));
+	coordinates.y = (int)(radius * sin(angle));
 	return coordinates;
 }
 
@@ -3402,6 +3411,8 @@ void Character::render() {
 void Character::renderEquippedWeapon() {
 	switch (params.equippedWeaponType) {
 		case characterParams::equippedWeaponTypeEnum::ranged: {
+			
+			//Update position
 			params.equippedRangedWeapon.position = { params.position.x, params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedRangedWeapon.sprite.areas[0][0].h / 2) };
 
 			//Get weapon angle
@@ -3428,15 +3439,57 @@ void Character::renderEquippedWeapon() {
 
 			}
 
+			//Render
 			SDL_Rect sRect = convertAreaToSDLRect(params.equippedRangedWeapon.sprite.areas[0][0]);
 			SDL_Rect dRect = { params.equippedRangedWeapon.position.x - camera.area.x, params.equippedRangedWeapon.position.y - camera.area.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h };
-			
 			if (areaWithinCameraView({ params.equippedRangedWeapon.position.x, params.equippedRangedWeapon.position.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h }) == true) {
 				SDL_RenderCopyEx(renderer, spriteSheets[params.equippedRangedWeapon.sprite.spriteSheetIndex].texture, &sRect, &dRect, params.equippedRangedWeapon.sprite.angle, params.equippedRangedWeapon.sprite.center, params.equippedRangedWeapon.sprite.flip);
 			}
+
 			break;
 		}
 		case characterParams::equippedWeaponTypeEnum::melee: {
+			
+			//Update weapon angle, flip and position based on character direction
+			/*switch (params.direction) {
+				case directionEnum::right: {
+					params.equippedMeleeWeapon.sprite.angle = 0;
+					params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+					params.equippedMeleeWeapon.position.x = params.position.x + params.size.w / 2;
+					params.equippedMeleeWeapon.position.y = params.position.y + (params.size.h / 2);
+					break;
+				}
+				case directionEnum::left: {
+					params.equippedMeleeWeapon.sprite.angle = 0;
+					params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_HORIZONTAL;
+					params.equippedMeleeWeapon.position.x = params.position.x + (params.size.w / 2) - (params.equippedMeleeWeapon.size.w - 1);
+					params.equippedMeleeWeapon.position.y = params.position.y + (params.size.h / 2);
+					break;
+				}
+				case directionEnum::down: {
+					params.equippedMeleeWeapon.sprite.angle = 90;
+					params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+					params.equippedMeleeWeapon.position.x = params.position.x + params.size.w / 2;
+					params.equippedMeleeWeapon.position.y = params.position.y + (params.size.h / 4) * 3;
+					break;
+				}
+			}*/
+
+			params.equippedMeleeWeapon.position = { params.position.x, params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedMeleeWeapon.sprite.areas[0][0].h / 2) };
+
+			if (rightStickXDir != 0 || rightStickYDir != 0) {
+				params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+			}
+			else if (xDir != 0 || yDir != 0) {
+				params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+			}
+
+			//Render
+			SDL_Rect sRect = convertAreaToSDLRect(params.equippedMeleeWeapon.sprite.areas[0][0]);
+			SDL_Rect dRect = { params.equippedMeleeWeapon.position.x - camera.area.x, params.equippedMeleeWeapon.position.y - camera.area.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h };
+			if (areaWithinCameraView({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }) == true) {
+				SDL_RenderCopyEx(renderer, spriteSheets[params.equippedMeleeWeapon.sprite.spriteSheetIndex].texture, &sRect, &dRect, params.equippedMeleeWeapon.sprite.angle, params.equippedMeleeWeapon.sprite.center, params.equippedMeleeWeapon.sprite.flip);
+			}
 
 			break;
 		}
