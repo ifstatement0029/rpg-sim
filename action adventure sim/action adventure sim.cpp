@@ -1665,27 +1665,36 @@ void initCharacters() {
 		currentCharacterParams.layer = 1;
 
 		//Init equipped weapon
-		currentCharacterParams.equippedWeapon.type = characterParams::weaponStruct::weaponTypeEnum::ranged;
-		currentCharacterParams.equippedWeapon.name = "Gun";
-		currentCharacterParams.equippedWeapon.size = { tileSize.w * 4, tileSize.h * 2 };
-		currentCharacterParams.equippedWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
-		vector<areaStruct> areas;
-		areas.push_back({ 2, 21, 21, 8 });
-		currentCharacterParams.equippedWeapon.sprite.areas.push_back(areas);
-		currentCharacterParams.equippedWeapon.fireMode = characterParams::weaponStruct::fireModeEnum::burst;
-		currentCharacterParams.equippedWeapon.burst.maxBulletsBeforePause = 3;
-		currentCharacterParams.equippedWeapon.burst.delay.delay = 200;
-		currentCharacterParams.equippedWeapon.magazine.ammoName = "Blank";
-		currentCharacterParams.equippedWeapon.magazine.capacity = 100;
-		currentCharacterParams.equippedWeapon.magazine.currentLoad = 90;
-		currentCharacterParams.equippedWeapon.reload.delay.delay = 1000;
-		currentCharacterParams.equippedWeapon.reload.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
-		currentCharacterParams.equippedWeapon.reload.sprite.areas = {
-			{
-				{ 41, 168, 8, 8 },
-				{ 52, 168, 8, 8 }
+		currentCharacterParams.equippedWeaponType = characterParams::equippedWeaponTypeEnum::melee;
+		switch (currentCharacterParams.equippedWeaponType) {
+			case characterParams::equippedWeaponTypeEnum::ranged: {
+				currentCharacterParams.equippedRangedWeapon.name = "Gun";
+				currentCharacterParams.equippedRangedWeapon.size = { tileSize.w * 4, tileSize.h * 2 };
+				currentCharacterParams.equippedRangedWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
+				vector<areaStruct> areas;
+				areas.push_back({ 2, 21, 21, 8 });
+				currentCharacterParams.equippedRangedWeapon.sprite.areas.push_back(areas);
+				currentCharacterParams.equippedRangedWeapon.fireMode = characterParams::rangedWeaponStruct::fireModeEnum::burst;
+				currentCharacterParams.equippedRangedWeapon.burst.maxBulletsBeforePause = 3;
+				currentCharacterParams.equippedRangedWeapon.burst.delay.delay = 200;
+				currentCharacterParams.equippedRangedWeapon.magazine.ammoName = "Blank";
+				currentCharacterParams.equippedRangedWeapon.magazine.capacity = 100;
+				currentCharacterParams.equippedRangedWeapon.magazine.currentLoad = 90;
+				currentCharacterParams.equippedRangedWeapon.reload.delay.delay = 1000;
+				currentCharacterParams.equippedRangedWeapon.reload.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
+				currentCharacterParams.equippedRangedWeapon.reload.sprite.areas = {
+					{
+						{ 41, 168, 8, 8 },
+						{ 52, 168, 8, 8 }
+					}
+				};
+				break;
 			}
-		};
+			case characterParams::equippedWeaponTypeEnum::melee: {
+				currentCharacterParams.equippedMeleeWeapon.name = --;;
+				break;
+			}
+		}
 
 		Character currentCharacter(currentCharacterParams);
 		characters.push_back(currentCharacter);
@@ -2691,7 +2700,7 @@ void renderUI() {
 	WHStruct textSize = getTextSize("Z", defaultFont);
 
 	//Render equipped weapon magazine ammo
-	characterParams::weaponStruct::magazineStruct magazine = characters[controlledCharacterIndex].getMagazine();
+	characterParams::rangedWeaponStruct::magazineStruct magazine = characters[controlledCharacterIndex].getMagazine();
 	renderText(characters[controlledCharacterIndex].getEquippedWeaponName(), defaultFont, defaultColour, { 0, textLogicalSize.h - (textSize.h * 6) });
 	renderText(magazine.ammoName, defaultFont, defaultColour, {0, textLogicalSize.h - (textSize.h * 4)});
 	renderText(formatStr("{}/{}", { str(magazine.currentLoad), str(magazine.capacity) }), defaultFont, defaultColour, { 0, textLogicalSize.h - (textSize.h * 2) });
@@ -3316,8 +3325,8 @@ const double convertCoordinatesToAngle(int x, int y) {
 
 XYStruct convertAngleToCoordinates(double angle, int radius) {
 	XYStruct coordinates = { -1, -1 };
-	coordinates.x = radius * cos(angle);
-	coordinates.y = radius * sin(angle);
+	coordinates.x = (int)radius * cos(angle);
+	coordinates.y = (int)radius * sin(angle);
 	return coordinates;
 }
 
@@ -3364,12 +3373,12 @@ directionEnum Character::getDirection() {
 	return params.direction;
 }
 
-characterParams::weaponStruct::magazineStruct Character::getMagazine() {
-	return params.equippedWeapon.magazine;
+characterParams::rangedWeaponStruct::magazineStruct Character::getMagazine() {
+	return params.equippedRangedWeapon.magazine;
 }
 
 string Character::getEquippedWeaponName() {
-	return params.equippedWeapon.name;
+	return params.equippedRangedWeapon.name;
 }
 
 void Character::render() {
@@ -3391,43 +3400,43 @@ void Character::render() {
 }
 
 void Character::renderEquippedWeapon() {
-	switch (params.equippedWeapon.type) {
-		case characterParams::weaponStruct::weaponTypeEnum::ranged: {
-			params.equippedWeapon.position = { params.position.x, params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedWeapon.sprite.areas[0][0].h / 2) };
+	switch (params.equippedWeaponType) {
+		case characterParams::equippedWeaponTypeEnum::ranged: {
+			params.equippedRangedWeapon.position = { params.position.x, params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedRangedWeapon.sprite.areas[0][0].h / 2) };
 
 			//Get weapon angle
 			if (rightStickXDir != 0 || rightStickYDir != 0) {
-				params.equippedWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+				params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
 			}
 			else if (xDir != 0 || yDir != 0) {
-				params.equippedWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+				params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
 			}
 			
 			//Flip weapon and adjust position
-			if (params.equippedWeapon.sprite.angle >= -90 && params.equippedWeapon.sprite.angle <= 90) {
+			if (params.equippedRangedWeapon.sprite.angle >= -90 && params.equippedRangedWeapon.sprite.angle <= 90) {
 				
 				//Weapon is facing right
-				params.equippedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
-				params.equippedWeapon.position.x += params.size.w / 4;
+				params.equippedRangedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+				params.equippedRangedWeapon.position.x += params.size.w / 4;
 
 			}
 			else {
 
 				//Weapon is facing left
-				params.equippedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
-				params.equippedWeapon.position.x -= params.size.w / 4;
+				params.equippedRangedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
+				params.equippedRangedWeapon.position.x -= params.size.w / 4;
 
 			}
 
-			SDL_Rect sRect = convertAreaToSDLRect(params.equippedWeapon.sprite.areas[0][0]);
-			SDL_Rect dRect = { params.equippedWeapon.position.x - camera.area.x, params.equippedWeapon.position.y - camera.area.y, params.equippedWeapon.size.w, params.equippedWeapon.size.h };
+			SDL_Rect sRect = convertAreaToSDLRect(params.equippedRangedWeapon.sprite.areas[0][0]);
+			SDL_Rect dRect = { params.equippedRangedWeapon.position.x - camera.area.x, params.equippedRangedWeapon.position.y - camera.area.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h };
 			
-			if (areaWithinCameraView({ params.equippedWeapon.position.x, params.equippedWeapon.position.y, params.equippedWeapon.size.w, params.equippedWeapon.size.h }) == true) {
-				SDL_RenderCopyEx(renderer, spriteSheets[params.equippedWeapon.sprite.spriteSheetIndex].texture, &sRect, &dRect, params.equippedWeapon.sprite.angle, params.equippedWeapon.sprite.center, params.equippedWeapon.sprite.flip);
+			if (areaWithinCameraView({ params.equippedRangedWeapon.position.x, params.equippedRangedWeapon.position.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h }) == true) {
+				SDL_RenderCopyEx(renderer, spriteSheets[params.equippedRangedWeapon.sprite.spriteSheetIndex].texture, &sRect, &dRect, params.equippedRangedWeapon.sprite.angle, params.equippedRangedWeapon.sprite.center, params.equippedRangedWeapon.sprite.flip);
 			}
 			break;
 		}
-		case characterParams::weaponStruct::weaponTypeEnum::melee: {
+		case characterParams::equippedWeaponTypeEnum::melee: {
 
 			break;
 		}
@@ -3435,16 +3444,16 @@ void Character::renderEquippedWeapon() {
 }
 
 void Character::renderReloadAnimation() {
-	if (params.equippedWeapon.reload.reloading == true) {
+	if (params.equippedRangedWeapon.reload.reloading == true) {
 
 		//Position animation on top of character
 		areaStruct reloadAnimationArea = { params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h / 6 };
 		if (areaWithinCameraView(reloadAnimationArea) == true) {
 
 			//Render background bar
-			SDL_Rect backgroundSRect = { convertAreaToSDLRect(params.equippedWeapon.reload.sprite.areas[0][0]) };
+			SDL_Rect backgroundSRect = { convertAreaToSDLRect(params.equippedRangedWeapon.reload.sprite.areas[0][0]) };
 			SDL_Rect backgroundDRect = { reloadAnimationArea.x - camera.area.x, reloadAnimationArea.y - camera.area.y, reloadAnimationArea.w, 3 };
-			//SDL_RenderCopy(renderer, spriteSheets[params.equippedWeapon.reload.sprite.spriteSheetIndex].texture, &backgroundSRect, &backgroundDRect);
+			//SDL_RenderCopy(renderer, spriteSheets[params.equippedRangedWeapon.reload.sprite.spriteSheetIndex].texture, &backgroundSRect, &backgroundDRect);
 			colourStruct newColour = { 255, 255, 255, 255 };
 			setSDLDrawColour(newColour);
 			SDL_RenderDrawLine(renderer, backgroundDRect.x, backgroundDRect.y - 1, backgroundDRect.x, backgroundDRect.y + 1); //left vertical bar
@@ -3452,10 +3461,10 @@ void Character::renderReloadAnimation() {
 			SDL_RenderDrawLine(renderer, backgroundDRect.x + backgroundDRect.w, backgroundDRect.y - 1, backgroundDRect.x + backgroundDRect.w, backgroundDRect.y + 1); //right vertical bar
 
 			//Render foreground bar
-			SDL_Rect foregroundSRect = { convertAreaToSDLRect(params.equippedWeapon.reload.sprite.areas[0][1]) };
-			int delayPercentage = (int)(((SDL_GetTicks() - params.equippedWeapon.reload.delay.startTicks) * 100) / params.equippedWeapon.reload.delay.delay);
+			SDL_Rect foregroundSRect = { convertAreaToSDLRect(params.equippedRangedWeapon.reload.sprite.areas[0][1]) };
+			int delayPercentage = (int)(((SDL_GetTicks() - params.equippedRangedWeapon.reload.delay.startTicks) * 100) / params.equippedRangedWeapon.reload.delay.delay);
 			SDL_Rect foregroundDRect = { reloadAnimationArea.x - camera.area.x, reloadAnimationArea.y + 1 - camera.area.y, (reloadAnimationArea.w * delayPercentage) / 100, 1 };
-			//SDL_RenderCopy(renderer, spriteSheets[params.equippedWeapon.reload.sprite.spriteSheetIndex].texture, &foregroundSRect, &foregroundDRect);
+			//SDL_RenderCopy(renderer, spriteSheets[params.equippedRangedWeapon.reload.sprite.spriteSheetIndex].texture, &foregroundSRect, &foregroundDRect);
 			SDL_RenderDrawLine(renderer, foregroundDRect.x + foregroundDRect.w - 1, foregroundDRect.y - 3, foregroundDRect.x + foregroundDRect.w - 1, foregroundDRect.y + 1);
 
 		}
@@ -3571,7 +3580,7 @@ void Character::move() {
 
 		//Face where weapon is aimed if aiming weapon
 		if (rightStickYDir != 0 || rightStickXDir != 0) {
-			int angle = (int)params.equippedWeapon.sprite.angle;
+			int angle = (int)params.equippedRangedWeapon.sprite.angle;
 			int selectionAngle = 45, halfSelectionAngle = selectionAngle / 2;
 			if (angle >= -90 - halfSelectionAngle && angle <= -90 + halfSelectionAngle) {
 				params.direction = directionEnum::up;
@@ -3776,15 +3785,15 @@ void Character::useEquippedWeapon() {
 
 	//Use equipped weapon
 	if (controllerButtons.RB == true) {
-		if (params.equippedWeapon.fireMode == characterParams::weaponStruct::fireModeEnum::semiAuto) {
+		if (params.equippedRangedWeapon.fireMode == characterParams::rangedWeaponStruct::fireModeEnum::semiAuto) {
 			controllerButtons.RB = false;
 		}
 
-		switch (params.equippedWeapon.type) {
-			case characterParams::weaponStruct::weaponTypeEnum::ranged: {
-				if (params.equippedWeapon.magazine.currentLoad > 0 && params.equippedWeapon.reload.reloading == false) {
+		switch (params.equippedWeaponType) {
+			case characterParams::equippedWeaponTypeEnum::ranged: {
+				if (params.equippedRangedWeapon.magazine.currentLoad > 0 && params.equippedRangedWeapon.reload.reloading == false) {
 
-					if (params.equippedWeapon.fireMode != characterParams::weaponStruct::fireModeEnum::burst || (params.equippedWeapon.fireMode == characterParams::weaponStruct::fireModeEnum::burst && params.equippedWeapon.burst.pause == false)) {
+					if (params.equippedRangedWeapon.fireMode != characterParams::rangedWeaponStruct::fireModeEnum::burst || (params.equippedRangedWeapon.fireMode == characterParams::rangedWeaponStruct::fireModeEnum::burst && params.equippedRangedWeapon.burst.pause == false)) {
 						
 						//Fire bullet
 						bulletParamsStruct bulletParams;
@@ -3799,40 +3808,40 @@ void Character::useEquippedWeapon() {
 								{ 11, 360, 16, 16 }
 							}
 						};
-						bulletParams.sprite.angle = params.equippedWeapon.sprite.angle;
+						bulletParams.sprite.angle = params.equippedRangedWeapon.sprite.angle;
 						bulletParams.speed.startTicks = SDL_GetTicks();
 						bulletParams.speed.delay = 1;
 						bulletParams.movePixelIncrement = 6;
 						initBullet(bulletParams);
 
 						//Update magazin current load
-						if (params.equippedWeapon.magazine.currentLoad > 0) {
-							--params.equippedWeapon.magazine.currentLoad;
+						if (params.equippedRangedWeapon.magazine.currentLoad > 0) {
+							--params.equippedRangedWeapon.magazine.currentLoad;
 						}
 
 					}
 
 					//Make weapon fire in bursts
-					if (params.equippedWeapon.fireMode == characterParams::weaponStruct::fireModeEnum::burst) {
-						if (params.equippedWeapon.burst.pause == false) {
-							if (params.equippedWeapon.burst.bulletsFired < params.equippedWeapon.burst.maxBulletsBeforePause) {
-								++params.equippedWeapon.burst.bulletsFired;
+					if (params.equippedRangedWeapon.fireMode == characterParams::rangedWeaponStruct::fireModeEnum::burst) {
+						if (params.equippedRangedWeapon.burst.pause == false) {
+							if (params.equippedRangedWeapon.burst.bulletsFired < params.equippedRangedWeapon.burst.maxBulletsBeforePause) {
+								++params.equippedRangedWeapon.burst.bulletsFired;
 							}
 							else {
-								params.equippedWeapon.burst.pause = true;
-								params.equippedWeapon.burst.delay.startTicks = SDL_GetTicks();
+								params.equippedRangedWeapon.burst.pause = true;
+								params.equippedRangedWeapon.burst.delay.startTicks = SDL_GetTicks();
 							}
 						}
-						else if (SDL_GetTicks() - params.equippedWeapon.burst.delay.startTicks >= params.equippedWeapon.burst.delay.delay) {
-							params.equippedWeapon.burst.pause = false;
-							params.equippedWeapon.burst.bulletsFired = 0;
+						else if (SDL_GetTicks() - params.equippedRangedWeapon.burst.delay.startTicks >= params.equippedRangedWeapon.burst.delay.delay) {
+							params.equippedRangedWeapon.burst.pause = false;
+							params.equippedRangedWeapon.burst.bulletsFired = 0;
 						}
 					}
 
 				}
 				break;
 			}
-			case characterParams::weaponStruct::weaponTypeEnum::melee: {
+			case characterParams::equippedWeaponTypeEnum::melee: {
 
 				break;
 			}
@@ -3840,14 +3849,14 @@ void Character::useEquippedWeapon() {
 	}
 
 	//Reload equipped ranged weapon
-	if (controllerButtons.X == true && params.equippedWeapon.reload.reloading == false && params.equippedWeapon.magazine.currentLoad < params.equippedWeapon.magazine.capacity) {
+	if (controllerButtons.X == true && params.equippedRangedWeapon.reload.reloading == false && params.equippedRangedWeapon.magazine.currentLoad < params.equippedRangedWeapon.magazine.capacity) {
 		controllerButtons.X = false;
-		params.equippedWeapon.reload.reloading = true;
-		params.equippedWeapon.reload.delay.startTicks = SDL_GetTicks();
+		params.equippedRangedWeapon.reload.reloading = true;
+		params.equippedRangedWeapon.reload.delay.startTicks = SDL_GetTicks();
 	}
-	if (params.equippedWeapon.reload.reloading == true && SDL_GetTicks() - params.equippedWeapon.reload.delay.startTicks >= params.equippedWeapon.reload.delay.delay) {
-		params.equippedWeapon.reload.reloading = false;
-		params.equippedWeapon.magazine.currentLoad = params.equippedWeapon.magazine.capacity;
+	if (params.equippedRangedWeapon.reload.reloading == true && SDL_GetTicks() - params.equippedRangedWeapon.reload.delay.startTicks >= params.equippedRangedWeapon.reload.delay.delay) {
+		params.equippedRangedWeapon.reload.reloading = false;
+		params.equippedRangedWeapon.magazine.currentLoad = params.equippedRangedWeapon.magazine.capacity;
 	}
 }
 

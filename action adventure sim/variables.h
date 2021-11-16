@@ -321,8 +321,9 @@ namespace game {
 			directionEnum direction = directionEnum::up;
 		} jump;
 
-		struct weaponStruct {
-			enum class weaponTypeEnum { ranged, melee } type = characterParams::weaponStruct::weaponTypeEnum::ranged;
+		enum class equippedWeaponTypeEnum { ranged, melee } equippedWeaponType = characterParams::equippedWeaponTypeEnum::melee;
+
+		struct rangedWeaponStruct {
 			string name = "";
 
 			XYStruct position = { -1, -1 };
@@ -330,7 +331,7 @@ namespace game {
 
 			spritesStruct sprite;
 
-			enum class fireModeEnum { semiAuto, burst, fullAuto } fireMode = characterParams::weaponStruct::fireModeEnum::semiAuto;
+			enum class fireModeEnum { semiAuto, burst, fullAuto } fireMode = characterParams::rangedWeaponStruct::fireModeEnum::semiAuto;
 
 			struct burstStruct {
 				bool pause = false;
@@ -348,7 +349,18 @@ namespace game {
 				delayStruct delay;
 				spritesStruct sprite;
 			} reload;
-		} equippedWeapon;
+		} equippedRangedWeapon;
+
+		struct meleeWeaponStruct {
+			string name = "";
+
+			XYStruct position = { -1, -1 };
+			WHStruct size = { -1, -1 };
+
+			spritesStruct sprite;
+
+			int swingAngle = 90;
+		} equippedMeleeWeapon;
 	};
 
 	class Character {
@@ -360,7 +372,7 @@ namespace game {
 		WHStruct getSize();
 		int getCurrentHeight();
 		directionEnum getDirection();
-		characterParams::weaponStruct::magazineStruct getMagazine();
+		characterParams::rangedWeaponStruct::magazineStruct getMagazine();
 		string getEquippedWeaponName();
 		
 		void render();
