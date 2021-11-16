@@ -3376,16 +3376,15 @@ void Character::render() {
 
 	//Render shadow
 	WHStruct shadowSize = { params.size.w, params.size.h / 5 };
-	XYStruct shadowPosition = { params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h };
-	areaStruct shadowArea = { shadowPosition.x, shadowPosition.y - params.shadowHeight, shadowSize.w, shadowSize.h };
-	if (areaWithinCameraView(shadowArea) == true) {
-		renderShadow(shadowArea, 50);
+	XYStruct shadowPosition = { params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h - params.shadowHeight };
+	if (areaWithinCameraView({ shadowPosition.x + camera.area.x, shadowPosition.y + camera.area.y, shadowSize.w, shadowSize.h }) == true) {
+		renderShadow({ shadowPosition.x, shadowPosition.y, shadowSize.w, shadowSize.h }, 50);
 	}
 	
 	//Render character
-	SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
-	SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h };
 	if (areaWithinCameraView({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }) == true) {
+		SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
+		SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h };
 		SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
 	}
 
@@ -3394,13 +3393,13 @@ void Character::render() {
 void Character::renderEquippedWeapon() {
 	switch (params.equippedWeapon.type) {
 		case characterParams::weaponStruct::weaponTypeEnum::ranged: {
-			params.equippedWeapon.position = { params.position.x, params.position.y + (params.size.h / 2) - (params.equippedWeapon.sprite.areas[0][0].h / 2) };
+			params.equippedWeapon.position = { params.position.x, params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedWeapon.sprite.areas[0][0].h / 2) };
 
 			//Get weapon angle
 			if (rightStickXDir != 0 || rightStickYDir != 0) {
 				params.equippedWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
 			}
-			else {
+			else if (xDir != 0 || yDir != 0) {
 				params.equippedWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
 			}
 			
@@ -3439,11 +3438,12 @@ void Character::renderReloadAnimation() {
 	if (params.equippedWeapon.reload.reloading == true) {
 
 		//Position animation on top of character
-		if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h / 6 }) == true) {
+		areaStruct reloadAnimationArea = { params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h / 6 };
+		if (areaWithinCameraView(reloadAnimationArea) == true) {
 
 			//Render background bar
 			SDL_Rect backgroundSRect = { convertAreaToSDLRect(params.equippedWeapon.reload.sprite.areas[0][0]) };
-			SDL_Rect backgroundDRect = { params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, 3 };
+			SDL_Rect backgroundDRect = { reloadAnimationArea.x - camera.area.x, reloadAnimationArea.y - camera.area.y, reloadAnimationArea.w, 3 };
 			//SDL_RenderCopy(renderer, spriteSheets[params.equippedWeapon.reload.sprite.spriteSheetIndex].texture, &backgroundSRect, &backgroundDRect);
 			colourStruct newColour = { 255, 255, 255, 255 };
 			setSDLDrawColour(newColour);
@@ -3454,7 +3454,7 @@ void Character::renderReloadAnimation() {
 			//Render foreground bar
 			SDL_Rect foregroundSRect = { convertAreaToSDLRect(params.equippedWeapon.reload.sprite.areas[0][1]) };
 			int delayPercentage = (int)(((SDL_GetTicks() - params.equippedWeapon.reload.delay.startTicks) * 100) / params.equippedWeapon.reload.delay.delay);
-			SDL_Rect foregroundDRect = { params.position.x - camera.area.x, params.position.y + 1 - camera.area.y, (params.size.w * delayPercentage) / 100, 1 };
+			SDL_Rect foregroundDRect = { reloadAnimationArea.x - camera.area.x, reloadAnimationArea.y + 1 - camera.area.y, (reloadAnimationArea.w * delayPercentage) / 100, 1 };
 			//SDL_RenderCopy(renderer, spriteSheets[params.equippedWeapon.reload.sprite.spriteSheetIndex].texture, &foregroundSRect, &foregroundDRect);
 			SDL_RenderDrawLine(renderer, foregroundDRect.x + foregroundDRect.w - 1, foregroundDRect.y - 3, foregroundDRect.x + foregroundDRect.w - 1, foregroundDRect.y + 1);
 
@@ -3790,7 +3790,7 @@ void Character::useEquippedWeapon() {
 						bulletParamsStruct bulletParams;
 						bulletParams.ID = getFreeID(getBulletIDs());
 						bulletParams.layer = params.layer;
-						bulletParams.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+						bulletParams.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) - params.jump.currentHeight };
 						bulletParams.originalPosition = bulletParams.position;
 						bulletParams.size = { tileSize.w / 2, tileSize.h / 2 };
 						bulletParams.sprite.spriteSheetIndex = getSpriteSheetIndex("bullets");
