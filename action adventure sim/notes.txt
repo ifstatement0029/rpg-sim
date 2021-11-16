@@ -37,8 +37,9 @@ ranged weapon:
 		- full auto (continuous shots) - done
 	- have a delay when reloading - done
 melee weapon: 
-	- can aim 360 degrees with left or right stick  - ;;
-	- 
+	- can aim in 8 directions with left or right stick  - ;;
+	- can attack in 8 directions
+	- attack animation: 180 degrees arc
 
 gear:
 
