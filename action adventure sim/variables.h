@@ -265,11 +265,11 @@ namespace game {
 		int walkSpeed = -1;
 	} path;
 
-	struct spritesStruct {
+	struct spriteStruct {
 		int spriteSheetIndex = -1;
 		vector<vector<areaStruct>> areas; //directions (up, down, left, right, upRight, downRight, downLeft, upLeft), frames
 		double angle = 0;
-		SDL_Point* center = NULL;
+		SDL_Point center = { -1, -1 };
 		SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE;
 	};
 
@@ -299,7 +299,7 @@ namespace game {
 		WHStruct size = { -1, -1 };
 		int layer = 0, shadowHeight = 0;
 		
-		spritesStruct sprites;
+		spriteStruct sprites;
 
 		directionEnum direction = directionEnum::down;
 		int frame = 0;
@@ -329,7 +329,7 @@ namespace game {
 			XYStruct position = { -1, -1 };
 			WHStruct size = { -1, -1 };
 
-			spritesStruct sprite;
+			spriteStruct sprite;
 
 			enum class fireModeEnum { semiAuto, burst, fullAuto } fireMode = characterParams::rangedWeaponStruct::fireModeEnum::semiAuto;
 
@@ -347,7 +347,7 @@ namespace game {
 			struct reloadStruct {
 				bool reloading = false;
 				delayStruct delay;
-				spritesStruct sprite;
+				spriteStruct sprite;
 			} reload;
 		} equippedRangedWeapon;
 
@@ -357,7 +357,7 @@ namespace game {
 			XYStruct position = { -1, -1 };
 			WHStruct size = { -1, -1 };
 
-			spritesStruct sprite;
+			spriteStruct sprite;
 
 			int swingAngle = 90;
 		} equippedMeleeWeapon;
@@ -426,7 +426,7 @@ namespace game {
 		XYStruct position = { -1, -1 }, originalPosition = { -1, -1 };
 		WHStruct size = { -1, -1 };
 
-		spritesStruct sprite;
+		spriteStruct sprite;
 
 		delayStruct speed;
 		int movePixelIncrement = 1;

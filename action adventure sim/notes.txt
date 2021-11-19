@@ -37,9 +37,9 @@ ranged weapon:
 		- full auto (continuous shots) - done
 	- have a delay when reloading - done
 melee weapon: 
-	- can aim in 8 directions with left or right stick  - ;;
-	- can attack in 8 directions
-	- attack animation: 180 degrees arc
+	- can aim 360 degrees with left or right stick - done
+	- can attack in 360 degrees - ;;
+	- attack animation: 180 (or whatever angle value is) degrees arc
 
 gear:
 
@@ -66,4 +66,8 @@ modding:
 cyberchair:
 character can sit in chair and all their cybernetic limbs and head are spread from their torso
 can replace/mod limbs, torso and head
+
+
+spider bot:
+
 

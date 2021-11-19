@@ -18,6 +18,15 @@ void setSDLLogicalSize(WHStruct targetSize) {
 	}
 }
 
+void SDLRenderCopyEx(SDL_Rect sRect, SDL_Rect dRect, spriteStruct& sprite) {
+	if (sprite.center.x != -1 && sprite.center.y != -1) {
+		SDL_RenderCopyEx(renderer, spriteSheets[sprite.spriteSheetIndex].texture, &sRect, &dRect, sprite.angle, &sprite.center, sprite.flip);
+	}
+	else {
+		SDL_RenderCopyEx(renderer, spriteSheets[sprite.spriteSheetIndex].texture, &sRect, &dRect, sprite.angle, NULL, sprite.flip);
+	}
+}
+
 WHStruct getSDLTextureSize(SDL_Texture* texture) {
 	WHStruct textureSize = { -1, -1 };
 	if (texture != NULL) {
@@ -1674,6 +1683,7 @@ void initCharacters() {
 				vector<areaStruct> areas;
 				areas.push_back({ 2, 21, 21, 8 });
 				currentCharacterParams.equippedRangedWeapon.sprite.areas.push_back(areas);
+				currentCharacterParams.equippedRangedWeapon.sprite.center = { 0, currentCharacterParams.equippedRangedWeapon.sprite.areas[0][0].h / 2 };
 				currentCharacterParams.equippedRangedWeapon.fireMode = characterParams::rangedWeaponStruct::fireModeEnum::burst;
 				currentCharacterParams.equippedRangedWeapon.burst.maxBulletsBeforePause = 3;
 				currentCharacterParams.equippedRangedWeapon.burst.delay.delay = 200;
@@ -1700,7 +1710,7 @@ void initCharacters() {
 						{ 522, 9, 29, 6 }
 					}
 				};
-				currentCharacterParams.equippedMeleeWeapon.sprite.center = { --;; lround((float)currentCharacterParams.equippedMeleeWeapon.size.w / 2), lround((float)currentCharacterParams.equippedMeleeWeapon.size.h / 2) };
+				currentCharacterParams.equippedMeleeWeapon.sprite.center = { 0, currentCharacterParams.equippedMeleeWeapon.sprite.areas[0][0].h / 2 };
 				break;
 			}
 		}
@@ -3413,7 +3423,7 @@ void Character::renderEquippedWeapon() {
 		case characterParams::equippedWeaponTypeEnum::ranged: {
 			
 			//Update position
-			params.equippedRangedWeapon.position = { params.position.x, params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedRangedWeapon.sprite.areas[0][0].h / 2) };
+			params.equippedRangedWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedRangedWeapon.sprite.areas[0][0].h / 2) };
 
 			//Get weapon angle
 			if (rightStickXDir != 0 || rightStickYDir != 0) {
@@ -3428,14 +3438,12 @@ void Character::renderEquippedWeapon() {
 				
 				//Weapon is facing right
 				params.equippedRangedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
-				params.equippedRangedWeapon.position.x += params.size.w / 4;
 
 			}
 			else {
 
 				//Weapon is facing left
 				params.equippedRangedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
-				params.equippedRangedWeapon.position.x -= params.size.w / 4;
 
 			}
 
@@ -3443,40 +3451,17 @@ void Character::renderEquippedWeapon() {
 			SDL_Rect sRect = convertAreaToSDLRect(params.equippedRangedWeapon.sprite.areas[0][0]);
 			SDL_Rect dRect = { params.equippedRangedWeapon.position.x - camera.area.x, params.equippedRangedWeapon.position.y - camera.area.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h };
 			if (areaWithinCameraView({ params.equippedRangedWeapon.position.x, params.equippedRangedWeapon.position.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h }) == true) {
-				SDL_RenderCopyEx(renderer, spriteSheets[params.equippedRangedWeapon.sprite.spriteSheetIndex].texture, &sRect, &dRect, params.equippedRangedWeapon.sprite.angle, params.equippedRangedWeapon.sprite.center, params.equippedRangedWeapon.sprite.flip);
+				SDLRenderCopyEx(sRect, dRect, params.equippedRangedWeapon.sprite);
 			}
 
 			break;
 		}
 		case characterParams::equippedWeaponTypeEnum::melee: {
 			
-			//Update weapon angle, flip and position based on character direction
-			/*switch (params.direction) {
-				case directionEnum::right: {
-					params.equippedMeleeWeapon.sprite.angle = 0;
-					params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
-					params.equippedMeleeWeapon.position.x = params.position.x + params.size.w / 2;
-					params.equippedMeleeWeapon.position.y = params.position.y + (params.size.h / 2);
-					break;
-				}
-				case directionEnum::left: {
-					params.equippedMeleeWeapon.sprite.angle = 0;
-					params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_HORIZONTAL;
-					params.equippedMeleeWeapon.position.x = params.position.x + (params.size.w / 2) - (params.equippedMeleeWeapon.size.w - 1);
-					params.equippedMeleeWeapon.position.y = params.position.y + (params.size.h / 2);
-					break;
-				}
-				case directionEnum::down: {
-					params.equippedMeleeWeapon.sprite.angle = 90;
-					params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
-					params.equippedMeleeWeapon.position.x = params.position.x + params.size.w / 2;
-					params.equippedMeleeWeapon.position.y = params.position.y + (params.size.h / 4) * 3;
-					break;
-				}
-			}*/
+			//Update position
+			params.equippedMeleeWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedMeleeWeapon.sprite.areas[0][0].h / 2) };
 
-			params.equippedMeleeWeapon.position = { params.position.x, params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedMeleeWeapon.sprite.areas[0][0].h / 2) };
-
+			//Get weapon angle
 			if (rightStickXDir != 0 || rightStickYDir != 0) {
 				params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
 			}
@@ -3484,11 +3469,25 @@ void Character::renderEquippedWeapon() {
 				params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
 			}
 
+			//Flip weapon and adjust position
+			if (params.equippedMeleeWeapon.sprite.angle >= -90 && params.equippedMeleeWeapon.sprite.angle <= 90) {
+
+				//Weapon is facing right
+				params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+
+			}
+			else {
+
+				//Weapon is facing left
+				params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
+
+			}
+
 			//Render
 			SDL_Rect sRect = convertAreaToSDLRect(params.equippedMeleeWeapon.sprite.areas[0][0]);
 			SDL_Rect dRect = { params.equippedMeleeWeapon.position.x - camera.area.x, params.equippedMeleeWeapon.position.y - camera.area.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h };
 			if (areaWithinCameraView({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }) == true) {
-				SDL_RenderCopyEx(renderer, spriteSheets[params.equippedMeleeWeapon.sprite.spriteSheetIndex].texture, &sRect, &dRect, params.equippedMeleeWeapon.sprite.angle, params.equippedMeleeWeapon.sprite.center, params.equippedMeleeWeapon.sprite.flip);
+				SDLRenderCopyEx(sRect, dRect, params.equippedMeleeWeapon.sprite);
 			}
 
 			break;
@@ -3633,7 +3632,17 @@ void Character::move() {
 
 		//Face where weapon is aimed if aiming weapon
 		if (rightStickYDir != 0 || rightStickXDir != 0) {
-			int angle = (int)params.equippedRangedWeapon.sprite.angle;
+			int angle = 0;
+			switch (params.equippedWeaponType) {
+				case characterParams::equippedWeaponTypeEnum::ranged: {
+					angle = (int)params.equippedRangedWeapon.sprite.angle;
+					break;
+				}
+				case characterParams::equippedWeaponTypeEnum::melee: {
+					angle = (int)params.equippedMeleeWeapon.sprite.angle;
+					break;
+				}
+			}
 			int selectionAngle = 45, halfSelectionAngle = selectionAngle / 2;
 			if (angle >= -90 - halfSelectionAngle && angle <= -90 + halfSelectionAngle) {
 				params.direction = directionEnum::up;
@@ -3895,7 +3904,7 @@ void Character::useEquippedWeapon() {
 				break;
 			}
 			case characterParams::equippedWeaponTypeEnum::melee: {
-
+				--;;
 				break;
 			}
 		}
@@ -3959,7 +3968,7 @@ void Bullet::render() {
 	SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h };
 
 	if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h }) == true) {
-		SDL_RenderCopyEx(renderer, spriteSheets[params.sprite.spriteSheetIndex].texture, &sRect, &dRect, params.sprite.angle, params.sprite.center, params.sprite.flip);
+		SDLRenderCopyEx(sRect, dRect, params.sprite);
 	}
 }
 
