@@ -1609,11 +1609,25 @@ void initLevel() {
 
 	//Walls
 	for (int wallsCnt = 0; wallsCnt < randInt(1000, 2000); ++wallsCnt) {
+		WHStruct wallSize = { 1, 1 };
+		if (randInt(1, 2) == 1) {
+			wallSize.w += randInt(1, 5);
+		}
+		else {
+			wallSize.h += randInt(1, 5);
+		}
+
 		XYStruct tilePosition = { randInt(0, (int)overworldGrid.gridTile[1].size() - 1), randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1) };
-		overworldGrid.gridTile[1][tilePosition.x][tilePosition.y].collidable = true;
-		overworldGrid.gridTile[1][tilePosition.x][tilePosition.y].tileIndex = getTileIndex("wall");
-		overworldGrid.gridTile[1][tilePosition.x][tilePosition.y].condition = 10;
-		overworldGrid.gridTile[1][tilePosition.x][tilePosition.y].resistance = 20;
+
+		for (int wallXCnt = tilePosition.x; wallXCnt < tilePosition.x + wallSize.w; ++wallXCnt) {
+			for (int wallYCnt = tilePosition.y; wallYCnt < tilePosition.y + wallSize.h; ++wallYCnt) {
+				if (areaWithinGrid({ wallXCnt, wallYCnt, 1, 1 }, 1) == true) {
+					overworldGrid.gridTile[1][wallXCnt][wallYCnt].collidable = true;
+					overworldGrid.gridTile[1][wallXCnt][wallYCnt].tileIndex = getTileIndex("wall");
+					overworldGrid.gridTile[1][wallXCnt][wallYCnt].resistance = 100;
+				}
+			}
+		}
 	}
 
 	//Tables (tiles)
@@ -1676,7 +1690,7 @@ void initCharacters() {
 		currentCharacterParams.layer = 1;
 
 		//Init equipped weapon
-		currentCharacterParams.equippedWeaponType = characterParams::equippedWeaponTypeEnum::melee;
+		currentCharacterParams.equippedWeaponType = characterParams::equippedWeaponTypeEnum::ranged;
 		switch (currentCharacterParams.equippedWeaponType) {
 			case characterParams::equippedWeaponTypeEnum::ranged: {
 				currentCharacterParams.equippedRangedWeapon.name = "Gun";
@@ -3873,6 +3887,7 @@ void Character::useEquippedWeapon() {
 						bulletParamsStruct bulletParams;
 						bulletParams.ID = getFreeID(getBulletIDs());
 						bulletParams.layer = params.layer;
+						bulletParams.height = params.jump.currentHeight;
 						bulletParams.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) - params.jump.currentHeight };
 						bulletParams.originalPosition = bulletParams.position;
 						bulletParams.size = { tileSize.w / 2, tileSize.h / 2 };
@@ -3886,8 +3901,8 @@ void Character::useEquippedWeapon() {
 						bulletParams.speed.startTicks = SDL_GetTicks();
 						bulletParams.speed.delay = 1;
 						bulletParams.movePixelIncrement = 6;
-						bulletParams.condition = 10;
-						bulletParams.resistance = 20;
+						bulletParams.damage = 90;
+						bulletParams.resistance = 100;
 						initBullet(bulletParams);
 
 						//Update magazin current load
@@ -4002,9 +4017,9 @@ XYStruct Bullet::getPosition() {
 
 void Bullet::render() {
 	SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
-	SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h };
+	SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.height, params.size.w, params.size.h };
 
-	if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h }) == true) {
+	if (areaWithinCameraView({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }) == true) {
 		SDLRenderCopyEx(sRect, dRect, params.sprite);
 	}
 }
@@ -4013,16 +4028,14 @@ void Bullet::move() {
 	if (SDL_GetTicks() - params.speed.startTicks >= params.speed.delay) {
 		params.speed.startTicks = SDL_GetTicks();
 		params.distanceTravelled += params.movePixelIncrement;
-		params.position = { lround((double)params.originalPosition.x + (params.distanceTravelled * cos(((params.sprite.angle) * M_PI) / 180))), lround((double)params.originalPosition.y + (params.distanceTravelled * sin(((params.sprite.angle) * M_PI) / 180))) };
+		params.position = { lround((double)params.originalPosition.x + ((params.distanceTravelled * cos(((params.sprite.angle) * M_PI) / 180)) * params.directionMods.x)), lround((double)params.originalPosition.y + ((params.distanceTravelled * sin(((params.sprite.angle) * M_PI) / 180)) * params.directionMods.y )) };
 	}
 }
 
 void Bullet::markForDestruction() {
 
 	//If bullet goes outside of overworld grid then destroy it
-	if (areaWithinArea({ params.position.x, params.position.y, params.size.w, params.size.h }, { 0, 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false) {
-		/*printStr("\nmark:");
-		printAreaL({ { params.position.x, params.position.y, params.size.w, params.size.h }, { 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, 0, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h } });*/
+	if (areaWithinArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { 0, 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false) {
 		bulletsToDestroyIDs.push_back(params.ID);
 	}
 
@@ -4030,17 +4043,55 @@ void Bullet::markForDestruction() {
 
 void Bullet::bouncePenetrateOrStayStuck() {
 	
-	//Calculate bullet force
-	--;;
+	//Calculate bullet force (the farther the bullet travels, the less damage it does
+	int force = params.damage - params.distanceTravelled;
 
 	//If bullet force is lower than wall/character/object/other bullets resistance then bullet bounces
+	collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }), params.layer, params.height);
+	if (collisionData.collision == true) {
+		if (force < overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance) {
+
+			//Bullet bounces
+			--;;
+			
+			//int bulletCos = params.distanceTravelled * cos(((params.sprite.angle) * M_PI) / 180);
+
+			/*bulletCosVal: = round(privPartyCharParams.bulletDistance * cos(((privPartyCharParams.firingAngle - 90) * pi) / 180));
+			if valueWithinWordRange(privPartyCharParams.bulletX + bulletCosVal) = true then
+				begin
+				privPartyCharParams.bulletX: = privPartyCharParams.bulletX + bulletCosVal;
+			end
+			else
+				begin
+				destroyBullet : = true;
+			end;
+			bulletSinVal: = round(privPartyCharParams.bulletDistance * sin(((privPartyCharParams.firingAngle - 90) * pi) / 180));
+			if valueWithinWordRange(privPartyCharParams.bulletY - bulletSinVal) = true then
+				begin
+				privPartyCharParams.bulletY: = privPartyCharParams.bulletY - bulletSinVal;
+			end
+			else
+				begin
+				destroyBullet : = true;
+			end;*/
+
+			//Update wall resistance by the amount of force that hits it
+			overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance -= force;
+
+		}
+		//else if () {
+
+		//	//If bullet force is within range of stuck tolerance percentage of wall/character/object/other then bullet stays stuck
 
 
-	//If bullet force is within range wall/character/object/other bullets resistance tolerance then bullet stays stuck
+		//}
+		//else if () {
+		//	
+		//	//If bullet force is greater than wall/character/object/other bullets resistance then bullet penetrates
 
 
-	//If bullet force is greater than wall/character/object/other bullets resistance then bullet penetrates
-
+		//}
+	}
 
 }
 

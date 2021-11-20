@@ -115,7 +115,7 @@ namespace game {
 	bool loadLevel = false;
 
 	struct gridTileStruct {
-		int tileIndex = -1, height = 0, condition = -1, resistance = -1;
+		int tileIndex = -1, height = 0, resistance = -1, stuckTolerancePercentage = 10;
 		bool collidable = false, jumpable = false;
 	};
 
@@ -426,9 +426,9 @@ namespace game {
 	vector<Table> tables;
 
 	struct bulletParamsStruct {
-		int ID = -1, layer = -1;
+		int ID = -1, layer = -1, height = 0;
 
-		XYStruct position = { -1, -1 }, originalPosition = { -1, -1 };
+		XYStruct position = { -1, -1 }, originalPosition = { -1, -1 }, directionMods = { 1, 1 };
 		WHStruct size = { -1, -1 };
 
 		spriteStruct sprite;
@@ -438,7 +438,7 @@ namespace game {
 
 		int distanceTravelled = 0;
 
-		int condition = -1, resistance = -1;
+		int damage = -1, resistance = -1, stuckTolerancePercentage = 10;
 	};
 
 	class Bullet {
