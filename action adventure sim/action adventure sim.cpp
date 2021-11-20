@@ -1612,6 +1612,8 @@ void initLevel() {
 		XYStruct tilePosition = { randInt(0, (int)overworldGrid.gridTile[1].size() - 1), randInt(0, (int)overworldGrid.gridTile[1][0].size() - 1) };
 		overworldGrid.gridTile[1][tilePosition.x][tilePosition.y].collidable = true;
 		overworldGrid.gridTile[1][tilePosition.x][tilePosition.y].tileIndex = getTileIndex("wall");
+		overworldGrid.gridTile[1][tilePosition.x][tilePosition.y].condition = 10;
+		overworldGrid.gridTile[1][tilePosition.x][tilePosition.y].resistance = 20;
 	}
 
 	//Tables (tiles)
@@ -3305,6 +3307,7 @@ void bulletActions() {
 	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
 		bullets[bulletsCnt].move();
 		bullets[bulletsCnt].markForDestruction();
+		bullets[bulletsCnt].bouncePenetrateOrStayStuck();
 	}
 }
 
@@ -3463,11 +3466,13 @@ void Character::renderEquippedWeapon() {
 			params.equippedMeleeWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedMeleeWeapon.sprite.areas[0][0].h / 2) };
 
 			//Get weapon angle
-			if (rightStickXDir != 0 || rightStickYDir != 0) {
-				params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
-			}
-			else if (xDir != 0 || yDir != 0) {
-				params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+			if (params.equippedMeleeWeapon.swing.swinging == false) {
+				if (rightStickXDir != 0 || rightStickYDir != 0) {
+					params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+				}
+				else if (xDir != 0 || yDir != 0) {
+					params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+				}
 			}
 
 			//Flip weapon and adjust position
@@ -3881,6 +3886,8 @@ void Character::useEquippedWeapon() {
 						bulletParams.speed.startTicks = SDL_GetTicks();
 						bulletParams.speed.delay = 1;
 						bulletParams.movePixelIncrement = 6;
+						bulletParams.condition = 10;
+						bulletParams.resistance = 20;
 						initBullet(bulletParams);
 
 						//Update magazin current load
@@ -3913,8 +3920,9 @@ void Character::useEquippedWeapon() {
 			case characterParams::equippedWeaponTypeEnum::melee: {
 				if (params.equippedMeleeWeapon.swing.swinging == false) {
 					params.equippedMeleeWeapon.swing.swinging = true;
-					params.equippedMeleeWeapon.swing.startAngle -= params.equippedMeleeWeapon.swing.angle / 2;
-					params.equippedMeleeWeapon.swing.endAngle = params.equippedMeleeWeapon.swing.startAngle + (params.equippedMeleeWeapon.swing.angle / 2);
+					params.equippedMeleeWeapon.swing.originalAngle = params.equippedMeleeWeapon.sprite.angle;
+					params.equippedMeleeWeapon.swing.startAngle = (int)params.equippedMeleeWeapon.sprite.angle - (params.equippedMeleeWeapon.swing.angle / 2);
+					params.equippedMeleeWeapon.swing.endAngle = params.equippedMeleeWeapon.swing.startAngle + params.equippedMeleeWeapon.swing.angle;
 					params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.startAngle;
 					params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
 				}
@@ -3935,7 +3943,7 @@ void Character::useEquippedWeapon() {
 	}
 
 	//Swing equipped melee weapon
-	if (SDL_GetTicks() - params.equippedMeleeWeapon.swing.delay.startTicks >= params.equippedMeleeWeapon.swing.delay.delay) {
+	if (params.equippedMeleeWeapon.swing.swinging == true && SDL_GetTicks() - params.equippedMeleeWeapon.swing.delay.startTicks >= params.equippedMeleeWeapon.swing.delay.delay) {
 		params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
 		if (params.equippedMeleeWeapon.swing.currentAngle < params.equippedMeleeWeapon.swing.endAngle) {
 			params.equippedMeleeWeapon.swing.currentAngle += params.equippedMeleeWeapon.swing.pixelIncrement;
@@ -3945,6 +3953,7 @@ void Character::useEquippedWeapon() {
 		}
 		else {
 			params.equippedMeleeWeapon.swing.swinging = false;
+			params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.originalAngle;
 		}
 	}
 
@@ -4016,6 +4025,22 @@ void Bullet::markForDestruction() {
 		printAreaL({ { params.position.x, params.position.y, params.size.w, params.size.h }, { 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, 0, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h } });*/
 		bulletsToDestroyIDs.push_back(params.ID);
 	}
+
+}
+
+void Bullet::bouncePenetrateOrStayStuck() {
+	
+	//Calculate bullet force
+	--;;
+
+	//If bullet force is lower than wall/character/object/other bullets resistance then bullet bounces
+
+
+	//If bullet force is within range wall/character/object/other bullets resistance tolerance then bullet stays stuck
+
+
+	//If bullet force is greater than wall/character/object/other bullets resistance then bullet penetrates
+
 
 }
 

@@ -115,7 +115,7 @@ namespace game {
 	bool loadLevel = false;
 
 	struct gridTileStruct {
-		int tileIndex = -1, height = 0;
+		int tileIndex = -1, height = 0, condition = -1, resistance = -1;
 		bool collidable = false, jumpable = false;
 	};
 
@@ -361,6 +361,7 @@ namespace game {
 
 			struct swingStruct {
 				bool swinging = false;
+				double originalAngle = -1;
 				int angle = 180, currentAngle = -1, startAngle = -1, endAngle = -1, pixelIncrement = 12;
 				delayStruct delay;
 			} swing;
@@ -436,6 +437,8 @@ namespace game {
 		int movePixelIncrement = 1;
 
 		int distanceTravelled = 0;
+
+		int condition = -1, resistance = -1;
 	};
 
 	class Bullet {
@@ -449,6 +452,7 @@ namespace game {
 		void render();
 		void move();
 		void markForDestruction();
+		void bouncePenetrateOrStayStuck();
 
 	private:
 		bulletParamsStruct params;

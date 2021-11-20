@@ -20,6 +20,7 @@ jump on tile - done
 jump on jumpable object - done
 need to allow character to jump from top of object - done
 collide with walls - done
+swim
 
 cybernetics:
 characters can replace limbs, torso and head with cybernetic counterparts
@@ -36,10 +37,11 @@ ranged weapon:
 		- burst (a few shots at a time) - done
 		- full auto (continuous shots) - done
 	- have a delay when reloading - done
+	- bullets can bounce against/penetrate/stay stuck in walls, characters, objects and other bullets - ;;
 melee weapon: 
 	- can aim 360 degrees with left or right stick - done
-	- can attack in 360 degrees - ;;
-	- attack animation: 180 (or whatever angle value is) degrees arc
+	- can attack in 360 degrees - done
+	- attack animation: 180 (or whatever angle value is) degrees arc - done
 
 gear:
 
