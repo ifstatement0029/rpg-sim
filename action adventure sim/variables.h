@@ -359,7 +359,11 @@ namespace game {
 
 			spriteStruct sprite;
 
-			int swingAngle = 90;
+			struct swingStruct {
+				bool swinging = false;
+				int angle = 180, currentAngle = -1, startAngle = -1, endAngle = -1, pixelIncrement = 12;
+				delayStruct delay;
+			} swing;
 		} equippedMeleeWeapon;
 	};
 

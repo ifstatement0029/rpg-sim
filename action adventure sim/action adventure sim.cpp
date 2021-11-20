@@ -1711,6 +1711,7 @@ void initCharacters() {
 					}
 				};
 				currentCharacterParams.equippedMeleeWeapon.sprite.center = { 0, currentCharacterParams.equippedMeleeWeapon.sprite.areas[0][0].h / 2 };
+				currentCharacterParams.equippedMeleeWeapon.swing.delay.delay = 1;
 				break;
 			}
 		}
@@ -3487,6 +3488,12 @@ void Character::renderEquippedWeapon() {
 			SDL_Rect sRect = convertAreaToSDLRect(params.equippedMeleeWeapon.sprite.areas[0][0]);
 			SDL_Rect dRect = { params.equippedMeleeWeapon.position.x - camera.area.x, params.equippedMeleeWeapon.position.y - camera.area.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h };
 			if (areaWithinCameraView({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }) == true) {
+
+				//Update weapon angle
+				if (params.equippedMeleeWeapon.swing.swinging == true) {
+					params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.currentAngle;
+				}
+
 				SDLRenderCopyEx(sRect, dRect, params.equippedMeleeWeapon.sprite);
 			}
 
@@ -3904,7 +3911,13 @@ void Character::useEquippedWeapon() {
 				break;
 			}
 			case characterParams::equippedWeaponTypeEnum::melee: {
-				--;;
+				if (params.equippedMeleeWeapon.swing.swinging == false) {
+					params.equippedMeleeWeapon.swing.swinging = true;
+					params.equippedMeleeWeapon.swing.startAngle -= params.equippedMeleeWeapon.swing.angle / 2;
+					params.equippedMeleeWeapon.swing.endAngle = params.equippedMeleeWeapon.swing.startAngle + (params.equippedMeleeWeapon.swing.angle / 2);
+					params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.startAngle;
+					params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
+				}
 				break;
 			}
 		}
@@ -3920,6 +3933,21 @@ void Character::useEquippedWeapon() {
 		params.equippedRangedWeapon.reload.reloading = false;
 		params.equippedRangedWeapon.magazine.currentLoad = params.equippedRangedWeapon.magazine.capacity;
 	}
+
+	//Swing equipped melee weapon
+	if (SDL_GetTicks() - params.equippedMeleeWeapon.swing.delay.startTicks >= params.equippedMeleeWeapon.swing.delay.delay) {
+		params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
+		if (params.equippedMeleeWeapon.swing.currentAngle < params.equippedMeleeWeapon.swing.endAngle) {
+			params.equippedMeleeWeapon.swing.currentAngle += params.equippedMeleeWeapon.swing.pixelIncrement;
+			if (params.equippedMeleeWeapon.swing.currentAngle > params.equippedMeleeWeapon.swing.endAngle) {
+				params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.endAngle;
+			}
+		}
+		else {
+			params.equippedMeleeWeapon.swing.swinging = false;
+		}
+	}
+
 }
 
 Table::Table(tableParamsStruct newParams) {
