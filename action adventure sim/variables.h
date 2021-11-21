@@ -435,7 +435,7 @@ namespace game {
 
 		delayStruct speed;
 		int movePixelIncrement = 1;
-
+		
 		int distanceTravelled = 0, totalDistanceTravelled = 0;
 
 		int damage = -1, resistance = -1, stuckTolerancePercentage = 10;

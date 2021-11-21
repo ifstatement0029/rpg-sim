@@ -3936,7 +3936,8 @@ void Character::useEquippedWeapon() {
 						bulletParams.height = params.jump.currentHeight;
 						bulletParams.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) - params.jump.currentHeight };
 						bulletParams.originalPosition = bulletParams.position;
-						bulletParams.size = { tileSize.w / 2, tileSize.h / 2 };
+						//bulletParams.size = { tileSize.w / 2, tileSize.h / 2 };
+						bulletParams.size = tileSize;
 						bulletParams.sprite.spriteSheetIndex = getSpriteSheetIndex("bullets");
 						bulletParams.sprite.areas = {
 							{
@@ -4095,32 +4096,34 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 	int force = params.damage - params.totalDistanceTravelled;
 
 	//If bullet force is lower than wall/character/object/other bullets resistance then bullet ricochet
-	areaStruct bulletPixelArea = { params.position.x, params.position.y - params.height, params.size.w, params.size.h };
-	collisionDataStruct collisionData = checkSubGridCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea(bulletPixelArea), bulletPixelArea, params.layer, params.height);
+	collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }), params.layer, params.height);
 	if (collisionData.collision == true) {
 
 		//Get side of grid tile hit by bullet
 		directionEnum sideHit = directionEnum::down;
-		areaStruct tilePixelArea = getPixelAreaFromGridArea({ collisionData.tileHitGridPosition.x, collisionData.tileHitGridPosition.y, tileSize.w, tileSize.h });
-		if (params.previousPosition.x + params.size.w - 1 < tilePixelArea.x) {
+		areaStruct tileGridArea = { collisionData.tileHitGridPosition.x, collisionData.tileHitGridPosition.y, 1, 1 };
+		areaStruct bulletPreviousGridArea = getGridAreaFromPixelArea({ params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h });
+		if (bulletPreviousGridArea.x + bulletPreviousGridArea.w - 1 < tileGridArea.x) {
 			sideHit = directionEnum::left;
 		}
-		else if (params.previousPosition.x > tilePixelArea.x + tilePixelArea.w - 1) {
+		else if (bulletPreviousGridArea.x > tileGridArea.x + tileGridArea.w - 1) {
 			sideHit = directionEnum::right;
-			printRand();
 		}
-		else if (params.previousPosition.y + params.size.h - 1 < tilePixelArea.y) {
+		else if (bulletPreviousGridArea.y + bulletPreviousGridArea.h - 1 < tileGridArea.y) {
 			sideHit = directionEnum::up;
 		}
-		else if (params.previousPosition.y > tilePixelArea.y + tilePixelArea.h - 1) {
+		else if (bulletPreviousGridArea.y > tileGridArea.y + tileGridArea.h - 1) {
 			sideHit = directionEnum::down;
 		}
 
 		//Bullet ricochets
+		params.originalPosition = params.position;
+		params.distanceTravelled = 0;
 		if (sideHit == directionEnum::left || sideHit == directionEnum::right) {
 			params.directionMods.x = -1;
-			params.originalPosition = params.position;
-			params.distanceTravelled = 0;
+		}
+		else {
+			params.directionMods.y = -1;
 		}
 		
 		//if (force < overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance) {
