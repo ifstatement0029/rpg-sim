@@ -762,7 +762,7 @@ collisionDataStruct checkCollisionWithOverworldGridFactoringHeight(areaStruct gr
 	for (int areaXCnt = gridArea.x; areaXCnt < gridArea.x + gridArea.w; ++areaXCnt) {
 		for (int areaYCnt = gridArea.y; areaYCnt < gridArea.y + gridArea.h; ++areaYCnt) {
 
-			if (gridLayer < (int)overworldGrid.gridTile.size() && areaXCnt < (int)overworldGrid.gridTile[gridLayer].size() && areaYCnt < (int)overworldGrid.gridTile[gridLayer][areaXCnt].size() && overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].collidable == true) {
+			if (gridLayer < (int)overworldGrid.gridTile.size() && areaXCnt >= 0 && areaXCnt <= (int)overworldGrid.gridTile[gridLayer].size() - 1 && areaYCnt >= 0 && areaYCnt <= (int)overworldGrid.gridTile[gridLayer][areaXCnt].size() - 1 && overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].collidable == true) {
 				if ((overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].jumpable == true && height < overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].height) || overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].jumpable == false) {
 					collisionData.collision = true;
 					collisionData.tileHitGridPosition = { areaXCnt, areaYCnt };
@@ -3947,7 +3947,7 @@ void Character::useEquippedWeapon() {
 						bulletParams.sprite.angle = params.equippedRangedWeapon.sprite.angle;
 						bulletParams.speed.startTicks = SDL_GetTicks();
 						bulletParams.speed.delay = 1;
-						bulletParams.movePixelIncrement = 1;
+						bulletParams.movePixelIncrement = 8;
 						bulletParams.damage = 90;
 						bulletParams.resistance = 100;
 						initBullet(bulletParams);
@@ -4094,6 +4094,9 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 	
 	//Calculate bullet force (the farther the bullet travels, the less damage it does
 	int force = params.damage - params.totalDistanceTravelled;
+	if (force < 0) {
+		force = 0;
+	}
 
 	//If bullet force is lower than wall/character/object/other bullets resistance then bullet ricochet
 	collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }), params.layer, params.height);
@@ -4116,32 +4119,28 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 			sideHit = directionEnum::down;
 		}
 
-		//Bullet ricochets
-		params.originalPosition = params.position;
-		params.distanceTravelled = 0;
-		if (sideHit == directionEnum::left || sideHit == directionEnum::right) {
-			params.directionMods.x = -1;
+		if (force < overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance) {
+
+			//Bullet ricochets
+			params.originalPosition = params.position;
+			params.distanceTravelled = 0;
+			if (sideHit == directionEnum::left || sideHit == directionEnum::right) {
+				params.directionMods.x = -1;
+			}
+			else {
+				params.directionMods.y = -1;
+			}
+
+			//Decrease wall resistance by the amount of force that hits it
+			overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance -= force;
+
 		}
-		else {
-			params.directionMods.y = -1;
+		else if (--;;) {
+
+			//If bullet force is within range of stuck tolerance percentage of wall/character/object/other then bullet stays stuck
+
+
 		}
-		
-		//if (force < overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance) {
-
-		//	//Bullet ricochet
-		//	
-		//	
-
-		//	//Update wall resistance by the amount of force that hits it
-		//	overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance -= force;
-
-		//}
-		//else if () {
-
-		//	//If bullet force is within range of stuck tolerance percentage of wall/character/object/other then bullet stays stuck
-
-
-		//}
 		//else if () {
 		//	
 		//	//If bullet force is greater than wall/character/object/other bullets resistance then bullet penetrates
