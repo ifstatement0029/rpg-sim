@@ -4074,6 +4074,8 @@ void Bullet::move() {
 	if (SDL_GetTicks() - params.speed.startTicks >= params.speed.delay) {
 		params.speed.startTicks = SDL_GetTicks();
 		params.distanceTravelled += params.movePixelIncrement;
+		params.totalDistanceTravelled += params.movePixelIncrement;
+		params.previousPosition = params.position;
 		params.position = { lround((double)params.originalPosition.x + ((params.distanceTravelled * cos(((params.sprite.angle) * M_PI) / 180)) * params.directionMods.x)), lround((double)params.originalPosition.y + ((params.distanceTravelled * sin(((params.sprite.angle) * M_PI) / 180)) * params.directionMods.y )) };
 	}
 }
@@ -4090,42 +4092,47 @@ void Bullet::markForDestruction() {
 void Bullet::ricochetPenetrateOrStayStuck() {
 	
 	//Calculate bullet force (the farther the bullet travels, the less damage it does
-	int force = params.damage - params.distanceTravelled;
+	int force = params.damage - params.totalDistanceTravelled;
 
 	//If bullet force is lower than wall/character/object/other bullets resistance then bullet ricochet
 	areaStruct bulletPixelArea = { params.position.x, params.position.y - params.height, params.size.w, params.size.h };
 	collisionDataStruct collisionData = checkSubGridCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea(bulletPixelArea), bulletPixelArea, params.layer, params.height);
 	if (collisionData.collision == true) {
-		if (force < overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance) {
 
-			//Bullet ricochet
-			--;;
-			
-			//int bulletCos = params.distanceTravelled * cos(((params.sprite.angle) * M_PI) / 180);
-
-			/*bulletCosVal: = round(privPartyCharParams.bulletDistance * cos(((privPartyCharParams.firingAngle - 90) * pi) / 180));
-			if valueWithinWordRange(privPartyCharParams.bulletX + bulletCosVal) = true then
-				begin
-				privPartyCharParams.bulletX: = privPartyCharParams.bulletX + bulletCosVal;
-			end
-			else
-				begin
-				destroyBullet : = true;
-			end;
-			bulletSinVal: = round(privPartyCharParams.bulletDistance * sin(((privPartyCharParams.firingAngle - 90) * pi) / 180));
-			if valueWithinWordRange(privPartyCharParams.bulletY - bulletSinVal) = true then
-				begin
-				privPartyCharParams.bulletY: = privPartyCharParams.bulletY - bulletSinVal;
-			end
-			else
-				begin
-				destroyBullet : = true;
-			end;*/
-
-			//Update wall resistance by the amount of force that hits it
-			overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance -= force;
-
+		//Get side of grid tile hit by bullet
+		directionEnum sideHit = directionEnum::down;
+		areaStruct tilePixelArea = getPixelAreaFromGridArea({ collisionData.tileHitGridPosition.x, collisionData.tileHitGridPosition.y, tileSize.w, tileSize.h });
+		if (params.previousPosition.x + params.size.w - 1 < tilePixelArea.x) {
+			sideHit = directionEnum::left;
 		}
+		else if (params.previousPosition.x > tilePixelArea.x + tilePixelArea.w - 1) {
+			sideHit = directionEnum::right;
+			printRand();
+		}
+		else if (params.previousPosition.y + params.size.h - 1 < tilePixelArea.y) {
+			sideHit = directionEnum::up;
+		}
+		else if (params.previousPosition.y > tilePixelArea.y + tilePixelArea.h - 1) {
+			sideHit = directionEnum::down;
+		}
+
+		//Bullet ricochets
+		if (sideHit == directionEnum::left || sideHit == directionEnum::right) {
+			params.directionMods.x = -1;
+			params.originalPosition = params.position;
+			params.distanceTravelled = 0;
+		}
+		
+		//if (force < overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance) {
+
+		//	//Bullet ricochet
+		//	
+		//	
+
+		//	//Update wall resistance by the amount of force that hits it
+		//	overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance -= force;
+
+		//}
 		//else if () {
 
 		//	//If bullet force is within range of stuck tolerance percentage of wall/character/object/other then bullet stays stuck

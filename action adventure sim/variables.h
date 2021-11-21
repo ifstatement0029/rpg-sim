@@ -428,7 +428,7 @@ namespace game {
 	struct bulletParamsStruct {
 		int ID = -1, layer = -1, height = 0;
 
-		XYStruct position = { -1, -1 }, originalPosition = { -1, -1 }, directionMods = { 1, 1 };
+		XYStruct position = { -1, -1 }, originalPosition = { -1, -1 }, previousPosition = { -1, -1 }, directionMods = { 1, 1 };
 		WHStruct size = { -1, -1 };
 
 		spriteStruct sprite;
@@ -436,7 +436,7 @@ namespace game {
 		delayStruct speed;
 		int movePixelIncrement = 1;
 
-		int distanceTravelled = 0;
+		int distanceTravelled = 0, totalDistanceTravelled = 0;
 
 		int damage = -1, resistance = -1, stuckTolerancePercentage = 10;
 	};
