@@ -700,10 +700,14 @@ areaStruct getGridArea(XYStruct pixelPosition, XYStruct pixelSize) {
 	return { objectGridCoordinates.x, objectGridCoordinates.y, objectGridSize.x, objectGridSize.y };
 }
 
-areaStruct getGridAreaFromPixelArea(areaStruct area) {
-	XYStruct gridPosition = getGridPosition({ area.x, area.y });
-	XYStruct gridSize = getGridPosition({ area.w, area.h });
+areaStruct getGridAreaFromPixelArea(areaStruct pixelArea) {
+	XYStruct gridPosition = getGridPosition({ pixelArea.x, pixelArea.y });
+	XYStruct gridSize = getGridPosition({ pixelArea.w, pixelArea.h });
 	return { gridPosition.x, gridPosition.y, gridSize.x, gridSize.y };
+}
+
+areaStruct getPixelAreaFromGridArea(areaStruct gridArea) {
+	return { gridArea.x * tileSize.w, gridArea.y * tileSize.h, gridArea.w * tileSize.w, gridArea.h * tileSize.h };
 }
 
 areaStruct getGridAreaFromSDLRect(SDL_Rect rect) {
@@ -765,6 +769,48 @@ collisionDataStruct checkCollisionWithOverworldGridFactoringHeight(areaStruct gr
 				}
 
 				return collisionData;
+			}
+
+		}
+	}
+
+	return collisionData;
+}
+
+collisionDataStruct checkSubGridCollisionWithOverworldGridFactoringHeight(areaStruct gridArea, areaStruct pixelArea, int gridLayer, int height) {
+	collisionDataStruct collisionData;
+
+	for (int areaXCnt = gridArea.x; areaXCnt < gridArea.x + gridArea.w; ++areaXCnt) {
+		for (int areaYCnt = gridArea.y; areaYCnt < gridArea.y + gridArea.h; ++areaYCnt) {
+
+			//Check collisions at grid level
+			if (gridLayer < (int)overworldGrid.gridTile.size() && areaXCnt < (int)overworldGrid.gridTile[gridLayer].size() && areaYCnt < (int)overworldGrid.gridTile[gridLayer][areaXCnt].size() && overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].collidable == true) {
+
+				//Check collision at pixel level
+				areaStruct tilePixelArea = getPixelAreaFromGridArea(gridArea);
+				for (int pixelAreaXCnt = pixelArea.x; pixelAreaXCnt < pixelArea.x + pixelArea.w; ++pixelAreaXCnt) {
+					for (int pixelAreaYCnt = pixelArea.y; pixelAreaYCnt < pixelArea.y + pixelArea.h; ++pixelAreaYCnt) {
+						
+						for (int tilePixelAreaXCnt = tilePixelArea.x; tilePixelAreaXCnt < tilePixelArea.x + tilePixelArea.w; ++tilePixelAreaXCnt) {
+							for (int tilePixelAreaYCnt = tilePixelArea.y; tilePixelAreaYCnt < tilePixelArea.y + tilePixelArea.h; ++tilePixelAreaYCnt) {
+								
+								if (pixelAreaXCnt == tilePixelAreaXCnt && pixelAreaYCnt == tilePixelAreaYCnt) {
+									
+									if ((overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].jumpable == true && height < overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].height) || overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].jumpable == false) {
+										collisionData.collision = true;
+										collisionData.tileHitGridPosition = { areaXCnt, areaYCnt };
+									}
+
+									return collisionData;
+
+								}
+
+							}
+						}
+
+					}
+				}
+
 			}
 
 		}
@@ -1700,7 +1746,7 @@ void initCharacters() {
 				areas.push_back({ 2, 21, 21, 8 });
 				currentCharacterParams.equippedRangedWeapon.sprite.areas.push_back(areas);
 				currentCharacterParams.equippedRangedWeapon.sprite.center = { 0, currentCharacterParams.equippedRangedWeapon.sprite.areas[0][0].h / 2 };
-				currentCharacterParams.equippedRangedWeapon.fireMode = characterParams::rangedWeaponStruct::fireModeEnum::burst;
+				currentCharacterParams.equippedRangedWeapon.fireMode = characterParams::rangedWeaponStruct::fireModeEnum::semiAuto;
 				currentCharacterParams.equippedRangedWeapon.burst.maxBulletsBeforePause = 3;
 				currentCharacterParams.equippedRangedWeapon.burst.delay.delay = 200;
 				currentCharacterParams.equippedRangedWeapon.magazine.ammoName = "Blank";
@@ -3321,7 +3367,7 @@ void bulletActions() {
 	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
 		bullets[bulletsCnt].move();
 		bullets[bulletsCnt].markForDestruction();
-		bullets[bulletsCnt].bouncePenetrateOrStayStuck();
+		bullets[bulletsCnt].ricochetPenetrateOrStayStuck();
 	}
 }
 
@@ -3900,7 +3946,7 @@ void Character::useEquippedWeapon() {
 						bulletParams.sprite.angle = params.equippedRangedWeapon.sprite.angle;
 						bulletParams.speed.startTicks = SDL_GetTicks();
 						bulletParams.speed.delay = 1;
-						bulletParams.movePixelIncrement = 6;
+						bulletParams.movePixelIncrement = 1;
 						bulletParams.damage = 90;
 						bulletParams.resistance = 100;
 						initBullet(bulletParams);
@@ -4041,17 +4087,18 @@ void Bullet::markForDestruction() {
 
 }
 
-void Bullet::bouncePenetrateOrStayStuck() {
+void Bullet::ricochetPenetrateOrStayStuck() {
 	
 	//Calculate bullet force (the farther the bullet travels, the less damage it does
 	int force = params.damage - params.distanceTravelled;
 
-	//If bullet force is lower than wall/character/object/other bullets resistance then bullet bounces
-	collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }), params.layer, params.height);
+	//If bullet force is lower than wall/character/object/other bullets resistance then bullet ricochet
+	areaStruct bulletPixelArea = { params.position.x, params.position.y - params.height, params.size.w, params.size.h };
+	collisionDataStruct collisionData = checkSubGridCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea(bulletPixelArea), bulletPixelArea, params.layer, params.height);
 	if (collisionData.collision == true) {
 		if (force < overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance) {
 
-			//Bullet bounces
+			//Bullet ricochet
 			--;;
 			
 			//int bulletCos = params.distanceTravelled * cos(((params.sprite.angle) * M_PI) / 180);

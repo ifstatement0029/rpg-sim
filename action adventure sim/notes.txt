@@ -37,7 +37,7 @@ ranged weapon:
 		- burst (a few shots at a time) - done
 		- full auto (continuous shots) - done
 	- have a delay when reloading - done
-	- bullets can bounce against/penetrate/stay stuck in walls, characters, objects and other bullets - ;;
+	- bullets can ricochet against/penetrate/stay stuck in walls, characters, objects and other bullets - ;;
 melee weapon: 
 	- can aim 360 degrees with left or right stick - done
 	- can attack in 360 degrees - done

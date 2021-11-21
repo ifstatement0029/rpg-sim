@@ -452,7 +452,7 @@ namespace game {
 		void render();
 		void move();
 		void markForDestruction();
-		void bouncePenetrateOrStayStuck();
+		void ricochetPenetrateOrStayStuck();
 
 	private:
 		bulletParamsStruct params;
