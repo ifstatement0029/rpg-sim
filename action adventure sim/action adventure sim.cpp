@@ -1670,7 +1670,8 @@ void initLevel() {
 				if (areaWithinGrid({ wallXCnt, wallYCnt, 1, 1 }, 1) == true) {
 					overworldGrid.gridTile[1][wallXCnt][wallYCnt].collidable = true;
 					overworldGrid.gridTile[1][wallXCnt][wallYCnt].tileIndex = getTileIndex("wall");
-					overworldGrid.gridTile[1][wallXCnt][wallYCnt].resistance = 100;
+					overworldGrid.gridTile[1][wallXCnt][wallYCnt].resistance = 1;
+					overworldGrid.gridTile[1][wallXCnt][wallYCnt].stuckTolerancePercentage = 100;
 				}
 			}
 		}
@@ -3384,7 +3385,9 @@ int getBulletIndexByID(int ID) {
 void destroyBullets() {
 	for (int bulletsToDestroyIDsCnt = 0; bulletsToDestroyIDsCnt < (int)bulletsToDestroyIDs.size(); ++bulletsToDestroyIDsCnt) {
 		int bulletIndex = getBulletIndexByID(bulletsToDestroyIDs[bulletsToDestroyIDsCnt]);
-		bullets.erase(bullets.begin() + bulletIndex);
+		if (bulletIndex > -1) {
+			bullets.erase(bullets.begin() + bulletIndex);
+		}
 	}
 
 	bulletsToDestroyIDs.clear();
@@ -3426,6 +3429,28 @@ vector<int> getBulletIDs() {
 void initBullet(bulletParamsStruct newParams) {
 	Bullet newBullet(newParams);
 	bullets.push_back(newBullet);
+}
+
+void removeStuckBullets() {
+	if ((int)stuckBulletIDs.size() > maxStuckBullets) {
+		bulletsToDestroyIDs.push_back(stuckBulletIDs[0]);
+		stuckBulletIDs.erase(stuckBulletIDs.begin());
+	}
+}
+
+void initExplosion(explosionParamsStruct newParams) {
+	Explosion newExplosion(newParams);
+	explosions.push_back(newExplosion);
+}
+
+vector<int> getExplosionIDs() {
+	vector<int> explosionIDs;
+
+	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
+		explosionIDs.push_back(explosions[explosionsCnt].getID());
+	}
+
+	return explosionIDs;
 }
 
 //functions end
@@ -3762,7 +3787,7 @@ void Character::move() {
 void Character::idleAnimation() {
 	
 	//Check if need to run idle animation
-	if (xDir == 0 && yDir == 0 && params.idleAnimation.animationRunning == false && SDL_GetTicks() - params.idleAnimation.delayBeforeAnimation.startTicks >= params.idleAnimation.delayBeforeAnimation.delay) {
+	if (xDir == 0 && yDir == 0 && params.idleAnimation.animationRunning == false && SDL_GetTicks() - params.idleAnimation.delayBeforeAnimation.startTicks >= params.idleAnimation.delayBeforeAnimation.delay / FPSTimerMod) {
 		params.idleAnimation.animationRunning = true;
 		params.idleAnimation.frameDuration.startTicks = SDL_GetTicks();
 		params.idleAnimation.frameDuration.delay = randInt(1, 2) * 1000;
@@ -3773,7 +3798,7 @@ void Character::idleAnimation() {
 	}
 
 	//Run idle animation
-	if (params.idleAnimation.animationRunning == true && SDL_GetTicks() - params.idleAnimation.frameDuration.startTicks >= params.idleAnimation.frameDuration.delay) {
+	if (params.idleAnimation.animationRunning == true && SDL_GetTicks() - params.idleAnimation.frameDuration.startTicks >= params.idleAnimation.frameDuration.delay / FPSTimerMod) {
 		params.idleAnimation.frameDuration.startTicks = SDL_GetTicks();
 		params.idleAnimation.frameDuration.delay = randInt(1, 2) * 1000;
 
@@ -3794,7 +3819,7 @@ void Character::jump() {
 	}
 
 	//If A is pressed for longer the character jumps higher
-	if (controllerButtons.A == true && SDL_GetTicks() - params.jump.jumpButtonPress.startTicks > params.jump.jumpButtonPress.delay) {
+	if (controllerButtons.A == true && SDL_GetTicks() - params.jump.jumpButtonPress.startTicks > params.jump.jumpButtonPress.delay / FPSTimerMod) {
 		params.jump.jumpButtonPress.startTicks = SDL_GetTicks();
 		params.jump.addedMaxHeight = params.size.h / 2;
 	}
@@ -3804,7 +3829,7 @@ void Character::jump() {
 		params.jump.addedMaxHeight = 0;
 	}
 
-	if (params.jump.jumping == true && SDL_GetTicks() - params.jump.move.startTicks > params.jump.move.delay) {
+	if (params.jump.jumping == true && SDL_GetTicks() - params.jump.move.startTicks > params.jump.move.delay / FPSTimerMod) {
 		params.jump.move.startTicks = SDL_GetTicks();
 		
 		switch (params.jump.direction) {
@@ -3947,7 +3972,7 @@ void Character::useEquippedWeapon() {
 						bulletParams.sprite.angle = params.equippedRangedWeapon.sprite.angle;
 						bulletParams.speed.startTicks = SDL_GetTicks();
 						bulletParams.speed.delay = 1;
-						bulletParams.movePixelIncrement = 8;
+						bulletParams.movePixelIncrement = 1;
 						bulletParams.damage = 90;
 						bulletParams.resistance = 100;
 						initBullet(bulletParams);
@@ -3970,7 +3995,7 @@ void Character::useEquippedWeapon() {
 								params.equippedRangedWeapon.burst.delay.startTicks = SDL_GetTicks();
 							}
 						}
-						else if (SDL_GetTicks() - params.equippedRangedWeapon.burst.delay.startTicks >= params.equippedRangedWeapon.burst.delay.delay) {
+						else if (SDL_GetTicks() - params.equippedRangedWeapon.burst.delay.startTicks >= params.equippedRangedWeapon.burst.delay.delay / FPSTimerMod) {
 							params.equippedRangedWeapon.burst.pause = false;
 							params.equippedRangedWeapon.burst.bulletsFired = 0;
 						}
@@ -3999,13 +4024,13 @@ void Character::useEquippedWeapon() {
 		params.equippedRangedWeapon.reload.reloading = true;
 		params.equippedRangedWeapon.reload.delay.startTicks = SDL_GetTicks();
 	}
-	if (params.equippedRangedWeapon.reload.reloading == true && SDL_GetTicks() - params.equippedRangedWeapon.reload.delay.startTicks >= params.equippedRangedWeapon.reload.delay.delay) {
+	if (params.equippedRangedWeapon.reload.reloading == true && SDL_GetTicks() - params.equippedRangedWeapon.reload.delay.startTicks >= params.equippedRangedWeapon.reload.delay.delay / FPSTimerMod) {
 		params.equippedRangedWeapon.reload.reloading = false;
 		params.equippedRangedWeapon.magazine.currentLoad = params.equippedRangedWeapon.magazine.capacity;
 	}
 
 	//Swing equipped melee weapon
-	if (params.equippedMeleeWeapon.swing.swinging == true && SDL_GetTicks() - params.equippedMeleeWeapon.swing.delay.startTicks >= params.equippedMeleeWeapon.swing.delay.delay) {
+	if (params.equippedMeleeWeapon.swing.swinging == true && SDL_GetTicks() - params.equippedMeleeWeapon.swing.delay.startTicks >= params.equippedMeleeWeapon.swing.delay.delay / FPSTimerMod) {
 		params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
 		if (params.equippedMeleeWeapon.swing.currentAngle < params.equippedMeleeWeapon.swing.endAngle) {
 			params.equippedMeleeWeapon.swing.currentAngle += params.equippedMeleeWeapon.swing.pixelIncrement;
@@ -4072,7 +4097,7 @@ void Bullet::render() {
 }
 
 void Bullet::move() {
-	if (SDL_GetTicks() - params.speed.startTicks >= params.speed.delay) {
+	if (params.stuck == false && SDL_GetTicks() - params.speed.startTicks >= params.speed.delay / FPSTimerMod) {
 		params.speed.startTicks = SDL_GetTicks();
 		params.distanceTravelled += params.movePixelIncrement;
 		params.totalDistanceTravelled += params.movePixelIncrement;
@@ -4091,64 +4116,108 @@ void Bullet::markForDestruction() {
 }
 
 void Bullet::ricochetPenetrateOrStayStuck() {
-	
-	//Calculate bullet force (the farther the bullet travels, the less damage it does
-	int force = params.damage - params.totalDistanceTravelled;
-	if (force < 0) {
-		force = 0;
-	}
+	if (params.stuck == false) {
 
-	//If bullet force is lower than wall/character/object/other bullets resistance then bullet ricochet
-	collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }), params.layer, params.height);
-	if (collisionData.collision == true) {
-
-		//Get side of grid tile hit by bullet
-		directionEnum sideHit = directionEnum::down;
-		areaStruct tileGridArea = { collisionData.tileHitGridPosition.x, collisionData.tileHitGridPosition.y, 1, 1 };
-		areaStruct bulletPreviousGridArea = getGridAreaFromPixelArea({ params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h });
-		if (bulletPreviousGridArea.x + bulletPreviousGridArea.w - 1 < tileGridArea.x) {
-			sideHit = directionEnum::left;
-		}
-		else if (bulletPreviousGridArea.x > tileGridArea.x + tileGridArea.w - 1) {
-			sideHit = directionEnum::right;
-		}
-		else if (bulletPreviousGridArea.y + bulletPreviousGridArea.h - 1 < tileGridArea.y) {
-			sideHit = directionEnum::up;
-		}
-		else if (bulletPreviousGridArea.y > tileGridArea.y + tileGridArea.h - 1) {
-			sideHit = directionEnum::down;
+		//Calculate bullet force (the farther the bullet travels, the less damage it does
+		int force = params.damage - params.totalDistanceTravelled;
+		if (force < 0) {
+			force = 0;
 		}
 
-		if (force < overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance) {
+		//Check for collision
+		collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }), params.layer, params.height);
 
-			//Bullet ricochets
-			params.originalPosition = params.position;
-			params.distanceTravelled = 0;
-			if (sideHit == directionEnum::left || sideHit == directionEnum::right) {
-				params.directionMods.x = -1;
+		if (collisionData.collision == true) {
+
+			//Get side of grid tile hit by bullet
+			directionEnum sideHit = directionEnum::down;
+			areaStruct tileGridArea = { collisionData.tileHitGridPosition.x, collisionData.tileHitGridPosition.y, 1, 1 };
+			areaStruct bulletPreviousGridArea = getGridAreaFromPixelArea({ params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h });
+			if (bulletPreviousGridArea.x + bulletPreviousGridArea.w - 1 < tileGridArea.x) {
+				sideHit = directionEnum::left;
 			}
-			else {
-				params.directionMods.y = -1;
+			else if (bulletPreviousGridArea.x > tileGridArea.x + tileGridArea.w - 1) {
+				sideHit = directionEnum::right;
 			}
+			else if (bulletPreviousGridArea.y + bulletPreviousGridArea.h - 1 < tileGridArea.y) {
+				sideHit = directionEnum::up;
+			}
+			else if (bulletPreviousGridArea.y > tileGridArea.y + tileGridArea.h - 1) {
+				sideHit = directionEnum::down;
+			}
+
+
+			int resistanceTolerance = (overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance * overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].stuckTolerancePercentage) / 100;
 
 			//Decrease wall resistance by the amount of force that hits it
-			overworldGrid.gridTile[params.height][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance -= force;
+			overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance -= force;
+
+			//If bullet force is lower than wall/character/object/other bullets resistance - resitance tolerance then bullet ricochet
+			if (force < overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance - resistanceTolerance) {
+
+				//Bullet ricochets
+				params.originalPosition = params.position;
+				params.distanceTravelled = 0;
+				if (sideHit == directionEnum::left || sideHit == directionEnum::right) {
+					params.directionMods.x = -1;
+				}
+				else {
+					params.directionMods.y = -1;
+				}
+
+			}
+			else if (force >= overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance - resistanceTolerance && force <= overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance + resistanceTolerance) {
+
+				//If bullet force is within range of stuck tolerance percentage of wall/character/object/other resistance then bullet stays stuck
+				params.stuck = true;
+				stuckBulletIDs.push_back(params.ID);
+
+			}
+			//else if (force > overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance + resistanceTolerance) {
+			//	
+			//	//If bullet force is greater than wall/character/object/other bullets resistance + resistance tolerance then bullet penetrates
+			//	
+			//}
+
+			//If resistance of wall/character/object/other bullets < 0 then explode
+			explosionParamsStruct newParams;
+			newParams.ID = getFreeID(getExplosionIDs());
+			newParams.sprite.spriteSheetIndex = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetIndex;
+			areaStruct tileArea = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetArea;
+			newParams.sprite.areas = {
+				{
+					{
+						{ tileArea.x, tileArea.y, tileArea.w, tileArea.h }
+					}
+				}
+			};
+			newParams.totalFragments = 4;
+			for (int fragmentsCnt = 0; fragmentsCnt < newParams.totalFragments; ++fragmentsCnt) {
+				explosionParamsStruct::fragmentStruct fragment;
+				
+				fragment.speed.startTicks = SDL_GetTicks();
+				fragment.speed.delay = 1;
+				fragment.pixelIncrement = 1;
+
+				newParams.fragments.push_back(fragment);
+			}
+			initExplosion(newParams);
 
 		}
-		else if (--;;) {
 
-			//If bullet force is within range of stuck tolerance percentage of wall/character/object/other then bullet stays stuck
-
-
-		}
-		//else if () {
-		//	
-		//	//If bullet force is greater than wall/character/object/other bullets resistance then bullet penetrates
-
-
-		//}
 	}
+}
 
+Explosion::Explosion(explosionParamsStruct newParams) {
+	params = newParams;
+}
+
+int Explosion::getID() {
+	return params.ID;
+}
+
+void Explosion::defineFragmentAreas() {
+	--;;
 }
 
 //class functions end
@@ -4157,7 +4226,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 //	++functionNumber;
 //}
 
-int main(int argc, char* args[]) {
+int main(int argc, char* args[]) {	
 	/*int number = 1;
 	test(number);
 	cout << number;
@@ -4225,6 +4294,8 @@ int main(int argc, char* args[]) {
 				//moveCamera();
 				characterActions();
 				bulletActions();
+
+				removeStuckBullets();
 
 				//Object destructions
 				destroyBullets();

@@ -290,6 +290,9 @@ namespace game {
 		Uint8 r = 0, g = 0, b = 0, a = 0;
 	};
 
+	int maxStuckBullets = 100;
+	vector<int> stuckBulletIDs;
+
 	//classes start
 
 	struct characterParams {
@@ -439,6 +442,8 @@ namespace game {
 		int distanceTravelled = 0, totalDistanceTravelled = 0;
 
 		int damage = -1, resistance = -1, stuckTolerancePercentage = 10;
+
+		bool stuck = false;
 	};
 
 	class Bullet {
@@ -459,6 +464,35 @@ namespace game {
 	};
 
 	vector<Bullet> bullets;
+
+	struct explosionParamsStruct {
+		int ID = -1;
+
+		spriteStruct sprite;
+
+		int totalFragments = -1;
+		struct fragmentStruct {
+			vector<areaStruct> areas; //no need to define this on instance creation; Explosion class has a method to define this based on total fragments
+			
+			delayStruct speed;
+			int pixelIncrement = -1;
+		};
+		vector<fragmentStruct> fragments;
+	};
+
+	class Explosion {
+	public:
+		Explosion(explosionParamsStruct newParams);
+
+		int getID();
+
+	private:
+		explosionParamsStruct params;
+
+		void defineFragmentAreas();
+	};
+
+	vector<Explosion> explosions;
 
 	//classes end
 
