@@ -4189,6 +4189,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 			//If resistance of wall/character/object/other bullets < 0 then explode
 			explosionParamsStruct newParams;
 			newParams.ID = getFreeID(getExplosionIDs());
+			newParams.tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 			newParams.sprite.spriteSheetIndex = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetIndex;
 			areaStruct tileArea = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetArea;
 			newParams.sprite.areas = {
@@ -4198,9 +4199,10 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 					}
 				}
 			};
-			newParams.totalFragments = { randInt(1, newParams.sprite.areas[0][0].w), randInt(1, newParams.sprite.areas[0][0].h) };
-			newParams.fragmentSize = { newParams.sprite.areas[0][0].w / newParams.totalFragments.x, newParams.sprite.areas[0][0].h / newParams.totalFragments.y };
-			areaStruct fragmentArea = { newParams.sprite.areas[0][0].x, newParams.sprite.areas[0][0].y, newParams.fragmentSize.w, newParams.fragmentSize.h };
+			//newParams.totalFragments = { randInt(1, newParams.sprite.areas[0][0].w), randInt(1, newParams.sprite.areas[0][0].h) };
+			newParams.totalFragments = { 2, 2 };
+			WHStruct fragmentSize = { newParams.sprite.areas[0][0].w / newParams.totalFragments.x, newParams.sprite.areas[0][0].h / newParams.totalFragments.y };
+			areaStruct fragmentArea = { newParams.sprite.areas[0][0].x, newParams.sprite.areas[0][0].y, fragmentSize.w, fragmentSize.h };
 			for (int totalFragmentsXCnt = 0; totalFragmentsXCnt < newParams.totalFragments.x; ++totalFragmentsXCnt) {
 				fragmentArea.y = newParams.sprite.areas[0][0].y;
 				for (int totalFragmentsYCnt = 0; totalFragmentsYCnt < newParams.totalFragments.y; ++totalFragmentsYCnt) {
@@ -4208,13 +4210,20 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 
 					fragment.position = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 					fragment.originalPosition = fragment.position;
+					fragment.size = fragmentSize;
 					fragment.sprite.spriteSheetIndex = newParams.sprite.spriteSheetIndex;
-					fragment.sprite.areas[0][0] = fragmentArea;
+					fragment.sprite.areas = {
+						{
+							{
+								{ fragmentArea.x, fragmentArea.y, fragmentArea.w, fragmentArea.h }
+							}
+						}
+					};
 					fragment.sprite.angle = randInt(0, 360);
 					if (fragment.sprite.angle > 180) {
-						fragment.sprite.angle = -(fragment.sprite.angle - 180);
+						fragment.sprite.angle = -(180 - (fragment.sprite.angle - 180));
 					}
-					fragment.sprite.center = { randInt(0, newParams.fragmentSize.w), randInt(0, newParams.fragmentSize.h) };
+					fragment.sprite.center = { randInt(0, fragmentSize.w), randInt(0, fragmentSize.h) };
 					int randomFlip = randInt(1, 3);
 					if (randomFlip == 1) {
 						fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
@@ -4237,6 +4246,10 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 			}
 			initExplosion(newParams);
 
+			//Remove tile from overworld grid
+			gridTileStruct blankTile;
+			overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y] = blankTile;
+
 		}
 
 	}
@@ -4255,9 +4268,10 @@ void Explosion::render() {
 	//Render all fragments
 	for (int fragmentsCnt = 0; fragmentsCnt < (int)params.fragments.size(); ++fragmentsCnt) {
 		SDL_Rect sRect = convertAreaToSDLRect(params.fragments[fragmentsCnt].sprite.areas[0][0]);
-		SDL_Rect dRect = { params.fragments[fragmentsCnt].position.x - camera.area.x, params.fragments[fragmentsCnt].position.y - camera.area.y, params.fragments[fragmentsCnt].sprite.areas[0][0].w, params.fragments[fragmentsCnt].sprite.areas[0][0].h };
+		SDL_Rect dRect = { params.fragments[fragmentsCnt].position.x - camera.area.x, params.fragments[fragmentsCnt].position.y - camera.area.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h };
 
 		if (areaWithinCameraView({ params.fragments[fragmentsCnt].position.x, params.fragments[fragmentsCnt].position.y, params.fragments[fragmentsCnt].sprite.areas[0][0].w, params.fragments[fragmentsCnt].sprite.areas[0][0].h }) == true) {
+			printSDLRectL({ sRect, dRect });
 			SDLRenderCopyEx(sRect, dRect, params.fragments[fragmentsCnt].sprite);
 		}
 	}
@@ -4274,7 +4288,10 @@ void Explosion::explode() {
 			params.fragments[fragmentsCnt].position = { lround((double)params.fragments[fragmentsCnt].originalPosition.x + (params.fragments[fragmentsCnt].distanceTravelled * cos(((params.fragments[fragmentsCnt].sprite.angle) * M_PI) / 180))), lround((double)params.fragments[fragmentsCnt].originalPosition.y + (params.fragments[fragmentsCnt].distanceTravelled * sin(((params.fragments[fragmentsCnt].sprite.angle) * M_PI) / 180))) };
 
 			//Rotate fragment
-			--;;
+			params.fragments[fragmentsCnt].sprite.angle += params.fragments[fragmentsCnt].pixelIncrement;
+			if (params.fragments[fragmentsCnt].sprite.angle > 180) {
+				params.fragments[fragmentsCnt].sprite.angle = -(180 - (params.fragments[fragmentsCnt].sprite.angle - 180));
+			}
 
 		}
 	}

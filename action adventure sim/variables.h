@@ -467,13 +467,15 @@ namespace game {
 
 	struct explosionParamsStruct {
 		int ID = -1;
+		XYStruct tilePixelPosition = { -1, -1 };
 
 		spriteStruct sprite;
 
 		XYStruct totalFragments = { -1, -1 };
-		WHStruct fragmentSize = { -1, -1 };
 		struct fragmentStruct {
 			XYStruct position = { -1, -1 }, originalPosition = { -1, -1 };
+			WHStruct size = { -1, -1 };
+
 			int distanceTravelled = 0;
 
 			spriteStruct sprite;
