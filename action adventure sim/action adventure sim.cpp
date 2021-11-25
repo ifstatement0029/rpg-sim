@@ -3373,9 +3373,9 @@ void bulletActions() {
 }
 
 void explosionActions() {
-	for (auto explosion : explosions) {
-		explosion.render();
-		explosion.explode();
+	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
+		explosions[explosionsCnt].render();
+		explosions[explosionsCnt].explode();
 	}
 }
 
@@ -4253,13 +4253,31 @@ int Explosion::getID() {
 void Explosion::render() {
 
 	//Render all fragments
-	--;;
+	for (int fragmentsCnt = 0; fragmentsCnt < (int)params.fragments.size(); ++fragmentsCnt) {
+		SDL_Rect sRect = convertAreaToSDLRect(params.fragments[fragmentsCnt].sprite.areas[0][0]);
+		SDL_Rect dRect = { params.fragments[fragmentsCnt].position.x - camera.area.x, params.fragments[fragmentsCnt].position.y - camera.area.y, params.fragments[fragmentsCnt].sprite.areas[0][0].w, params.fragments[fragmentsCnt].sprite.areas[0][0].h };
+
+		if (areaWithinCameraView({ params.fragments[fragmentsCnt].position.x, params.fragments[fragmentsCnt].position.y, params.fragments[fragmentsCnt].sprite.areas[0][0].w, params.fragments[fragmentsCnt].sprite.areas[0][0].h }) == true) {
+			SDLRenderCopyEx(sRect, dRect, params.fragments[fragmentsCnt].sprite);
+		}
+	}
 
 }
 
 void Explosion::explode() {
-	
-	//Move each fragment from their original position in the angle they are at, while rotating each of them
+	for (int fragmentsCnt = 0; fragmentsCnt < (int)params.fragments.size(); ++fragmentsCnt) {
+		if (SDL_GetTicks() - params.fragments[fragmentsCnt].speed.startTicks >= params.fragments[fragmentsCnt].speed.delay) {
+			params.fragments[fragmentsCnt].speed.startTicks = SDL_GetTicks();
+
+			//Update fragment position
+			params.fragments[fragmentsCnt].distanceTravelled += params.fragments[fragmentsCnt].pixelIncrement;
+			params.fragments[fragmentsCnt].position = { lround((double)params.fragments[fragmentsCnt].originalPosition.x + (params.fragments[fragmentsCnt].distanceTravelled * cos(((params.fragments[fragmentsCnt].sprite.angle) * M_PI) / 180))), lround((double)params.fragments[fragmentsCnt].originalPosition.y + (params.fragments[fragmentsCnt].distanceTravelled * sin(((params.fragments[fragmentsCnt].sprite.angle) * M_PI) / 180))) };
+
+			//Rotate fragment
+			--;;
+
+		}
+	}
 }
 
 //class functions end
