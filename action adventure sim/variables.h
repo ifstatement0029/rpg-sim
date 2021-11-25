@@ -470,9 +470,9 @@ namespace game {
 
 		spriteStruct sprite;
 
-		int totalFragments = -1;
+		int totalFragments = -1; //needs to be an even number
 		struct fragmentStruct {
-			vector<areaStruct> areas; //no need to define this on instance creation; Explosion class has a method to define this based on total fragments
+			areaStruct area; //no need to define this on instance creation; Explosion class defineFragmentAreas() will define this based on total fragments
 			
 			delayStruct speed;
 			int pixelIncrement = -1;
@@ -486,10 +486,10 @@ namespace game {
 
 		int getID();
 
+		void defineFragmentAreas();
+
 	private:
 		explosionParamsStruct params;
-
-		void defineFragmentAreas();
 	};
 
 	vector<Explosion> explosions;

@@ -2695,8 +2695,8 @@ void renderBackgroundCharactersAndObjects() {
 	//Correct camera area w and h to keep aspect ratio
 	cameraLogicalSize.w = camera.area.w;
 	cameraLogicalSize.h = camera.area.h;
-	decimalNumPartsStruct currentDecimalNumPartsX = getDecimalNumParts((float)cameraLogicalSize.w / aspectRatio.ratio.w);
-	decimalNumPartsStruct currentDecimalNumPartsY = getDecimalNumParts((float)cameraLogicalSize.h / aspectRatio.ratio.h);
+	decimalNumPartsStruct currentDecimalNumPartsX = getDecimalNumParts((double)cameraLogicalSize.w / aspectRatio.ratio.w);
+	decimalNumPartsStruct currentDecimalNumPartsY = getDecimalNumParts((double)cameraLogicalSize.h / aspectRatio.ratio.h);
 	if (currentDecimalNumPartsX.fractpart > 0 || currentDecimalNumPartsY.fractpart > 0) {
 		int highestIntPart = (int)(currentDecimalNumPartsX.intpart);
 		if (currentDecimalNumPartsY.intpart > currentDecimalNumPartsX.intpart) {
@@ -3369,6 +3369,12 @@ void bulletActions() {
 		bullets[bulletsCnt].move();
 		bullets[bulletsCnt].markForDestruction();
 		bullets[bulletsCnt].ricochetPenetrateOrStayStuck();
+	}
+}
+
+void explosionActions() {
+	for (auto explosion : explosions) {
+		explosion.defineFragmentAreas();
 	}
 }
 
@@ -4191,7 +4197,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 					}
 				}
 			};
-			newParams.totalFragments = 4;
+			newParams.totalFragments = 4; --;;randomize num of fragments
 			for (int fragmentsCnt = 0; fragmentsCnt < newParams.totalFragments; ++fragmentsCnt) {
 				explosionParamsStruct::fragmentStruct fragment;
 				
@@ -4217,7 +4223,29 @@ int Explosion::getID() {
 }
 
 void Explosion::defineFragmentAreas() {
-	--;;
+	if (params.totalFragments > 0 and (int)params.fragments.size()) {
+		WHStruct fragmentSize = { params.sprite.areas[0][0].w / params.totalFragments, params.sprite.areas[0][0].h / params.totalFragments };
+
+		vector<string> dimensions = { "width", "height" };
+		for (auto dimension : dimensions) {
+			areaStruct fragmentArea = { 0, 0, fragmentSize.w, fragmentSize.h };
+			for (int fragmentsCnt = 0; fragmentsCnt < params.totalFragments; ++fragmentsCnt) {
+				explosionParamsStruct::fragmentStruct fragment;
+				fragment.area = fragmentArea;
+				fragment.speed.startTicks = SDL_GetTicks();
+				fragment.speed.delay = 1;
+				fragment.pixelIncrement = 1;
+				params.fragments.push_back(fragment);
+
+				if (dimension == "width") {
+					fragmentArea.x += fragmentArea.w;
+				}
+				else {
+					fragmentArea.y += fragmentArea.h;
+				}
+			}
+		}
+	}
 }
 
 //class functions end
@@ -4226,7 +4254,7 @@ void Explosion::defineFragmentAreas() {
 //	++functionNumber;
 //}
 
-int main(int argc, char* args[]) {	
+int main(int argc, char* args[]) {
 	/*int number = 1;
 	test(number);
 	cout << number;
@@ -4294,6 +4322,7 @@ int main(int argc, char* args[]) {
 				//moveCamera();
 				characterActions();
 				bulletActions();
+				explosionActions();
 
 				removeStuckBullets();
 
