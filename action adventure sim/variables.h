@@ -470,9 +470,13 @@ namespace game {
 
 		spriteStruct sprite;
 
-		int totalFragments = -1; //needs to be an even number
+		XYStruct totalFragments = { -1, -1 };
+		WHStruct fragmentSize = { -1, -1 };
 		struct fragmentStruct {
-			areaStruct area; //no need to define this on instance creation; Explosion class defineFragmentAreas() will define this based on total fragments
+			XYStruct position = { -1, -1 }, originalPosition = { -1, -1 };
+			int distanceTravelled = 0;
+
+			spriteStruct sprite;
 			
 			delayStruct speed;
 			int pixelIncrement = -1;
@@ -486,7 +490,8 @@ namespace game {
 
 		int getID();
 
-		void defineFragmentAreas();
+		void render();
+		void explode();
 
 	private:
 		explosionParamsStruct params;

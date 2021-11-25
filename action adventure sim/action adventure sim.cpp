@@ -3374,7 +3374,8 @@ void bulletActions() {
 
 void explosionActions() {
 	for (auto explosion : explosions) {
-		explosion.defineFragmentAreas();
+		explosion.render();
+		explosion.explode();
 	}
 }
 
@@ -4197,15 +4198,42 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 					}
 				}
 			};
-			newParams.totalFragments = 4; --;;randomize num of fragments
-			for (int fragmentsCnt = 0; fragmentsCnt < newParams.totalFragments; ++fragmentsCnt) {
-				explosionParamsStruct::fragmentStruct fragment;
-				
-				fragment.speed.startTicks = SDL_GetTicks();
-				fragment.speed.delay = 1;
-				fragment.pixelIncrement = 1;
+			newParams.totalFragments = { randInt(1, newParams.sprite.areas[0][0].w), randInt(1, newParams.sprite.areas[0][0].h) };
+			newParams.fragmentSize = { newParams.sprite.areas[0][0].w / newParams.totalFragments.x, newParams.sprite.areas[0][0].h / newParams.totalFragments.y };
+			areaStruct fragmentArea = { newParams.sprite.areas[0][0].x, newParams.sprite.areas[0][0].y, newParams.fragmentSize.w, newParams.fragmentSize.h };
+			for (int totalFragmentsXCnt = 0; totalFragmentsXCnt < newParams.totalFragments.x; ++totalFragmentsXCnt) {
+				fragmentArea.y = newParams.sprite.areas[0][0].y;
+				for (int totalFragmentsYCnt = 0; totalFragmentsYCnt < newParams.totalFragments.y; ++totalFragmentsYCnt) {
+					explosionParamsStruct::fragmentStruct fragment;
 
-				newParams.fragments.push_back(fragment);
+					fragment.position = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+					fragment.originalPosition = fragment.position;
+					fragment.sprite.spriteSheetIndex = newParams.sprite.spriteSheetIndex;
+					fragment.sprite.areas[0][0] = fragmentArea;
+					fragment.sprite.angle = randInt(0, 360);
+					if (fragment.sprite.angle > 180) {
+						fragment.sprite.angle = -(fragment.sprite.angle - 180);
+					}
+					fragment.sprite.center = { randInt(0, newParams.fragmentSize.w), randInt(0, newParams.fragmentSize.h) };
+					int randomFlip = randInt(1, 3);
+					if (randomFlip == 1) {
+						fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+					}
+					else if (randomFlip == 2) {
+						fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_HORIZONTAL;
+					}
+					else if (randomFlip == 3) {
+						fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
+					}
+					fragment.speed.startTicks = SDL_GetTicks();
+					fragment.speed.delay = 1;
+					fragment.pixelIncrement = 1;
+
+					newParams.fragments.push_back(fragment);
+
+					fragmentArea.y += fragmentArea.h;
+				}
+				fragmentArea.x += fragmentArea.w;
 			}
 			initExplosion(newParams);
 
@@ -4222,30 +4250,16 @@ int Explosion::getID() {
 	return params.ID;
 }
 
-void Explosion::defineFragmentAreas() {
-	if (params.totalFragments > 0 and (int)params.fragments.size()) {
-		WHStruct fragmentSize = { params.sprite.areas[0][0].w / params.totalFragments, params.sprite.areas[0][0].h / params.totalFragments };
+void Explosion::render() {
 
-		vector<string> dimensions = { "width", "height" };
-		for (auto dimension : dimensions) {
-			areaStruct fragmentArea = { 0, 0, fragmentSize.w, fragmentSize.h };
-			for (int fragmentsCnt = 0; fragmentsCnt < params.totalFragments; ++fragmentsCnt) {
-				explosionParamsStruct::fragmentStruct fragment;
-				fragment.area = fragmentArea;
-				fragment.speed.startTicks = SDL_GetTicks();
-				fragment.speed.delay = 1;
-				fragment.pixelIncrement = 1;
-				params.fragments.push_back(fragment);
+	//Render all fragments
+	--;;
 
-				if (dimension == "width") {
-					fragmentArea.x += fragmentArea.w;
-				}
-				else {
-					fragmentArea.y += fragmentArea.h;
-				}
-			}
-		}
-	}
+}
+
+void Explosion::explode() {
+	
+	//Move each fragment from their original position in the angle they are at, while rotating each of them
 }
 
 //class functions end
