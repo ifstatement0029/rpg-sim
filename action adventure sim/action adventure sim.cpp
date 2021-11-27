@@ -4139,8 +4139,8 @@ void Bullet::move() {
 
 void Bullet::markForDestruction() {
 
-	//If bullet goes outside of overworld grid or has a reistance <= 0 then destroy it
-	if (areaWithinArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { 0, 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false || params.resistance <= 0) {
+	//If bullet goes outside of overworld grid then destroy it
+	if (areaWithinArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { 0, 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false) {
 		bulletsToDestroyIDs.push_back(params.ID);
 	}
 
@@ -4159,7 +4159,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 		collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }), params.layer, params.height);
 
 		//Check for collision with characters
-		--;;
+		//;;
 
 		if (collisionData.collision == true) {
 
@@ -4217,33 +4217,33 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 
 			//If resistance of wall/character/object/other bullets <= 0 then explode
 			if (overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance <= 0) {
-				explosionParamsStruct newParams;
-				newParams.ID = getFreeID(getExplosionIDs());
-				newParams.overworldGridLayer = params.layer;
-				newParams.tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
-				newParams.sprite.spriteSheetIndex = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetIndex;
+				explosionParamsStruct newExplosionParams;
+				newExplosionParams.ID = getFreeID(getExplosionIDs());
+				newExplosionParams.overworldGridLayer = params.layer;
+				newExplosionParams.tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				newExplosionParams.sprite.spriteSheetIndex = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetIndex;
 				areaStruct tileArea = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetArea;
-				newParams.sprite.areas = {
+				newExplosionParams.sprite.areas = {
 					{
 						{
 							{ tileArea.x, tileArea.y, tileArea.w, tileArea.h }
 						}
 					}
 				};
-				newParams.totalFragments = { randInt(1, newParams.sprite.areas[0][0].w), randInt(1, newParams.sprite.areas[0][0].h) };
-				//newParams.totalFragments = { 2, 2 };
-				WHStruct fragmentSize = { newParams.sprite.areas[0][0].w / newParams.totalFragments.x, newParams.sprite.areas[0][0].h / newParams.totalFragments.y };
-				areaStruct fragmentArea = { newParams.sprite.areas[0][0].x, newParams.sprite.areas[0][0].y, fragmentSize.w, fragmentSize.h };
-				for (int totalFragmentsXCnt = 0; totalFragmentsXCnt < newParams.totalFragments.x; ++totalFragmentsXCnt) {
-					fragmentArea.y = newParams.sprite.areas[0][0].y;
-					for (int totalFragmentsYCnt = 0; totalFragmentsYCnt < newParams.totalFragments.y; ++totalFragmentsYCnt) {
+				newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
+				//newExplosionParams.totalFragments = { 2, 2 };
+				WHStruct fragmentSize = { newExplosionParams.sprite.areas[0][0].w / newExplosionParams.totalFragments.x, newExplosionParams.sprite.areas[0][0].h / newExplosionParams.totalFragments.y };
+				areaStruct fragmentArea = { newExplosionParams.sprite.areas[0][0].x, newExplosionParams.sprite.areas[0][0].y, fragmentSize.w, fragmentSize.h };
+				for (int totalFragmentsXCnt = 0; totalFragmentsXCnt < newExplosionParams.totalFragments.x; ++totalFragmentsXCnt) {
+					fragmentArea.y = newExplosionParams.sprite.areas[0][0].y;
+					for (int totalFragmentsYCnt = 0; totalFragmentsYCnt < newExplosionParams.totalFragments.y; ++totalFragmentsYCnt) {
 						explosionParamsStruct::fragmentStruct fragment;
 
 						fragment.position = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 						fragment.originalPosition = fragment.position;
 						fragment.size = fragmentSize;
 						fragment.maxDistance = randInt(fragment.size.w * 4, fragment.size.w * 8);
-						fragment.sprite.spriteSheetIndex = newParams.sprite.spriteSheetIndex;
+						fragment.sprite.spriteSheetIndex = newExplosionParams.sprite.spriteSheetIndex;
 						fragment.sprite.areas = {
 							{
 								{
@@ -4271,19 +4271,27 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 						fragment.speed.delay = 1;
 						fragment.pixelIncrement = 2;
 
-						newParams.fragments.push_back(fragment);
+						newExplosionParams.fragments.push_back(fragment);
 
 						fragmentArea.y += fragmentArea.h;
 					}
 					fragmentArea.x += fragmentArea.w;
 				}
-				initExplosion(newParams);
+				initExplosion(newExplosionParams);
 
 				//Remove tile from overworld grid
 				gridTileStruct blankTile;
 				overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y] = blankTile;
 
 			}
+
+			//If bullet (from this class) resistance <= 0 then explode bullet
+			if (params.resistance <= 0) {
+				explosionParamsStruct newExplosionParams;
+				--;;
+				initExplosion(newExplosionParams);
+			}
+
 		}
 
 	}
