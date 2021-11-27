@@ -94,7 +94,7 @@ namespace game {
 	SDL_Rect sRect = { -1, -1, -1, -1 }, dRect = { -1, -1, -1, -1 };
 
 	struct spriteSheetStruct {
-		string filePath = "";
+		string filePathAndName = "";
 		SDL_Surface* surface = NULL;
 		SDL_Texture* texture = NULL;
 	};
@@ -153,7 +153,7 @@ namespace game {
 	int controlledCharacterIndex = 0;
 
 	struct renderOrderStruct {
-		enum class typeEnum { character, table, bullet } type = typeEnum::character;
+		enum class typeEnum { character, table, bullet, explosion } type = typeEnum::character;
 		int layerIndex = -1, index = -1, height = 0;
 		XYStruct position = { -1, -1 };
 	};
@@ -476,7 +476,7 @@ namespace game {
 			XYStruct position = { -1, -1 }, originalPosition = { -1, -1 };
 			WHStruct size = { -1, -1 };
 
-			int distanceTravelled = 0;
+			int overworldGridLayer = -1, distanceTravelled = 0;
 
 			spriteStruct sprite;
 			
@@ -491,6 +491,9 @@ namespace game {
 		Explosion(explosionParamsStruct newParams);
 
 		int getID();
+		XYStruct getFragmentPosition(int fragmentIndex);
+		int getFragmentOverworldGridLayer(int fragmentIndex);
+		int getTotalFragments();
 
 		void render();
 		void explode();

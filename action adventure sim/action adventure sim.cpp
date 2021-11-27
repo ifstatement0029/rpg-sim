@@ -458,7 +458,7 @@ void initColours() {
 int getSpriteSheetIndex(string spriteSheetName) {
 	for (int spriteSheetsCnt = 0; spriteSheetsCnt < (int)spriteSheets.size(); ++spriteSheetsCnt) {
 		string folderPath = "assets\\sprite sheets\\";
-		if (spriteSheets[spriteSheetsCnt].filePath.substr(folderPath.length(), spriteSheets[spriteSheetsCnt].filePath.length() - folderPath.length() - 4) == spriteSheetName) {
+		if (spriteSheets[spriteSheetsCnt].filePathAndName.substr(folderPath.length(), spriteSheets[spriteSheetsCnt].filePathAndName.length() - folderPath.length() - 4) == spriteSheetName) {
 			return spriteSheetsCnt;
 		}
 	}
@@ -473,6 +473,15 @@ int getSpriteSheetIndex(string spriteSheetName) {
 	return -1;
 }
 
+string getSpriteSheetName(int spriteSheetIndex) {
+	for (int spriteSheetsCnt = 0; spriteSheetsCnt < (int)spriteSheets.size(); ++spriteSheetsCnt) {
+		if (spriteSheetsCnt == spriteSheetIndex) {
+			return spriteSheets[spriteSheetsCnt].filePathAndName;
+		}
+	}
+	return "";
+}
+
 void initSpriteSheets() {
 
 	//Load sprite sheets
@@ -480,8 +489,8 @@ void initSpriteSheets() {
 	vector<string> spriteSheetFiles = getFilesOrFolders("assets\\sprite sheets");
 	for (int spriteSheetFilesCnt = 0; spriteSheetFilesCnt < (int)spriteSheetFiles.size(); ++spriteSheetFilesCnt) {
 		spriteSheetStruct currentSpriteSheet;
-		currentSpriteSheet.filePath = spriteSheetFiles[spriteSheetFilesCnt];
-		currentSpriteSheet.surface = IMG_Load(currentSpriteSheet.filePath.c_str());
+		currentSpriteSheet.filePathAndName = spriteSheetFiles[spriteSheetFilesCnt];
+		currentSpriteSheet.surface = IMG_Load(currentSpriteSheet.filePathAndName.c_str());
 		spriteSheets.push_back(currentSpriteSheet);
 	}
 
@@ -2678,6 +2687,20 @@ void renderBackgroundCharactersAndObjects() {
 		renderOrder.push_back(newRenderOrderElement);
 	}
 
+	//Insert explosion fragments in renderOrder vector
+	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
+		for (int fragmentsCnt = 0; fragmentsCnt < explosions[explosionsCnt].getTotalFragments(); ++fragmentsCnt) {
+			renderOrderStruct newRenderOrderElement;
+
+			newRenderOrderElement.type = renderOrderStruct::typeEnum::explosion;
+			newRenderOrderElement.layerIndex = explosions[explosionsCnt].getFragmentOverworldGridLayer(fragmentsCnt);
+			newRenderOrderElement.index = fragmentsCnt;
+			newRenderOrderElement.position = explosions[explosionsCnt].getFragmentPosition(fragmentsCnt);
+
+			renderOrder.push_back(newRenderOrderElement);
+		}
+	}
+
 	//Sort renderOrder by x then by y, then by layerNum
 	if ((int)renderOrder.size() > 0) {
 		sort(renderOrder.begin(), renderOrder.end(), compareRenderOrderStructByX);
@@ -2757,6 +2780,10 @@ void renderBackgroundCharactersAndObjects() {
 						}
 						case renderOrderStruct::typeEnum::bullet: {
 							bullets[renderOrder[renderOrderCnt].index].render();
+							break;
+						}
+						case renderOrderStruct::typeEnum::explosion: {
+							--;;
 							break;
 						}
 					}
@@ -3374,8 +3401,7 @@ void bulletActions() {
 
 void explosionActions() {
 	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
-		explosions[explosionsCnt].render();
-		explosions[explosionsCnt].explode();
+		//explosions[explosionsCnt].explode();
 	}
 }
 
@@ -4211,6 +4237,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 					fragment.position = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 					fragment.originalPosition = fragment.position;
 					fragment.size = fragmentSize;
+					fragment.overworldGridLayer = params.layer;
 					fragment.sprite.spriteSheetIndex = newParams.sprite.spriteSheetIndex;
 					fragment.sprite.areas = {
 						{
@@ -4263,6 +4290,30 @@ int Explosion::getID() {
 	return params.ID;
 }
 
+XYStruct Explosion::getFragmentPosition(int fragmentIndex) {
+	for (int fragmentsCnt = 0; fragmentsCnt < (int)params.fragments.size(); ++fragmentsCnt) {
+		if (fragmentIndex == fragmentsCnt) {
+			return params.fragments[fragmentsCnt].position;
+		}
+	}
+
+	return { -1, -1 };
+}
+
+int Explosion::getFragmentOverworldGridLayer(int fragmentIndex) {
+	for (int fragmentsCnt = 0; fragmentsCnt < (int)params.fragments.size(); ++fragmentsCnt) {
+		if (fragmentIndex == fragmentsCnt) {
+			return params.fragments[fragmentsCnt].overworldGridLayer;
+		}
+	}
+
+	return -1;
+}
+
+int Explosion::getTotalFragments() {
+	return (int)params.fragments.size();
+}
+
 void Explosion::render() {
 
 	//Render all fragments
@@ -4270,8 +4321,7 @@ void Explosion::render() {
 		SDL_Rect sRect = convertAreaToSDLRect(params.fragments[fragmentsCnt].sprite.areas[0][0]);
 		SDL_Rect dRect = { params.fragments[fragmentsCnt].position.x - camera.area.x, params.fragments[fragmentsCnt].position.y - camera.area.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h };
 
-		if (areaWithinCameraView({ params.fragments[fragmentsCnt].position.x, params.fragments[fragmentsCnt].position.y, params.fragments[fragmentsCnt].sprite.areas[0][0].w, params.fragments[fragmentsCnt].sprite.areas[0][0].h }) == true) {
-			printSDLRectL({ sRect, dRect });
+		if (areaWithinCameraView({ params.fragments[fragmentsCnt].position.x, params.fragments[fragmentsCnt].position.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h }) == true) {
 			SDLRenderCopyEx(sRect, dRect, params.fragments[fragmentsCnt].sprite);
 		}
 	}
