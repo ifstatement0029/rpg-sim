@@ -4139,8 +4139,8 @@ void Bullet::move() {
 
 void Bullet::markForDestruction() {
 
-	//If bullet goes outside of overworld grid then destroy it
-	if (areaWithinArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { 0, 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false) {
+	//If bullet goes outside of overworld grid or has a reistance <= 0 then destroy it
+	if (areaWithinArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { 0, 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false || params.resistance <= 0) {
 		bulletsToDestroyIDs.push_back(params.ID);
 	}
 
@@ -4155,8 +4155,11 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 			force = 0;
 		}
 
-		//Check for collision
+		//Check for collision with wall
 		collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }), params.layer, params.height);
+
+		//Check for collision with characters
+		--;;
 
 		if (collisionData.collision == true) {
 
@@ -4177,11 +4180,13 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				sideHit = directionEnum::down;
 			}
 
-
-			int resistanceTolerance = (overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance * overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].stuckTolerancePercentage) / 100;
-
 			//Decrease wall resistance by the amount of force that hits it
 			overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance -= force;
+
+			//Decrease bullet resistance
+			params.resistance -= force;
+
+			int resistanceTolerance = (overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance * overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].stuckTolerancePercentage) / 100;
 
 			//If bullet force is lower than wall/character/object/other bullets resistance - resitance tolerance then bullet ricochet
 			if (force < overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance - resistanceTolerance) {
@@ -4210,72 +4215,75 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 			//	
 			//}
 
-			//If resistance of wall/character/object/other bullets < 0 then explode
-			explosionParamsStruct newParams;
-			newParams.ID = getFreeID(getExplosionIDs());
-			newParams.overworldGridLayer = params.layer;
-			newParams.tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
-			newParams.sprite.spriteSheetIndex = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetIndex;
-			areaStruct tileArea = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetArea;
-			newParams.sprite.areas = {
-				{
+			//If resistance of wall/character/object/other bullets <= 0 then explode
+			if (overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance <= 0) {
+				explosionParamsStruct newParams;
+				newParams.ID = getFreeID(getExplosionIDs());
+				newParams.overworldGridLayer = params.layer;
+				newParams.tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				newParams.sprite.spriteSheetIndex = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetIndex;
+				areaStruct tileArea = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetArea;
+				newParams.sprite.areas = {
 					{
-						{ tileArea.x, tileArea.y, tileArea.w, tileArea.h }
-					}
-				}
-			};
-			//newParams.totalFragments = { randInt(1, newParams.sprite.areas[0][0].w), randInt(1, newParams.sprite.areas[0][0].h) };
-			newParams.totalFragments = { 2, 2 };
-			WHStruct fragmentSize = { newParams.sprite.areas[0][0].w / newParams.totalFragments.x, newParams.sprite.areas[0][0].h / newParams.totalFragments.y };
-			areaStruct fragmentArea = { newParams.sprite.areas[0][0].x, newParams.sprite.areas[0][0].y, fragmentSize.w, fragmentSize.h };
-			for (int totalFragmentsXCnt = 0; totalFragmentsXCnt < newParams.totalFragments.x; ++totalFragmentsXCnt) {
-				fragmentArea.y = newParams.sprite.areas[0][0].y;
-				for (int totalFragmentsYCnt = 0; totalFragmentsYCnt < newParams.totalFragments.y; ++totalFragmentsYCnt) {
-					explosionParamsStruct::fragmentStruct fragment;
-
-					fragment.position = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
-					fragment.originalPosition = fragment.position;
-					fragment.size = fragmentSize;
-					fragment.maxDistance = randInt(fragment.size.w * 4, fragment.size.w * 8);
-					fragment.sprite.spriteSheetIndex = newParams.sprite.spriteSheetIndex;
-					fragment.sprite.areas = {
 						{
-							{
-								{ fragmentArea.x, fragmentArea.y, fragmentArea.w, fragmentArea.h }
-							}
+							{ tileArea.x, tileArea.y, tileArea.w, tileArea.h }
 						}
-					};
-					fragment.sprite.angle = randInt(0, 360);
-					if (fragment.sprite.angle > 180) {
-						fragment.sprite.angle = -(180 - (fragment.sprite.angle - 180));
 					}
-					fragment.sprite.center = { randInt(0, fragmentSize.w), randInt(0, fragmentSize.h) };
-					int randomFlip = randInt(1, 3);
-					if (randomFlip == 1) {
-						fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
-					}
-					else if (randomFlip == 2) {
-						fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_HORIZONTAL;
-					}
-					else if (randomFlip == 3) {
-						fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
-					}
-					fragment.speed.startTicks = SDL_GetTicks();
-					fragment.speed.delay = 1;
-					fragment.pixelIncrement = 2;
+				};
+				newParams.totalFragments = { randInt(1, newParams.sprite.areas[0][0].w), randInt(1, newParams.sprite.areas[0][0].h) };
+				//newParams.totalFragments = { 2, 2 };
+				WHStruct fragmentSize = { newParams.sprite.areas[0][0].w / newParams.totalFragments.x, newParams.sprite.areas[0][0].h / newParams.totalFragments.y };
+				areaStruct fragmentArea = { newParams.sprite.areas[0][0].x, newParams.sprite.areas[0][0].y, fragmentSize.w, fragmentSize.h };
+				for (int totalFragmentsXCnt = 0; totalFragmentsXCnt < newParams.totalFragments.x; ++totalFragmentsXCnt) {
+					fragmentArea.y = newParams.sprite.areas[0][0].y;
+					for (int totalFragmentsYCnt = 0; totalFragmentsYCnt < newParams.totalFragments.y; ++totalFragmentsYCnt) {
+						explosionParamsStruct::fragmentStruct fragment;
 
-					newParams.fragments.push_back(fragment);
+						fragment.position = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+						fragment.originalPosition = fragment.position;
+						fragment.size = fragmentSize;
+						fragment.maxDistance = randInt(fragment.size.w * 4, fragment.size.w * 8);
+						fragment.sprite.spriteSheetIndex = newParams.sprite.spriteSheetIndex;
+						fragment.sprite.areas = {
+							{
+								{
+									{ fragmentArea.x, fragmentArea.y, fragmentArea.w, fragmentArea.h }
+								}
+							}
+						};
+						int angleTolerance = (params.sprite.angle * 10) / 100;
+						fragment.sprite.angle = randInt(params.sprite.angle - angleTolerance, params.sprite.angle + angleTolerance);
+						if (fragment.sprite.angle > 180) {
+							fragment.sprite.angle = -(180 - (fragment.sprite.angle - 180));
+						}
+						fragment.sprite.center = { randInt(0, fragmentSize.w), randInt(0, fragmentSize.h) };
+						int randomFlip = randInt(1, 3);
+						if (randomFlip == 1) {
+							fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+						}
+						else if (randomFlip == 2) {
+							fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_HORIZONTAL;
+						}
+						else if (randomFlip == 3) {
+							fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
+						}
+						fragment.speed.startTicks = SDL_GetTicks();
+						fragment.speed.delay = 1;
+						fragment.pixelIncrement = 2;
 
-					fragmentArea.y += fragmentArea.h;
+						newParams.fragments.push_back(fragment);
+
+						fragmentArea.y += fragmentArea.h;
+					}
+					fragmentArea.x += fragmentArea.w;
 				}
-				fragmentArea.x += fragmentArea.w;
+				initExplosion(newParams);
+
+				//Remove tile from overworld grid
+				gridTileStruct blankTile;
+				overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y] = blankTile;
+
 			}
-			initExplosion(newParams);
-
-			//Remove tile from overworld grid
-			gridTileStruct blankTile;
-			overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y] = blankTile;
-
 		}
 
 	}
