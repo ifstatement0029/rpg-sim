@@ -2687,18 +2687,16 @@ void renderBackgroundCharactersAndObjects() {
 		renderOrder.push_back(newRenderOrderElement);
 	}
 
-	//Insert explosion fragments in renderOrder vector
+	//Insert explosion in renderOrder vector
 	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
-		for (int fragmentsCnt = 0; fragmentsCnt < explosions[explosionsCnt].getTotalFragments(); ++fragmentsCnt) {
-			renderOrderStruct newRenderOrderElement;
+		renderOrderStruct newRenderOrderElement;
 
-			newRenderOrderElement.type = renderOrderStruct::typeEnum::explosion;
-			newRenderOrderElement.layerIndex = explosions[explosionsCnt].getFragmentOverworldGridLayer(fragmentsCnt);
-			newRenderOrderElement.index = fragmentsCnt;
-			newRenderOrderElement.position = explosions[explosionsCnt].getFragmentPosition(fragmentsCnt);
+		newRenderOrderElement.type = renderOrderStruct::typeEnum::explosion;
+		newRenderOrderElement.layerIndex = explosions[explosionsCnt].getOverworldGridLayer();
+		newRenderOrderElement.index = explosionsCnt;
+		newRenderOrderElement.position = explosions[explosionsCnt].getFragmentPosition(0);;
 
-			renderOrder.push_back(newRenderOrderElement);
-		}
+		renderOrder.push_back(newRenderOrderElement);
 	}
 
 	//Sort renderOrder by x then by y, then by layerNum
@@ -2742,9 +2740,9 @@ void renderBackgroundCharactersAndObjects() {
 
 					XYStruct tilePosition = { gridXCnt * tileSize.w, gridYCnt * tileSize.h };
 
-					sRect = convertAreaToSDLRect(tiles[overworldGrid.gridTile[layersCnt][gridXCnt][gridYCnt].tileIndex].spriteSheetArea);
+					SDL_Rect sRect = convertAreaToSDLRect(tiles[overworldGrid.gridTile[layersCnt][gridXCnt][gridYCnt].tileIndex].spriteSheetArea);
 
-					dRect = { tilePosition.x - camera.area.x, tilePosition.y - camera.area.y, tileSize.w, tileSize.h };
+					SDL_Rect dRect = { tilePosition.x - camera.area.x, tilePosition.y - camera.area.y, tileSize.w, tileSize.h };
 
 					SDL_RenderCopy(renderer, spriteSheets[tiles[overworldGrid.gridTile[layersCnt][gridXCnt][gridYCnt].tileIndex].spriteSheetIndex].texture, &sRect, &dRect);
 				}
@@ -2783,7 +2781,7 @@ void renderBackgroundCharactersAndObjects() {
 							break;
 						}
 						case renderOrderStruct::typeEnum::explosion: {
-							--;;
+							explosions[renderOrder[renderOrderCnt].index].render();
 							break;
 						}
 					}
@@ -2796,8 +2794,8 @@ void renderBackgroundCharactersAndObjects() {
 	//Render pre-render texture to screen
 	setSDLRenderTarget(NULL);
 	WHStruct preRenderTextureSize = getSDLTextureSize(preRenderTexture);
-	sRect = { 0, 0, preRenderTextureSize.w, preRenderTextureSize.h };
-	dRect = { 0, 0, preRenderTextureSize.w, preRenderTextureSize.h };
+	SDL_Rect sRect = { 0, 0, preRenderTextureSize.w, preRenderTextureSize.h };
+	SDL_Rect dRect = { 0, 0, preRenderTextureSize.w, preRenderTextureSize.h };
 	SDL_RenderCopy(renderer, preRenderTexture, &sRect, &dRect);
 	clearTexture(preRenderTexture, 0, 0, 0, 255);
 
@@ -3401,7 +3399,7 @@ void bulletActions() {
 
 void explosionActions() {
 	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
-		//explosions[explosionsCnt].explode();
+		explosions[explosionsCnt].explode();
 	}
 }
 
@@ -4005,7 +4003,7 @@ void Character::useEquippedWeapon() {
 						bulletParams.sprite.angle = params.equippedRangedWeapon.sprite.angle;
 						bulletParams.speed.startTicks = SDL_GetTicks();
 						bulletParams.speed.delay = 1;
-						bulletParams.movePixelIncrement = 1;
+						bulletParams.movePixelIncrement = 6;
 						bulletParams.damage = 90;
 						bulletParams.resistance = 100;
 						initBullet(bulletParams);
@@ -4215,6 +4213,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 			//If resistance of wall/character/object/other bullets < 0 then explode
 			explosionParamsStruct newParams;
 			newParams.ID = getFreeID(getExplosionIDs());
+			newParams.overworldGridLayer = params.layer;
 			newParams.tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 			newParams.sprite.spriteSheetIndex = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetIndex;
 			areaStruct tileArea = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetArea;
@@ -4237,7 +4236,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 					fragment.position = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
 					fragment.originalPosition = fragment.position;
 					fragment.size = fragmentSize;
-					fragment.overworldGridLayer = params.layer;
+					fragment.maxDistance = randInt(fragment.size.w * 4, fragment.size.w * 8);
 					fragment.sprite.spriteSheetIndex = newParams.sprite.spriteSheetIndex;
 					fragment.sprite.areas = {
 						{
@@ -4263,7 +4262,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 					}
 					fragment.speed.startTicks = SDL_GetTicks();
 					fragment.speed.delay = 1;
-					fragment.pixelIncrement = 1;
+					fragment.pixelIncrement = 2;
 
 					newParams.fragments.push_back(fragment);
 
@@ -4290,28 +4289,20 @@ int Explosion::getID() {
 	return params.ID;
 }
 
-XYStruct Explosion::getFragmentPosition(int fragmentIndex) {
-	for (int fragmentsCnt = 0; fragmentsCnt < (int)params.fragments.size(); ++fragmentsCnt) {
-		if (fragmentIndex == fragmentsCnt) {
-			return params.fragments[fragmentsCnt].position;
-		}
-	}
-
-	return { -1, -1 };
+int Explosion::getOverworldGridLayer() {
+	return params.overworldGridLayer;
 }
 
-int Explosion::getFragmentOverworldGridLayer(int fragmentIndex) {
-	for (int fragmentsCnt = 0; fragmentsCnt < (int)params.fragments.size(); ++fragmentsCnt) {
-		if (fragmentIndex == fragmentsCnt) {
-			return params.fragments[fragmentsCnt].overworldGridLayer;
-		}
-	}
-
-	return -1;
+XYStruct Explosion::getFragmentPosition(int fragmentIndex) {
+	return params.fragments[fragmentIndex].position;
 }
 
 int Explosion::getTotalFragments() {
 	return (int)params.fragments.size();
+}
+
+vector<explosionParamsStruct::fragmentStruct> Explosion::getFragments() {
+	return params.fragments;
 }
 
 void Explosion::render() {
@@ -4333,16 +4324,19 @@ void Explosion::explode() {
 		if (SDL_GetTicks() - params.fragments[fragmentsCnt].speed.startTicks >= params.fragments[fragmentsCnt].speed.delay) {
 			params.fragments[fragmentsCnt].speed.startTicks = SDL_GetTicks();
 
-			//Update fragment position
-			params.fragments[fragmentsCnt].distanceTravelled += params.fragments[fragmentsCnt].pixelIncrement;
-			params.fragments[fragmentsCnt].position = { lround((double)params.fragments[fragmentsCnt].originalPosition.x + (params.fragments[fragmentsCnt].distanceTravelled * cos(((params.fragments[fragmentsCnt].sprite.angle) * M_PI) / 180))), lround((double)params.fragments[fragmentsCnt].originalPosition.y + (params.fragments[fragmentsCnt].distanceTravelled * sin(((params.fragments[fragmentsCnt].sprite.angle) * M_PI) / 180))) };
+			if (params.fragments[fragmentsCnt].distanceTravelled < params.fragments[fragmentsCnt].maxDistance) {
 
-			//Rotate fragment
-			params.fragments[fragmentsCnt].sprite.angle += params.fragments[fragmentsCnt].pixelIncrement;
-			if (params.fragments[fragmentsCnt].sprite.angle > 180) {
-				params.fragments[fragmentsCnt].sprite.angle = -(180 - (params.fragments[fragmentsCnt].sprite.angle - 180));
+				//Update fragment position
+				params.fragments[fragmentsCnt].distanceTravelled += params.fragments[fragmentsCnt].pixelIncrement;
+				params.fragments[fragmentsCnt].position = { lround((double)params.fragments[fragmentsCnt].originalPosition.x + (params.fragments[fragmentsCnt].distanceTravelled * cos(((params.fragments[fragmentsCnt].sprite.angle) * M_PI) / 180))), lround((double)params.fragments[fragmentsCnt].originalPosition.y + (params.fragments[fragmentsCnt].distanceTravelled * sin(((params.fragments[fragmentsCnt].sprite.angle) * M_PI) / 180))) };
+
+				//Rotate fragment
+				params.fragments[fragmentsCnt].sprite.angle += params.fragments[fragmentsCnt].pixelIncrement;
+				if (params.fragments[fragmentsCnt].sprite.angle > 180) {
+					params.fragments[fragmentsCnt].sprite.angle = -(180 - (params.fragments[fragmentsCnt].sprite.angle - 180));
+				}
+
 			}
-
 		}
 	}
 }

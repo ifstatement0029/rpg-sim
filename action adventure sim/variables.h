@@ -466,7 +466,7 @@ namespace game {
 	vector<Bullet> bullets;
 
 	struct explosionParamsStruct {
-		int ID = -1;
+		int ID = -1, overworldGridLayer = -1;
 		XYStruct tilePixelPosition = { -1, -1 };
 
 		spriteStruct sprite;
@@ -476,7 +476,7 @@ namespace game {
 			XYStruct position = { -1, -1 }, originalPosition = { -1, -1 };
 			WHStruct size = { -1, -1 };
 
-			int overworldGridLayer = -1, distanceTravelled = 0;
+			int distanceTravelled = 0, maxDistance = -1;
 
 			spriteStruct sprite;
 			
@@ -491,9 +491,10 @@ namespace game {
 		Explosion(explosionParamsStruct newParams);
 
 		int getID();
+		int getOverworldGridLayer();
 		XYStruct getFragmentPosition(int fragmentIndex);
-		int getFragmentOverworldGridLayer(int fragmentIndex);
 		int getTotalFragments();
+		vector<explosionParamsStruct::fragmentStruct> getFragments();
 
 		void render();
 		void explode();
