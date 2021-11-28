@@ -3270,6 +3270,17 @@ void mainMenu() {
 	}
 }
 
+void displayCopyright(XYStruct position, int fontSize) {
+
+	//Display copyright symbol
+	SDL_Rect dRect = { position.x, position.y, fontSize, fontSize };
+	SDL_RenderCopy(renderer, spriteSheets[getSpriteSheetIndex("copyright symbol")].texture, NULL, &dRect);
+
+	//Display copyright wording
+	renderText("Copyright 2021", defaultFont, defaultColour, { position.x + (fontSize * 2), position.y });
+
+}
+
 void foo(int Z) {
 	for (int i = 0; i < Z; i++) {
 		//cout << "Thread using function pointer as callable\n";
@@ -4351,7 +4362,7 @@ void Explosion::render() {
 
 void Explosion::explode() {
 	for (int fragmentsCnt = 0; fragmentsCnt < (int)params.fragments.size(); ++fragmentsCnt) {
-		if (SDL_GetTicks() - params.fragments[fragmentsCnt].speed.startTicks >= params.fragments[fragmentsCnt].speed.delay) {
+		if (SDL_GetTicks() - params.fragments[fragmentsCnt].speed.startTicks >= params.fragments[fragmentsCnt].speed.delay / FPSTimerMod) {
 			params.fragments[fragmentsCnt].speed.startTicks = SDL_GetTicks();
 
 			if (params.fragments[fragmentsCnt].distanceTravelled < params.fragments[fragmentsCnt].maxDistance) {
@@ -4438,6 +4449,8 @@ int main(int argc, char* args[]) {
 
 			if (displayMainMenu == true) {
 				mainMenu();
+				int fontSize = tileSize.h * 2;
+				displayCopyright({ 0, textLogicalSize.h - (fontSize * 2) }, fontSize);
 			}
 			else {
 
