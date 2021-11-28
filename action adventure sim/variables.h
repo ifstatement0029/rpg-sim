@@ -18,11 +18,11 @@ namespace fs = filesystem;
 
 namespace game {
 
-	bool fullscreen = true;
+	bool fullscreen = false;
 	SDL_Window* window = NULL;
 	//WHStruct windowResolution = { 3840, 2160 };
-	WHStruct windowResolution = { 2560, 1440 };
-	//WHStruct windowResolution = { 1920, 1080 };
+	//WHStruct windowResolution = { 2560, 1440 };
+	WHStruct windowResolution = { 1920, 1080 };
 
 	int FPSCap = 60; // 0 for uncapped
 	bool vSyncOn = true;
@@ -467,9 +467,10 @@ namespace game {
 
 	struct explosionParamsStruct {
 		int ID = -1, overworldGridLayer = -1;
-		XYStruct tilePixelPosition = { -1, -1 };
 
 		spriteStruct sprite;
+
+		collisionDataStruct collisionData;
 
 		XYStruct totalFragments = { -1, -1 };
 		struct fragmentStruct {
@@ -496,6 +497,7 @@ namespace game {
 		int getTotalFragments();
 		vector<explosionParamsStruct::fragmentStruct> getFragments();
 
+		void createFragments();
 		void render();
 		void explode();
 
