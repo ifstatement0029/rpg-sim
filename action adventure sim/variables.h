@@ -241,8 +241,9 @@ namespace game {
 
 	struct collisionDataStruct {
 		bool collision = false;
-		//enum class tileHitCornerEnum { up, right, down, left } tileHitCorner = tileHitCornerEnum::up;
-		XYStruct tileHitGridPosition = { -1, -1 };
+		XYStruct collidePosition = { -1, -1 };
+		enum class tileHitCornerEnum { up, right, down, left } tileHitCorner = tileHitCornerEnum::down;
+		int instanceID = -1;
 	};
 
 	struct menuControlsStruct {

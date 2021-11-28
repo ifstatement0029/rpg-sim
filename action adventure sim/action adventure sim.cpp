@@ -754,7 +754,7 @@ collisionDataStruct checkCollisionWithOverworldGrid(areaStruct gridArea, int gri
 			
 			if (gridLayer < (int)overworldGrid.gridTile.size() && areaXCnt < (int)overworldGrid.gridTile[gridLayer].size() && areaYCnt < (int)overworldGrid.gridTile[gridLayer][areaXCnt].size() && overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].collidable == true) {
 				collisionData.collision = true;
-				collisionData.tileHitGridPosition = { areaXCnt, areaYCnt };
+				collisionData.collidePosition = { areaXCnt, areaYCnt };
 
 				return collisionData;
 			}
@@ -774,7 +774,25 @@ collisionDataStruct checkCollisionWithOverworldGridFactoringHeight(areaStruct gr
 			if (gridLayer < (int)overworldGrid.gridTile.size() && areaXCnt >= 0 && areaXCnt <= (int)overworldGrid.gridTile[gridLayer].size() - 1 && areaYCnt >= 0 && areaYCnt <= (int)overworldGrid.gridTile[gridLayer][areaXCnt].size() - 1 && overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].collidable == true) {
 				if ((overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].jumpable == true && height < overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].height) || overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].jumpable == false) {
 					collisionData.collision = true;
-					collisionData.tileHitGridPosition = { areaXCnt, areaYCnt };
+					collisionData.collidePosition = { areaXCnt, areaYCnt };
+
+					//Get side of grid tile hit by bullet
+					directionEnum sideHit = directionEnum::down;
+					areaStruct tileGridArea = { --;; overworldGridCollisionData.collidePosition.x, overworldGridCollisionData.collidePosition.y, 1, 1 };
+					areaStruct bulletPreviousGridArea = getGridAreaFromPixelArea({ params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h });
+					if (bulletPreviousGridArea.x + bulletPreviousGridArea.w - 1 < tileGridArea.x) {
+						sideHit = directionEnum::left;
+					}
+					else if (bulletPreviousGridArea.x > tileGridArea.x + tileGridArea.w - 1) {
+						sideHit = directionEnum::right;
+					}
+					else if (bulletPreviousGridArea.y + bulletPreviousGridArea.h - 1 < tileGridArea.y) {
+						sideHit = directionEnum::up;
+					}
+					else if (bulletPreviousGridArea.y > tileGridArea.y + tileGridArea.h - 1) {
+						sideHit = directionEnum::down;
+					}
+
 				}
 
 				return collisionData;
@@ -807,7 +825,7 @@ collisionDataStruct checkSubGridCollisionWithOverworldGridFactoringHeight(areaSt
 									
 									if ((overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].jumpable == true && height < overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].height) || overworldGrid.gridTile[gridLayer][areaXCnt][areaYCnt].jumpable == false) {
 										collisionData.collision = true;
-										collisionData.tileHitGridPosition = { areaXCnt, areaYCnt };
+										collisionData.collidePosition = { areaXCnt, areaYCnt };
 									}
 
 									return collisionData;
@@ -876,6 +894,20 @@ bool checkCollisionWithCollidableObjectFactoringHeight(areaStruct gridArea, int 
 		}
 	}
 	return false;
+}
+
+collisionDataStruct checkCollisionWithCharacter(areaStruct sourcePixelArea) {
+	collisionDataStruct collisionData;
+	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
+		XYStruct characterPosition = characters[charactersCnt].getPosition();
+		WHStruct characterSize = characters[charactersCnt].getSize();
+		if (areaWithinArea(sourcePixelArea, { characterPosition.x, characterPosition.y, characterSize.w, characterSize.h }) == true) {
+			collisionData.collision = true;
+			collisionData.collidePosition = characterPosition;
+			return collisionData;
+		}
+	}
+	return collisionData;
 }
 
 void displayLoadingMessage() {
@@ -3699,7 +3731,7 @@ void Character::move() {
 
 			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight);
 			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
-				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				/*XYStruct tilePixelPosition = { collisionData.collidePosition.x * tileSize.w, collisionData.collidePosition.y * tileSize.h };
 				params.position.x = tilePixelPosition.x + tileSize.w;*/
 				params.position.x += params.move.pixelIncrement;
 			}
@@ -3714,7 +3746,7 @@ void Character::move() {
 
 			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight);
 			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
-				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				/*XYStruct tilePixelPosition = { collisionData.collidePosition.x * tileSize.w, collisionData.collidePosition.y * tileSize.h };
 				params.position.x = tilePixelPosition.x - params.size.w;*/
 				params.position.x -= params.move.pixelIncrement;
 			}
@@ -3729,7 +3761,7 @@ void Character::move() {
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight);
 			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
-				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				/*XYStruct tilePixelPosition = { collisionData.collidePosition.x * tileSize.w, collisionData.collidePosition.y * tileSize.h };
 				params.position.y = tilePixelPosition.y + tileSize.h;*/
 				params.position.y += params.move.pixelIncrement;
 			}
@@ -3744,7 +3776,7 @@ void Character::move() {
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight);
 			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
-				/*XYStruct tilePixelPosition = { collisionData.tileHitGridPosition.x * tileSize.w, collisionData.tileHitGridPosition.y * tileSize.h };
+				/*XYStruct tilePixelPosition = { collisionData.collidePosition.x * tileSize.w, collisionData.collidePosition.y * tileSize.h };
 				params.position.y = tilePixelPosition.y - params.size.h;*/
 				params.position.y -= params.move.pixelIncrement;
 			}
@@ -3956,12 +3988,12 @@ void Character::jumpOnTile() {
 		bool collidedWithObject = false;
 		collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer);
 		if (collisionData.collision == true) {
-			if (params.jump.direction == directionEnum::down && params.jump.currentHeight > 0 && params.jump.currentHeight <= overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].height) {
+			if (params.jump.direction == directionEnum::down && params.jump.currentHeight > 0 && params.jump.currentHeight <= overworldGrid.gridTile[params.layer][collisionData.collidePosition.x][collisionData.collidePosition.y].height) {
 
 				//Stop jumping
 				params.jump.jumping = false;
 
-				params.jump.currentHeight = overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].height;
+				params.jump.currentHeight = overworldGrid.gridTile[params.layer][collisionData.collidePosition.x][collisionData.collidePosition.y].height;
 				params.jump.onTileObject = true;
 				params.shadowHeight = params.jump.currentHeight;
 			}
@@ -4170,16 +4202,17 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 		}
 
 		//Check for collision with wall
-		collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }), params.layer, params.height);
+		collisionDataStruct overworldGridCollisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }), params.layer, params.height);
 
 		//Check for collision with characters
-		--;;
+		collisionDataStruct characterCollisionData = checkCollisionWithCharacter({ params.position.x, params.position.y, params.size.w, params.size.h });
 
-		if (collisionData.collision == true) {
+		//Overworld grid collision
+		if (overworldGridCollisionData.collision == true) {
 
 			//Get side of grid tile hit by bullet
 			directionEnum sideHit = directionEnum::down;
-			areaStruct tileGridArea = { collisionData.tileHitGridPosition.x, collisionData.tileHitGridPosition.y, 1, 1 };
+			areaStruct tileGridArea = { overworldGridCollisionData.collidePosition.x, overworldGridCollisionData.collidePosition.y, 1, 1 };
 			areaStruct bulletPreviousGridArea = getGridAreaFromPixelArea({ params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h });
 			if (bulletPreviousGridArea.x + bulletPreviousGridArea.w - 1 < tileGridArea.x) {
 				sideHit = directionEnum::left;
@@ -4195,15 +4228,15 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 			}
 
 			//Decrease wall resistance by the amount of force that hits it
-			overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance -= force;
+			overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance -= force;
 
 			//Decrease bullet resistance
 			params.resistance -= force;
 
-			int resistanceTolerance = (overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance * overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].stuckTolerancePercentage) / 100;
+			int resistanceTolerance = (overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance * overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].stuckTolerancePercentage) / 100;
 
 			//If bullet force is lower than wall/character/object/other bullets resistance - resitance tolerance then bullet ricochet
-			if (force < overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance - resistanceTolerance) {
+			if (force < overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance - resistanceTolerance) {
 
 				//Bullet ricochets
 				params.originalPosition = params.position;
@@ -4216,26 +4249,26 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				}
 
 			}
-			else if (force >= overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance - resistanceTolerance && force <= overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance + resistanceTolerance) {
+			else if (force >= overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance - resistanceTolerance && force <= overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance + resistanceTolerance) {
 
 				//If bullet force is within range of stuck tolerance percentage of wall/character/object/other resistance then bullet stays stuck
 				params.stuck = true;
 				stuckBulletIDs.push_back(params.ID);
 
 			}
-			//else if (force > overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance + resistanceTolerance) {
+			//else if (force > overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance + resistanceTolerance) {
 			//	
 			//	//If bullet force is greater than wall/character/object/other bullets resistance + resistance tolerance then bullet penetrates
 			//	
 			//}
 
 			//If resistance of wall/character/object/other bullets <= 0 then explode
-			if (overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].resistance <= 0) {
+			if (overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance <= 0) {
 				explosionParamsStruct newExplosionParams;
 				newExplosionParams.ID = getFreeID(getExplosionIDs());
 				newExplosionParams.overworldGridLayer = params.layer;
-				newExplosionParams.sprite.spriteSheetIndex = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetIndex;
-				areaStruct tileArea = tiles[overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y].tileIndex].spriteSheetArea;
+				newExplosionParams.sprite.spriteSheetIndex = tiles[overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].tileIndex].spriteSheetIndex;
+				areaStruct tileArea = tiles[overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].tileIndex].spriteSheetArea;
 				newExplosionParams.sprite.areas = {
 					{
 						{
@@ -4243,14 +4276,14 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 						}
 					}
 				};
-				newExplosionParams.collisionData = collisionData;
+				newExplosionParams.collisionData = overworldGridCollisionData;
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 				newExplosionParams.totalFragments = { 2, 2 };
 				initExplosion(newExplosionParams);
 
 				//Remove tile from overworld grid
 				gridTileStruct blankTile;
-				overworldGrid.gridTile[params.layer][collisionData.tileHitGridPosition.x][collisionData.tileHitGridPosition.y] = blankTile;
+				overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y] = blankTile;
 
 			}
 
@@ -4266,6 +4299,13 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 
 				initExplosion(newExplosionParams);
 			}
+
+		}
+
+		//Character collision
+		if (characterCollisionData.collision == true) {
+
+			
 
 		}
 
@@ -4305,7 +4345,7 @@ void Explosion::createFragments() {
 			for (int totalFragmentsYCnt = 0; totalFragmentsYCnt < params.totalFragments.y; ++totalFragmentsYCnt) {
 				explosionParamsStruct::fragmentStruct fragment;
 
-				fragment.position = { params.collisionData.tileHitGridPosition.x * tileSize.w, params.collisionData.tileHitGridPosition.y * tileSize.h };
+				fragment.position = { params.collisionData.collidePosition.x * tileSize.w, params.collisionData.collidePosition.y * tileSize.h };
 				fragment.originalPosition = fragment.position;
 				fragment.size = fragmentSize;
 				fragment.maxDistance = randInt(fragment.size.w * 4, fragment.size.w * 8);
