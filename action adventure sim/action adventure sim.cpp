@@ -1755,13 +1755,14 @@ void initLevel() {
 void initCharacters() {
 	controlledCharacterIndex = 0;
 	int characterID = 0;
-	for (int charactersCnt = 0; charactersCnt < 1; ++charactersCnt) {
+	XYStruct characterPosition = { 191, 193 };
+	for (int charactersCnt = 0; charactersCnt < 2; ++charactersCnt) {
 		characterParams currentCharacterParams;
 
 		currentCharacterParams.ID = characterID;
 		++characterID;
 
-		currentCharacterParams.position = { 191, 193 };
+		currentCharacterParams.position = characterPosition;
 		currentCharacterParams.groundPosition = currentCharacterParams.position;
 		currentCharacterParams.size = { tileSize.w * 4, tileSize.h * 4 };
 
@@ -1839,8 +1840,12 @@ void initCharacters() {
 			}
 		}
 
+		currentCharacterParams.resistance = 1;
+
 		Character currentCharacter(currentCharacterParams);
 		characters.push_back(currentCharacter);
+
+		characterPosition.x += currentCharacterParams.size.w;
 	}
 }
 
@@ -3442,12 +3447,17 @@ void createMazeAndGetAStarPath(areaStruct startPixelArea, areaStruct endPixelAre
 
 void characterActions() {
 	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
-		characters[charactersCnt].move();
-		characters[charactersCnt].idleAnimation();
-		characters[charactersCnt].jump();
-		characters[charactersCnt].jumpOnCollidableObject();
-		characters[charactersCnt].jumpOnTile();
-		characters[charactersCnt].useEquippedWeapon();
+		if (controlledCharacterIndex == charactersCnt) {
+			characters[charactersCnt].move();
+			characters[charactersCnt].jump();
+			characters[charactersCnt].jumpOnCollidableObject();
+			characters[charactersCnt].jumpOnTile();
+			characters[charactersCnt].updateEquippedWeaponAngle();
+			characters[charactersCnt].useEquippedWeapon();
+		}
+		else {
+			characters[charactersCnt].idleAnimation();
+		}
 	}
 }
 
@@ -3561,13 +3571,13 @@ int getCharacterIndexByID(int ID) {
 
 void destroyCharacters() {
 	for (int charactersToDestroyIDsCnt = 0; charactersToDestroyIDsCnt < (int)charactersToDestroyIDs.size(); ++charactersToDestroyIDsCnt) {
-		--;;
-
-		/*int bulletIndex = getBulletIndexByID(bulletsToDestroyIDs[bulletsToDestroyIDsCnt]);
-		if (bulletIndex > -1) {
-			bullets.erase(bullets.begin() + bulletIndex);
-		}*/
+		int characterIndex = getCharacterIndexByID(charactersToDestroyIDs[charactersToDestroyIDsCnt]);
+		if (characterIndex > -1) {
+			characters.erase(characters.begin() + characterIndex);
+		}
 	}
+
+	charactersToDestroyIDs.clear();
 }
 
 //functions end
@@ -3660,6 +3670,31 @@ void Character::render() {
 
 }
 
+void Character::updateEquippedWeaponAngle() {
+	switch (params.equippedWeaponType) {
+		case characterParams::equippedWeaponTypeEnum::ranged: {
+			if (rightStickXDir != 0 || rightStickYDir != 0) {
+				params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+			}
+			else if (xDir != 0 || yDir != 0) {
+				params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+			}
+			break;
+		}
+		case characterParams::equippedWeaponTypeEnum::melee: {
+			if (params.equippedMeleeWeapon.swing.swinging == false) {
+				if (rightStickXDir != 0 || rightStickYDir != 0) {
+					params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+				}
+				else if (xDir != 0 || yDir != 0) {
+					params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+				}
+			}
+			break;
+		}
+	}
+}
+
 void Character::renderEquippedWeapon() {
 	switch (params.equippedWeaponType) {
 		case characterParams::equippedWeaponTypeEnum::ranged: {
@@ -3668,12 +3703,12 @@ void Character::renderEquippedWeapon() {
 			params.equippedRangedWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedRangedWeapon.sprite.areas[0][0].h / 2) };
 
 			//Get weapon angle
-			if (rightStickXDir != 0 || rightStickYDir != 0) {
+			/*if (rightStickXDir != 0 || rightStickYDir != 0) {
 				params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
 			}
 			else if (xDir != 0 || yDir != 0) {
 				params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
-			}
+			}*/
 			
 			//Flip weapon and adjust position
 			if (params.equippedRangedWeapon.sprite.angle >= -90 && params.equippedRangedWeapon.sprite.angle <= 90) {
@@ -3704,14 +3739,14 @@ void Character::renderEquippedWeapon() {
 			params.equippedMeleeWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedMeleeWeapon.sprite.areas[0][0].h / 2) };
 
 			//Get weapon angle
-			if (params.equippedMeleeWeapon.swing.swinging == false) {
+			/*if (params.equippedMeleeWeapon.swing.swinging == false) {
 				if (rightStickXDir != 0 || rightStickYDir != 0) {
 					params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
 				}
 				else if (xDir != 0 || yDir != 0) {
 					params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
 				}
-			}
+			}*/
 
 			//Flip weapon and adjust position
 			if (params.equippedMeleeWeapon.sprite.angle >= -90 && params.equippedMeleeWeapon.sprite.angle <= 90) {
@@ -4128,6 +4163,7 @@ void Character::useEquippedWeapon() {
 						bulletParams.movePixelIncrement = 6;
 						bulletParams.damage = 90;
 						bulletParams.resistance = 100;
+						bulletParams.characterID = params.ID;
 						initBullet(bulletParams);
 
 						//Update magazin current load
@@ -4355,7 +4391,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 		}
 
 		//Character collision
-		if (characterCollisionData.collision == true) {
+		if (characterCollisionData.collision == true && characterCollisionData.instanceID != params.characterID) {
 
 			//Decrease character resistance by the amount of force that hits
 			int characterIndex = getCharacterIndexByID(characterCollisionData.instanceID);
@@ -4408,7 +4444,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 						}
 					}
 				};
-				newExplosionParams.collisionData = overworldGridCollisionData;
+				newExplosionParams.collisionData = characterCollisionData; --;;
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 				newExplosionParams.totalFragments = { 2, 2 };
 				initExplosion(newExplosionParams);

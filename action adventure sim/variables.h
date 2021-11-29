@@ -401,6 +401,7 @@ namespace game {
 		void setDestroy(bool newDestroy);
 		
 		void render();
+		void updateEquippedWeaponAngle();
 		void renderEquippedWeapon();
 		void renderReloadAnimation();
 		void move();
@@ -463,6 +464,8 @@ namespace game {
 		int damage = -1, resistance = -1, stuckTolerancePercentage = 10;
 
 		bool stuck = false, destroy = false;
+
+		int characterID = -1;
 	};
 
 	class Bullet {

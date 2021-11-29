@@ -41,6 +41,7 @@ ranged weapon:
 	- walls, characters, objectsm, other bullets and current bullet explode if resistance < 0 - ;;
 	- stuck bullets need to be removed after a certain time
 	- explosion fragments need to be removed after a time
+	- have blood/dust/etc when character/object/etc explode
 melee weapon: 
 	- can aim 360 degrees with left or right stick - done
 	- can attack in 360 degrees - done
