@@ -242,7 +242,7 @@ namespace game {
 	struct collisionDataStruct {
 		bool collision = false;
 		XYStruct collidePosition = { -1, -1 };
-		enum class tileHitCornerEnum { up, right, down, left } tileHitCorner = tileHitCornerEnum::down;
+		enum class tileHitCornerEnum { none, up, right, down, left } hitCorner = tileHitCornerEnum::none;
 		int instanceID = -1;
 	};
 
@@ -294,6 +294,8 @@ namespace game {
 	int maxStuckBullets = 100;
 	vector<int> stuckBulletIDs;
 
+	vector<int> charactersToDestroyIDs;
+
 	//classes start
 
 	struct characterParams {
@@ -303,6 +305,7 @@ namespace game {
 		WHStruct size = { -1, -1 };
 		int layer = 0, shadowHeight = 0;
 		
+		bool displaySprites = true;
 		spriteStruct sprites;
 
 		directionEnum direction = directionEnum::down;
@@ -370,6 +373,10 @@ namespace game {
 				delayStruct delay;
 			} swing;
 		} equippedMeleeWeapon;
+
+		int resistance = -1, stuckTolerancePercentage = 10;
+
+		bool destroy = false;
 	};
 
 	class Character {
@@ -381,8 +388,17 @@ namespace game {
 		WHStruct getSize();
 		int getCurrentHeight();
 		directionEnum getDirection();
+		int getFrame();
 		characterParams::rangedWeaponStruct::magazineStruct getMagazine();
 		string getEquippedWeaponName();
+		int getID();
+		int getResistance();
+		void setResistance(int newResistance);
+		int getStuckTolerancePercentage();
+		int getCharacterSpriteSheetIndex();
+		areaStruct getSpriteSheetArea(directionEnum direction, int frame);
+		void setDisplaySprites(bool newDisplaySprites);
+		void setDestroy(bool newDestroy);
 		
 		void render();
 		void renderEquippedWeapon();
@@ -393,6 +409,7 @@ namespace game {
 		void jumpOnCollidableObject();
 		void jumpOnTile();
 		void useEquippedWeapon();
+		void markForDestruction();
 
 	private:
 		characterParams params;
@@ -435,6 +452,7 @@ namespace game {
 		XYStruct position = { -1, -1 }, originalPosition = { -1, -1 }, previousPosition = { -1, -1 }, directionMods = { 1, 1 };
 		WHStruct size = { -1, -1 };
 
+		bool displaySprite = true;
 		spriteStruct sprite;
 
 		delayStruct speed;
@@ -444,7 +462,7 @@ namespace game {
 
 		int damage = -1, resistance = -1, stuckTolerancePercentage = 10;
 
-		bool stuck = false;
+		bool stuck = false, destroy = false;
 	};
 
 	class Bullet {
@@ -459,6 +477,7 @@ namespace game {
 		void move();
 		void markForDestruction();
 		void ricochetPenetrateOrStayStuck();
+		void explode();
 
 	private:
 		bulletParamsStruct params;

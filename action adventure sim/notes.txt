@@ -39,6 +39,8 @@ ranged weapon:
 	- have a delay when reloading - done
 	- bullets can ricochet against/penetrate/stay stuck in walls, characters, objects and other bullets - ;;
 	- walls, characters, objectsm, other bullets and current bullet explode if resistance < 0 - ;;
+	- stuck bullets need to be removed after a certain time
+	- explosion fragments need to be removed after a time
 melee weapon: 
 	- can aim 360 degrees with left or right stick - done
 	- can attack in 360 degrees - done
