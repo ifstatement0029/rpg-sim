@@ -1730,7 +1730,7 @@ void initLevel() {
 				if (areaWithinGrid({ wallXCnt, wallYCnt, 1, 1 }, 1) == true) {
 					overworldGrid.gridTile[1][wallXCnt][wallYCnt].collidable = true;
 					overworldGrid.gridTile[1][wallXCnt][wallYCnt].tileIndex = getTileIndex("wall");
-					overworldGrid.gridTile[1][wallXCnt][wallYCnt].resistance = 1000;
+					overworldGrid.gridTile[1][wallXCnt][wallYCnt].resistance = 1;
 					overworldGrid.gridTile[1][wallXCnt][wallYCnt].stuckTolerancePercentage = 10;
 				}
 			}
@@ -3644,6 +3644,10 @@ areaStruct Character::getSpriteSheetArea(directionEnum direction, int frame) {
 	return params.sprites.areas[(int)direction][frame];
 }
 
+bool Character::getDisplaySprites() {
+	return params.displaySprites;
+}
+
 void Character::setDisplaySprites(bool newDisplaySprites) {
 	params.displaySprites = newDisplaySprites;
 }
@@ -4378,6 +4382,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 					}
 				};
 				newExplosionParams.collisionData = overworldGridCollisionData;
+				newExplosionParams.collisionData.collidePosition = { newExplosionParams.collisionData.collidePosition.x * tileSize.w, newExplosionParams.collisionData.collidePosition.y * tileSize.h };
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 				newExplosionParams.totalFragments = { 2, 2 };
 				initExplosion(newExplosionParams);
@@ -4391,7 +4396,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 		}
 
 		//Character collision
-		if (characterCollisionData.collision == true && characterCollisionData.instanceID != params.characterID) {
+		if (characterCollisionData.collision == true && characterCollisionData.instanceID != params.characterID && characters[getCharacterIndexByID(characterCollisionData.instanceID)].getDisplaySprites() == true) {
 
 			//Decrease character resistance by the amount of force that hits
 			int characterIndex = getCharacterIndexByID(characterCollisionData.instanceID);
@@ -4444,7 +4449,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 						}
 					}
 				};
-				newExplosionParams.collisionData = characterCollisionData; --;;
+				newExplosionParams.collisionData = characterCollisionData;
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 				newExplosionParams.totalFragments = { 2, 2 };
 				initExplosion(newExplosionParams);
@@ -4468,6 +4473,10 @@ void Bullet::explode() {
 		newExplosionParams.sprite = params.sprite;
 		//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 		newExplosionParams.totalFragments = { 2, 2 };
+		newExplosionParams.collisionData.collidePosition = params.position;
+		newExplosionParams.collisionData.collision = true;
+		newExplosionParams.collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::none;
+		newExplosionParams.collisionData.instanceID = params.ID;
 		initExplosion(newExplosionParams);
 
 		params.displaySprite = false;
@@ -4508,7 +4517,7 @@ void Explosion::createFragments() {
 			for (int totalFragmentsYCnt = 0; totalFragmentsYCnt < params.totalFragments.y; ++totalFragmentsYCnt) {
 				explosionParamsStruct::fragmentStruct fragment;
 
-				fragment.position = { params.collisionData.collidePosition.x * tileSize.w, params.collisionData.collidePosition.y * tileSize.h };
+				fragment.position = params.collisionData.collidePosition;
 				fragment.originalPosition = fragment.position;
 				fragment.size = fragmentSize;
 				fragment.maxDistance = randInt(fragment.size.w * 4, fragment.size.w * 8);

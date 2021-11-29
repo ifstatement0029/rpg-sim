@@ -397,6 +397,7 @@ namespace game {
 		int getStuckTolerancePercentage();
 		int getCharacterSpriteSheetIndex();
 		areaStruct getSpriteSheetArea(directionEnum direction, int frame);
+		bool getDisplaySprites();
 		void setDisplaySprites(bool newDisplaySprites);
 		void setDestroy(bool newDestroy);
 		
