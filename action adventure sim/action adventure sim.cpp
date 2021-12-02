@@ -1756,7 +1756,7 @@ void initCharacters() {
 	controlledCharacterIndex = 0;
 	int characterID = 0;
 	XYStruct characterPosition = { 191, 193 };
-	for (int charactersCnt = 0; charactersCnt < 2; ++charactersCnt) {
+	for (int charactersCnt = 0; charactersCnt < 10; ++charactersCnt) {
 		characterParams currentCharacterParams;
 
 		currentCharacterParams.ID = characterID;
@@ -4381,10 +4381,11 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 						}
 					}
 				};
+				newExplosionParams.sprite.angle = params.sprite.angle;
 				newExplosionParams.collisionData = overworldGridCollisionData;
 				newExplosionParams.collisionData.collidePosition = { newExplosionParams.collisionData.collidePosition.x * tileSize.w, newExplosionParams.collisionData.collidePosition.y * tileSize.h };
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
-				newExplosionParams.totalFragments = { 2, 2 };
+				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
 				initExplosion(newExplosionParams);
 
 				//Remove tile from overworld grid
@@ -4449,9 +4450,10 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 						}
 					}
 				};
+				newExplosionParams.sprite.angle = params.sprite.angle;
 				newExplosionParams.collisionData = characterCollisionData;
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
-				newExplosionParams.totalFragments = { 2, 2 };
+				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
 				initExplosion(newExplosionParams);
 
 				//Disable character sprite display
@@ -4471,8 +4473,8 @@ void Bullet::explode() {
 		newExplosionParams.ID = getFreeID(getExplosionIDs());
 		newExplosionParams.overworldGridLayer = params.layer;
 		newExplosionParams.sprite = params.sprite;
-		//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
-		newExplosionParams.totalFragments = { 2, 2 };
+		newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
+		//newExplosionParams.totalFragments = { 2, 2 };
 		newExplosionParams.collisionData.collidePosition = params.position;
 		newExplosionParams.collisionData.collision = true;
 		newExplosionParams.collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::none;
@@ -4520,7 +4522,7 @@ void Explosion::createFragments() {
 				fragment.position = params.collisionData.collidePosition;
 				fragment.originalPosition = fragment.position;
 				fragment.size = fragmentSize;
-				fragment.maxDistance = randInt(fragment.size.w * 4, fragment.size.w * 8);
+				fragment.maxDistance = randInt(fragment.size.w * 4, fragment.size.w * 8); --;;depends on force object was hit with
 				fragment.sprite.spriteSheetIndex = params.sprite.spriteSheetIndex;
 				fragment.sprite.areas = {
 					{
