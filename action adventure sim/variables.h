@@ -430,6 +430,8 @@ namespace game {
 
 		int spriteSheetIndex = -1;
 		SDL_Rect spriteSRect = { -1, -1, -1, -1 };
+
+		int resistance = -1, stuckTolerancePercentage = 10;
 	};
 
 	class Table {
@@ -438,7 +440,12 @@ namespace game {
 
 		int getLayer();
 		XYStruct getPosition();
+		WHStruct getSize();
+		int getID();
 		int getHeight();
+		int getResistance();
+		void setResistance(int newResistance);
+		int getStuckTolerancePercentage();
 
 		void render();
 	
@@ -495,6 +502,8 @@ namespace game {
 		spriteStruct sprite;
 
 		collisionDataStruct collisionData;
+
+		int force = -1;
 
 		XYStruct totalFragments = { -1, -1 };
 		struct fragmentStruct {

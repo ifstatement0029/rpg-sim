@@ -37,7 +37,7 @@ ranged weapon:
 		- burst (a few shots at a time) - done
 		- full auto (continuous shots) - done
 	- have a delay when reloading - done
-	- bullets can ricochet against/penetrate/stay stuck in walls, characters, objects and other bullets - ;;
+	- bullets can ricochet against/penetrate/stay stuck in walls, characters, objects (tables, etc.) and other bullets - ;;
 	- walls, characters, objectsm, other bullets and current bullet explode if resistance < 0 - ;;
 	- stuck bullets need to be removed after a certain time
 	- explosion fragments need to be removed after a time
