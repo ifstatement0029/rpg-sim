@@ -428,8 +428,9 @@ namespace game {
 		WHStruct size = { -1, -1 };
 		int height = -1;
 
-		int spriteSheetIndex = -1;
-		SDL_Rect spriteSRect = { -1, -1, -1, -1 };
+		/*int spriteSheetIndex = -1;
+		SDL_Rect spriteSRect = { -1, -1, -1, -1 };*/
+		spriteStruct sprite;
 
 		int resistance = -1, stuckTolerancePercentage = 10;
 	};
@@ -446,6 +447,8 @@ namespace game {
 		int getResistance();
 		void setResistance(int newResistance);
 		int getStuckTolerancePercentage();
+		int getTableSpriteSheetIndex();
+		areaStruct getSpriteSheetArea();
 
 		void render();
 	
@@ -487,6 +490,8 @@ namespace game {
 		void render();
 		void move();
 		void markForDestruction();
+		void ricochet(collisionDataStruct& collisionData);
+		void stuck();
 		void ricochetPenetrateOrStayStuck();
 		void explode();
 

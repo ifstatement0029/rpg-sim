@@ -1691,9 +1691,13 @@ void initTables(int layer) {
 		newTableParams.position = { gridArea.x, gridArea.y };
 		newTableParams.size = { gridArea.w, gridArea.h };
 		newTableParams.height = newTableParams.size.h / 2;
-		newTableParams.spriteSheetIndex = getSpriteSheetIndex("table");
-		newTableParams.spriteSRect = { 0, 0, 24, 16 };
-		newTableParams.resistance = 50;
+		newTableParams.sprite.spriteSheetIndex = getSpriteSheetIndex("table");
+		newTableParams.sprite.areas = {
+			{
+				{ 0, 0, 24, 16 }
+			}
+		};
+		newTableParams.resistance = 1;
 		Table newTable(newTableParams);
 		tables.push_back(newTable);
 
@@ -4293,11 +4297,11 @@ Table::Table(tableParamsStruct newParams) {
 }
 
 void Table::render() {
-	SDL_Rect sRect = params.spriteSRect;
+	SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
 	SDL_Rect dRect = convertAreaToSDLRect({ params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h });
 
 	if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h }) == true) {
-		SDL_RenderCopy(renderer, spriteSheets[params.spriteSheetIndex].texture, &sRect, &dRect);
+		SDL_RenderCopy(renderer, spriteSheets[params.sprite.spriteSheetIndex].texture, &sRect, &dRect);
 	}
 }
 
@@ -4331,6 +4335,14 @@ void Table::setResistance(int newResistance) {
 
 int Table::getStuckTolerancePercentage() {
 	return params.stuckTolerancePercentage;
+}
+
+int Table::getTableSpriteSheetIndex() {
+	return params.sprite.spriteSheetIndex;
+}
+
+areaStruct Table::getSpriteSheetArea() {
+	return --;;
 }
 
 Bullet::Bullet(bulletParamsStruct newParams) {
@@ -4377,6 +4389,22 @@ void Bullet::markForDestruction() {
 
 }
 
+void Bullet::ricochet(collisionDataStruct& collisionData) {
+	params.originalPosition = params.position;
+	params.distanceTravelled = 0;
+	if (collisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::left || collisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::right) {
+		params.directionMods.x = -1;
+	}
+	else {
+		params.directionMods.y = -1;
+	}
+}
+
+void Bullet::stuck() {
+	params.stuck = true;
+	stuckBulletIDs.push_back(params.ID);
+}
+
 void Bullet::ricochetPenetrateOrStayStuck() {
 	if (params.stuck == false) {
 
@@ -4410,21 +4438,23 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 			if (force < overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance - resistanceTolerance) {
 
 				//Bullet ricochets
-				params.originalPosition = params.position;
+				/*params.originalPosition = params.position;
 				params.distanceTravelled = 0;
 				if (overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::left || overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::right) {
 					params.directionMods.x = -1;
 				}
 				else {
 					params.directionMods.y = -1;
-				}
+				}*/
+				ricochet(overworldGridCollisionData);
 
 			}
 			else if (force >= overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance - resistanceTolerance && force <= overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance + resistanceTolerance) {
 
 				//If bullet force is within range of stuck tolerance percentage of wall resistance then bullet stays stuck
-				params.stuck = true;
-				stuckBulletIDs.push_back(params.ID);
+				/*params.stuck = true;
+				stuckBulletIDs.push_back(params.ID);*/
+				stuck();
 
 			}
 			//else if (force > overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance + resistanceTolerance) {
@@ -4480,21 +4510,23 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 			if (force < characterNewResistance - resistanceTolerance) {
 
 				//Bullet ricochets
-				params.originalPosition = params.position;
+				/*params.originalPosition = params.position;
 				params.distanceTravelled = 0;
 				if (overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::left || overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::right) {
 					params.directionMods.x = -1;
 				}
 				else {
 					params.directionMods.y = -1;
-				}
+				}*/
+				ricochet(characterCollisionData);
 
 			}
 			else if (force >= characterNewResistance - resistanceTolerance && force <= characterNewResistance + resistanceTolerance) {
 
 				//If bullet force is within range of stuck tolerance percentage of character resistance then bullet stays stuck
-				params.stuck = true;
-				stuckBulletIDs.push_back(params.ID);
+				/*params.stuck = true;
+				stuckBulletIDs.push_back(params.ID);*/
+				stuck();
 
 			}
 			//else if (force > characterNewResistance + resistanceTolerance) {
@@ -4537,28 +4569,60 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 
 			//Decrease table resistance by the amount of force that hits
 			int tableIndex = getTableIndexByID(tableCollisionData.instanceID);
-			int newResistance = tables[tableIndex].getResistance() - force;
-			tables[tableIndex].setResistance(newResistance);
+			int newTableResistance = tables[tableIndex].getResistance() - force;
+			tables[tableIndex].setResistance(newTableResistance);
 
 			//Decrease bullet resistance
 			params.resistance -= force;
 
-			int resistanceTolerance = (newResistance * tables[tableIndex].getStuckTolerancePercentage()) / 100;
+			int resistanceTolerance = (newTableResistance * tables[tableIndex].getStuckTolerancePercentage()) / 100;
 
 			//If bullet force is lower than table resistance - resitance tolerance then bullet ricochet
-			if (force < --;; characterNewResistance - resistanceTolerance) {
+			if (force < newTableResistance - resistanceTolerance) {
 
 				//Bullet ricochets
-				params.originalPosition = params.position;
-				params.distanceTravelled = 0;
-				if (overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::left || overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::right) {
-					params.directionMods.x = -1;
-				}
-				else {
-					params.directionMods.y = -1;
-				}
+				ricochet(tableCollisionData);
 
 			}
+			else if (force >= newTableResistance - resistanceTolerance && force <= newTableResistance + resistanceTolerance) {
+
+				//If bullet force is within range of stuck tolerance percentage of table resistance then bullet stays stuck
+				stuck();
+
+			}
+			//else if (force > newTableResistance + resistanceTolerance) {
+			//	
+			//	//If bullet force is greater than table resistance + resistance tolerance then bullet penetrates
+			//	
+			//}
+
+			//If resistance of character <= 0 then explode
+			if (newTableResistance <= 0) {
+				explosionParamsStruct newExplosionParams;
+				newExplosionParams.ID = getFreeID(getExplosionIDs());
+				newExplosionParams.overworldGridLayer = params.layer;
+				newExplosionParams.sprite.spriteSheetIndex = tables[tableIndex].getTableSpriteSheetIndex();
+				areaStruct tileArea = tables[tableIndex].getSpriteSheetArea();
+				newExplosionParams.sprite.areas = {
+					{
+						{
+							{ tileArea.x, tileArea.y, tileArea.w, tileArea.h }
+						}
+					}
+				};
+				newExplosionParams.sprite.angle = params.sprite.angle;
+				newExplosionParams.collisionData = characterCollisionData;
+				newExplosionParams.force = force;
+				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
+				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
+				initExplosion(newExplosionParams);
+
+				//Disable character sprite display
+				characters[characterIndex].setDisplaySprites(false);
+				characters[characterIndex].setDestroy(true);
+
+			}
+
 		}
 
 	}
