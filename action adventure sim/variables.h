@@ -18,11 +18,11 @@ namespace fs = filesystem;
 
 namespace game {
 
-	bool fullscreen = false;
+	bool fullscreen = true;
 	SDL_Window* window = NULL;
 	//WHStruct windowResolution = { 3840, 2160 };
-	//WHStruct windowResolution = { 2560, 1440 };
-	WHStruct windowResolution = { 1920, 1080 };
+	WHStruct windowResolution = { 2560, 1440 };
+	//WHStruct windowResolution = { 1920, 1080 };
 
 	int FPSCap = 60; // 0 for uncapped
 	bool vSyncOn = true;
@@ -379,6 +379,8 @@ namespace game {
 		int resistance = -1, stuckTolerancePercentage = 10;
 
 		bool destroy = false;
+
+		vector<int> bulletsFiredIDs;
 	};
 
 	class Character {
@@ -402,6 +404,7 @@ namespace game {
 		bool getDisplaySprites();
 		void setDisplaySprites(bool newDisplaySprites);
 		void setDestroy(bool newDestroy);
+		vector<int> getBulletsFiredIDs();
 		
 		void render();
 		void updateEquippedWeaponAngle();
@@ -456,6 +459,7 @@ namespace game {
 		areaStruct getSpriteSheetArea();
 		void setDisplaySprites(bool newDisplaySprite);
 		void setDestroy(bool newDestroy);
+
 		void markForDestruction();
 
 		void render();
@@ -497,6 +501,12 @@ namespace game {
 		WHStruct getSize();
 		int getResistance();
 		void setResistance(int newResistance);
+		int getStuckTolerancePercentage();
+		int getBulletSpriteSheetIndex();
+		areaStruct getSpriteSheetArea();
+		void setDisplaySprite(bool newDisplaySprite);
+		void setDestroy(bool newDestroy);
+		int getCharacterID();
 
 		void render();
 		void move();
@@ -554,6 +564,7 @@ namespace game {
 		explosionParamsStruct params;
 	};
 
+	int maxExplosions = 100;
 	vector<Explosion> explosions;
 
 	//classes end

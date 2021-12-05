@@ -3530,6 +3530,12 @@ void characterActions() {
 	}
 }
 
+void tableActions() {
+	for (int tablesCnt = 0; tablesCnt < (int)tables.size(); ++tablesCnt) {
+		tables[tablesCnt].markForDestruction();
+	}
+}
+
 void bulletActions() {
 	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
 		bullets[bulletsCnt].move();
@@ -3612,6 +3618,10 @@ void removeStuckBullets() {
 		bulletsToDestroyIDs.push_back(stuckBulletIDs[0]);
 		stuckBulletIDs.erase(stuckBulletIDs.begin());
 	}
+}
+
+void removeExplosions() {
+	--;;
 }
 
 void initExplosion(explosionParamsStruct newParams) {
@@ -3743,6 +3753,10 @@ void Character::setDisplaySprites(bool newDisplaySprites) {
 
 void Character::setDestroy(bool newDestroy) {
 	params.destroy = newDestroy;
+}
+
+vector<int> Character::getBulletsFiredIDs() {
+	return params.bulletsFiredIDs;
 }
 
 void Character::render() {
@@ -4259,6 +4273,8 @@ void Character::useEquippedWeapon() {
 						bulletParams.characterID = params.ID;
 						initBullet(bulletParams);
 
+						params.bulletsFiredIDs.push_back(bulletParams.ID);
+
 						//Update magazin current load
 						if (params.equippedRangedWeapon.magazine.currentLoad > 0) {
 							--params.equippedRangedWeapon.magazine.currentLoad;
@@ -4431,12 +4447,38 @@ void Bullet::setResistance(int newResistance) {
 	params.resistance = newResistance;
 }
 
-void Bullet::render() {
-	SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
-	SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.height, params.size.w, params.size.h };
+int Bullet::getStuckTolerancePercentage() {
+	return params.stuckTolerancePercentage;
+}
 
-	if (areaWithinCameraView({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }) == true && params.displaySprite == true) {
-		SDLRenderCopyEx(sRect, dRect, params.sprite);
+int Bullet::getBulletSpriteSheetIndex() {
+	return params.sprite.spriteSheetIndex;
+}
+
+areaStruct Bullet::getSpriteSheetArea() {
+	return params.sprite.areas[0][0];
+}
+
+void Bullet::setDisplaySprite(bool newDisplaySprite) {
+	params.displaySprite = newDisplaySprite;
+}
+
+void Bullet::setDestroy(bool newDestroy) {
+	params.destroy = newDestroy;
+}
+
+int Bullet::getCharacterID() {
+	return params.characterID;
+}
+
+void Bullet::render() {
+	if (params.displaySprite == true) {
+		SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
+		SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.height, params.size.w, params.size.h };
+
+		if (areaWithinCameraView({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }) == true && params.displaySprite == true) {
+			SDLRenderCopyEx(sRect, dRect, params.sprite);
+		}
 	}
 }
 
@@ -4452,7 +4494,7 @@ void Bullet::move() {
 
 void Bullet::markForDestruction() {
 
-	//If bullet goes outside of overworld grid then destroy it
+	//If bullet goes outside of overworld grid or destroy = true then destroy it
 	if (areaWithinArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { 0, 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false || params.destroy == true) {
 		bulletsToDestroyIDs.push_back(params.ID);
 	}
@@ -4694,69 +4736,88 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				tables[tableIndex].setDisplaySprites(false);
 				tables[tableIndex].setDestroy(true);
 
+				//Remove table collision from overworld grid
+				XYStruct tablePosition = tables[tableIndex].getPosition();
+				WHStruct tableSize = tables[tableIndex].getSize();
+				setOverworldGridCollision(overworldGrid.gridTile, params.layer, getGridAreaFromPixelArea({ tablePosition.x, tablePosition.y, tableSize.w, tableSize.h }), false);
+
 			}
 
 		}
 
 		//Other bullet collision
 		if (otherBulletCollisionData.collision == true) {
-
-			//Decrease other bullet resistance by the amount of force that hits
 			int otherBulletIndex = getBulletIndexByID(otherBulletCollisionData.instanceID);
-			int newOtherBulletResistance = bullets[otherBulletIndex].getResistance() - force;
-			bullets[otherBulletIndex].setResistance(newOtherBulletResistance);
-
-			//Decrease bullet resistance
-			params.resistance -= force;
-
-			int resistanceTolerance = (--;; newTableResistance * tables[tableIndex].getStuckTolerancePercentage()) / 100;
-
-			//If bullet force is lower than table resistance - resitance tolerance then bullet ricochet
-			if (force < newTableResistance - resistanceTolerance) {
-
-				//Bullet ricochets
-				ricochet(tableCollisionData);
-
+			
+			//Check if other bullet was fired by same character who fired current bullet
+			vector<int> bulletsFiredIDs = characters[bullets[otherBulletIndex].getCharacterID()].getBulletsFiredIDs();
+			bool bulletFiredBySameCharacter = false;
+			for (int bulletsFiredIDsCnt = 0; bulletsFiredIDsCnt < (int)bulletsFiredIDs.size(); ++bulletsFiredIDsCnt) {
+				if (bullets[otherBulletIndex].getID() == bulletsFiredIDs[bulletsFiredIDsCnt]) {
+					bulletFiredBySameCharacter = true;
+					break;
+				}
 			}
-			else if (force >= newTableResistance - resistanceTolerance && force <= newTableResistance + resistanceTolerance) {
 
-				//If bullet force is within range of stuck tolerance percentage of table resistance then bullet stays stuck
-				stuck();
+			//If bullet is not the same as current bullet and is not a bullet that has been fired by same character who fired current bullet
+			if (otherBulletIndex > -1 && otherBulletIndex != params.ID && bulletFiredBySameCharacter == false) {
 
-			}
-			//else if (force > newTableResistance + resistanceTolerance) {
-			//	
-			//	//If bullet force is greater than table resistance + resistance tolerance then bullet penetrates
-			//	
-			//}
+				//Decrease other bullet resistance by the amount of force that hits
+				int newOtherBulletResistance = bullets[otherBulletIndex].getResistance() - force;
+				bullets[otherBulletIndex].setResistance(newOtherBulletResistance);
 
-			//If resistance of character <= 0 then explode
-			if (newTableResistance <= 0) {
-				explosionParamsStruct newExplosionParams;
-				newExplosionParams.ID = getFreeID(getExplosionIDs());
-				newExplosionParams.overworldGridLayer = params.layer;
-				newExplosionParams.sprite.spriteSheetIndex = tables[tableIndex].getTableSpriteSheetIndex();
-				areaStruct tableArea = tables[tableIndex].getSpriteSheetArea();
-				newExplosionParams.sprite.areas = {
-					{
+				//Decrease bullet resistance
+				params.resistance -= force;
+
+				int resistanceTolerance = (newOtherBulletResistance * bullets[otherBulletIndex].getStuckTolerancePercentage()) / 100;
+
+				//If bullet force is lower than other bullet resistance - resitance tolerance then bullet ricochet
+				if (force < newOtherBulletResistance - resistanceTolerance) {
+
+					//Bullet ricochets
+					ricochet(tableCollisionData);
+
+				}
+				else if (force >= newOtherBulletResistance - resistanceTolerance && force <= newOtherBulletResistance + resistanceTolerance) {
+
+					//If bullet force is within range of stuck tolerance percentage of other bullet resistance then bullet stays stuck
+					stuck();
+
+				}
+				//else if (force > newTableResistance + resistanceTolerance) {
+				//	
+				//	//If bullet force is greater than table resistance + resistance tolerance then bullet penetrates
+				//	
+				//}
+
+				//If resistance of other bullet <= 0 then explode
+				if (newOtherBulletResistance <= 0) {
+					explosionParamsStruct newExplosionParams;
+					newExplosionParams.ID = getFreeID(getExplosionIDs());
+					newExplosionParams.overworldGridLayer = params.layer;
+					newExplosionParams.sprite.spriteSheetIndex = bullets[otherBulletIndex].getBulletSpriteSheetIndex();
+					areaStruct otherBulletArea = bullets[otherBulletIndex].getSpriteSheetArea();
+					newExplosionParams.sprite.areas = {
 						{
-							{ tableArea.x, tableArea.y, tableArea.w, tableArea.h }
+							{
+								{ otherBulletArea.x, otherBulletArea.y, otherBulletArea.w, otherBulletArea.h }
+							}
 						}
-					}
-				};
-				newExplosionParams.sprite.angle = params.sprite.angle;
-				newExplosionParams.collisionData = tableCollisionData;
-				newExplosionParams.force = force;
-				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
-				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
-				initExplosion(newExplosionParams);
+					};
+					newExplosionParams.sprite.angle = params.sprite.angle;
+					newExplosionParams.collisionData = tableCollisionData;
+					newExplosionParams.force = force;
+					//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
+					newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
+					initExplosion(newExplosionParams);
 
-				//Disable table sprite display
-				tables[tableIndex].setDisplaySprites(false);
-				tables[tableIndex].setDestroy(true);
+					//Disable other bullet sprite display
+					bullets[otherBulletIndex].setDisplaySprite(false);
+					bullets[otherBulletIndex].setDestroy(true);
+
+				}
 
 			}
-
 		}
 
 	}
@@ -4969,10 +5030,12 @@ int main(int argc, char* args[]) {
 				//Actions
 				//moveCamera();
 				characterActions();
+				tableActions();
 				bulletActions();
 				explosionActions();
 
 				removeStuckBullets();
+				removeExplosions();
 
 				//Object destructions
 				destroyBullets();

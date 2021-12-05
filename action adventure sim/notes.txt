@@ -37,10 +37,11 @@ ranged weapon:
 		- burst (a few shots at a time) - done
 		- full auto (continuous shots) - done
 	- have a delay when reloading - done
-	- bullets can ricochet against/penetrate/stay stuck in walls, characters, objects (tables, etc.) and other bullets - ;;
-	- walls, characters, objectsm, other bullets and current bullet explode if resistance < 0 - ;;
-	- stuck bullets need to be removed after a certain time
-	- explosion fragments need to be removed after a time
+	- bullets can ricochet against/penetrate/stay stuck in walls, characters, objects (tables, etc.) and other bullets - done
+	- walls, characters, objects, other bullets and current bullet explode if resistance < 0 - done
+	- stuck bullets need to be removed after a a maximum of stuck bullets is reached - done
+	- explosion fragments need to be removed after a maximum of explosions is reached - ;;
+	- when removing stuck bullets and explosion fragments, have a fading out effect on the bullet and fragment
 	- have blood/dust/etc when character/object/etc explode
 melee weapon: 
 	- can aim 360 degrees with left or right stick - done
