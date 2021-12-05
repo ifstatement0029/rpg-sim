@@ -296,6 +296,8 @@ namespace game {
 
 	vector<int> charactersToDestroyIDs;
 
+	vector<int> tablesToDestroyIDs;
+
 	//classes start
 
 	struct characterParams {
@@ -431,8 +433,11 @@ namespace game {
 		/*int spriteSheetIndex = -1;
 		SDL_Rect spriteSRect = { -1, -1, -1, -1 };*/
 		spriteStruct sprite;
+		bool displaySprite = true;
 
 		int resistance = -1, stuckTolerancePercentage = 10;
+
+		bool destroy = false;
 	};
 
 	class Table {
@@ -449,6 +454,9 @@ namespace game {
 		int getStuckTolerancePercentage();
 		int getTableSpriteSheetIndex();
 		areaStruct getSpriteSheetArea();
+		void setDisplaySprites(bool newDisplaySprite);
+		void setDestroy(bool newDestroy);
+		void markForDestruction();
 
 		void render();
 	
@@ -486,6 +494,9 @@ namespace game {
 		int getID();
 		int getLayer();
 		XYStruct getPosition();
+		WHStruct getSize();
+		int getResistance();
+		void setResistance(int newResistance);
 
 		void render();
 		void move();

@@ -932,14 +932,46 @@ collisionDataStruct checkCollisionWithCharacter(areaStruct sourcePixelArea, area
 collisionDataStruct checkCollisionWithTable(areaStruct sourcePixelArea, areaStruct previousPixelArea) {
 	collisionDataStruct collisionData;
 	for (int tablesCnt = 0; tablesCnt < (int)tables.size(); ++tablesCnt) {
-		XYStruct characterPosition = tables[tablesCnt].getPosition();
-		WHStruct characterSize = tables[tablesCnt].getSize();
-		if (areaWithinArea(sourcePixelArea, { characterPosition.x, characterPosition.y, characterSize.w, characterSize.h }) == true) {
+		XYStruct tablePosition = tables[tablesCnt].getPosition();
+		WHStruct tableSize = tables[tablesCnt].getSize();
+		if (areaWithinArea(sourcePixelArea, { tablePosition.x, tablePosition.y, tableSize.w, tableSize.h }) == true) {
 			collisionData.collision = true;
-			collisionData.collidePosition = characterPosition;
+			collisionData.collidePosition = tablePosition;
 			collisionData.instanceID = tables[tablesCnt].getID();
 
-			//Get side of character hit
+			//Get side of table hit
+			if (previousPixelArea.x > -1 && previousPixelArea.y > -1 && previousPixelArea.w > -1 && previousPixelArea.h > -1) {
+				if (previousPixelArea.x + previousPixelArea.w - 1 < sourcePixelArea.x) {
+					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::left;
+				}
+				else if (previousPixelArea.x > sourcePixelArea.x + sourcePixelArea.w - 1) {
+					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::right;
+				}
+				else if (previousPixelArea.y + previousPixelArea.h - 1 < sourcePixelArea.y) {
+					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::up;
+				}
+				else if (previousPixelArea.y > sourcePixelArea.y + sourcePixelArea.h - 1) {
+					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::down;
+				}
+			}
+
+			return collisionData;
+		}
+	}
+	return collisionData;
+}
+
+collisionDataStruct checkCollisionWithBullet(areaStruct sourcePixelArea, areaStruct previousPixelArea) {
+	collisionDataStruct collisionData;
+	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
+		XYStruct bulletPosition = bullets[bulletsCnt].getPosition();
+		WHStruct bulletSize = bullets[bulletsCnt].getSize();
+		if (areaWithinArea(sourcePixelArea, { bulletPosition.x, bulletPosition.y, bulletSize.w, bulletSize.h }) == true) {
+			collisionData.collision = true;
+			collisionData.collidePosition = bulletPosition;
+			collisionData.instanceID = bullets[bulletsCnt].getID();
+
+			//Get side of bullet hit
 			if (previousPixelArea.x > -1 && previousPixelArea.y > -1 && previousPixelArea.w > -1 && previousPixelArea.h > -1) {
 				if (previousPixelArea.x + previousPixelArea.w - 1 < sourcePixelArea.x) {
 					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::left;
@@ -3603,6 +3635,7 @@ int getCharacterIndexByID(int ID) {
 			return charactersCnt;
 		}
 	}
+
 	return -1;
 }
 
@@ -3625,6 +3658,15 @@ int getTableIndexByID(int ID) {
 	}
 
 	return -1;
+}
+
+void destroyTables() {
+	for (int tablesToDestroyIDsCnt = 0; tablesToDestroyIDsCnt < (int)tablesToDestroyIDs.size(); ++tablesToDestroyIDsCnt) {
+		int tableIndex = getTableIndexByID(tablesToDestroyIDs[tablesToDestroyIDsCnt]);
+		if (tableIndex > -1) {
+			tables.erase(tables.begin() + tableIndex);
+		}
+	}
 }
 
 //functions end
@@ -4297,11 +4339,13 @@ Table::Table(tableParamsStruct newParams) {
 }
 
 void Table::render() {
-	SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
-	SDL_Rect dRect = convertAreaToSDLRect({ params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h });
+	if (params.displaySprite == true) {
+		SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
+		SDL_Rect dRect = convertAreaToSDLRect({ params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h });
 
-	if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h }) == true) {
-		SDL_RenderCopy(renderer, spriteSheets[params.sprite.spriteSheetIndex].texture, &sRect, &dRect);
+		if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h }) == true) {
+			SDL_RenderCopy(renderer, spriteSheets[params.sprite.spriteSheetIndex].texture, &sRect, &dRect);
+		}
 	}
 }
 
@@ -4342,7 +4386,21 @@ int Table::getTableSpriteSheetIndex() {
 }
 
 areaStruct Table::getSpriteSheetArea() {
-	return --;;
+	return params.sprite.areas[0][0];
+}
+
+void Table::setDisplaySprites(bool newDisplaySprite) {
+	params.displaySprite = newDisplaySprite;
+}
+
+void Table::setDestroy(bool newDestroy) {
+	params.destroy = newDestroy;
+}
+
+void Table::markForDestruction() {
+	if (params.destroy == true) {
+		tablesToDestroyIDs.push_back(params.ID);
+	}
 }
 
 Bullet::Bullet(bulletParamsStruct newParams) {
@@ -4359,6 +4417,18 @@ int Bullet::getLayer() {
 
 XYStruct Bullet::getPosition() {
 	return params.position;
+}
+
+WHStruct Bullet::getSize() {
+	return params.size;
+}
+
+int Bullet::getResistance() {
+	return params.resistance;
+}
+
+void Bullet::setResistance(int newResistance) {
+	params.resistance = newResistance;
 }
 
 void Bullet::render() {
@@ -4422,6 +4492,9 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 
 		//Check for collision with tables
 		collisionDataStruct tableCollisionData = checkCollisionWithTable({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h });
+
+		//Check for collision with other bullets
+		collisionDataStruct otherBulletCollisionData = checkCollisionWithBullet({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h });
 
 		//Overworld grid collision
 		if (overworldGridCollisionData.collision == true) {
@@ -4541,11 +4614,11 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				newExplosionParams.ID = getFreeID(getExplosionIDs());
 				newExplosionParams.overworldGridLayer = params.layer;
 				newExplosionParams.sprite.spriteSheetIndex = characters[characterIndex].getCharacterSpriteSheetIndex();
-				areaStruct tileArea = characters[characterIndex].getSpriteSheetArea(characters[characterIndex].getDirection(), characters[characterIndex].getFrame());
+				areaStruct characterArea = characters[characterIndex].getSpriteSheetArea(characters[characterIndex].getDirection(), characters[characterIndex].getFrame());
 				newExplosionParams.sprite.areas = {
 					{
 						{
-							{ tileArea.x, tileArea.y, tileArea.w, tileArea.h }
+							{ characterArea.x, characterArea.y, characterArea.w, characterArea.h }
 						}
 					}
 				};
@@ -4602,24 +4675,85 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				newExplosionParams.ID = getFreeID(getExplosionIDs());
 				newExplosionParams.overworldGridLayer = params.layer;
 				newExplosionParams.sprite.spriteSheetIndex = tables[tableIndex].getTableSpriteSheetIndex();
-				areaStruct tileArea = tables[tableIndex].getSpriteSheetArea();
+				areaStruct tableArea = tables[tableIndex].getSpriteSheetArea();
 				newExplosionParams.sprite.areas = {
 					{
 						{
-							{ tileArea.x, tileArea.y, tileArea.w, tileArea.h }
+							{ tableArea.x, tableArea.y, tableArea.w, tableArea.h }
 						}
 					}
 				};
 				newExplosionParams.sprite.angle = params.sprite.angle;
-				newExplosionParams.collisionData = characterCollisionData;
+				newExplosionParams.collisionData = tableCollisionData;
 				newExplosionParams.force = force;
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
 				initExplosion(newExplosionParams);
 
-				//Disable character sprite display
-				characters[characterIndex].setDisplaySprites(false);
-				characters[characterIndex].setDestroy(true);
+				//Disable table sprite display
+				tables[tableIndex].setDisplaySprites(false);
+				tables[tableIndex].setDestroy(true);
+
+			}
+
+		}
+
+		//Other bullet collision
+		if (otherBulletCollisionData.collision == true) {
+
+			//Decrease other bullet resistance by the amount of force that hits
+			int otherBulletIndex = getBulletIndexByID(otherBulletCollisionData.instanceID);
+			int newOtherBulletResistance = bullets[otherBulletIndex].getResistance() - force;
+			bullets[otherBulletIndex].setResistance(newOtherBulletResistance);
+
+			//Decrease bullet resistance
+			params.resistance -= force;
+
+			int resistanceTolerance = (--;; newTableResistance * tables[tableIndex].getStuckTolerancePercentage()) / 100;
+
+			//If bullet force is lower than table resistance - resitance tolerance then bullet ricochet
+			if (force < newTableResistance - resistanceTolerance) {
+
+				//Bullet ricochets
+				ricochet(tableCollisionData);
+
+			}
+			else if (force >= newTableResistance - resistanceTolerance && force <= newTableResistance + resistanceTolerance) {
+
+				//If bullet force is within range of stuck tolerance percentage of table resistance then bullet stays stuck
+				stuck();
+
+			}
+			//else if (force > newTableResistance + resistanceTolerance) {
+			//	
+			//	//If bullet force is greater than table resistance + resistance tolerance then bullet penetrates
+			//	
+			//}
+
+			//If resistance of character <= 0 then explode
+			if (newTableResistance <= 0) {
+				explosionParamsStruct newExplosionParams;
+				newExplosionParams.ID = getFreeID(getExplosionIDs());
+				newExplosionParams.overworldGridLayer = params.layer;
+				newExplosionParams.sprite.spriteSheetIndex = tables[tableIndex].getTableSpriteSheetIndex();
+				areaStruct tableArea = tables[tableIndex].getSpriteSheetArea();
+				newExplosionParams.sprite.areas = {
+					{
+						{
+							{ tableArea.x, tableArea.y, tableArea.w, tableArea.h }
+						}
+					}
+				};
+				newExplosionParams.sprite.angle = params.sprite.angle;
+				newExplosionParams.collisionData = tableCollisionData;
+				newExplosionParams.force = force;
+				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
+				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
+				initExplosion(newExplosionParams);
+
+				//Disable table sprite display
+				tables[tableIndex].setDisplaySprites(false);
+				tables[tableIndex].setDestroy(true);
 
 			}
 
@@ -4695,7 +4829,8 @@ void Explosion::createFragments() {
 					}
 				};
 				int angleTolerance = (params.sprite.angle * 10) / 100;
-				fragment.sprite.angle = randInt(params.sprite.angle - angleTolerance, params.sprite.angle + angleTolerance);
+				//fragment.sprite.angle = randInt(params.sprite.angle - angleTolerance, params.sprite.angle + angleTolerance);
+				fragment.sprite.angle = randInt(0, 360);
 				if (fragment.sprite.angle > 180) {
 					fragment.sprite.angle = -(180 - (fragment.sprite.angle - 180));
 				}
@@ -4842,6 +4977,7 @@ int main(int argc, char* args[]) {
 				//Object destructions
 				destroyBullets();
 				destroyCharacters();
+				destroyTables();
 
 				//Centre camera on controlled character
 				XYStruct characterPosition = characters[controlledCharacterIndex].getPosition();
