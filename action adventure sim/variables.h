@@ -285,14 +285,13 @@ namespace game {
 	};
 	vector<collidableObjectStruct> collidableObjects;
 
-	vector<int> bulletsToDestroyIDs;
-
 	struct colourStruct {
 		Uint8 r = 0, g = 0, b = 0, a = 0;
 	};
 
 	int maxStuckBullets = 2;
-	vector<int> stuckBulletIDs;
+	//vector<int> stuckBulletIDs;
+	vector<int> bulletsToDestroyIDs;
 
 	vector<int> charactersToDestroyIDs;
 
@@ -520,7 +519,6 @@ namespace game {
 		void move();
 		void markForDestruction();
 		void ricochet(collisionDataStruct& collisionData);
-		void stuck();
 		void ricochetPenetrateOrStayStuck();
 		void explode();
 

@@ -3636,23 +3636,14 @@ void initBullet(bulletParamsStruct newParams) {
 }
 
 void setStuckBulletsFadeOut() {
-	if ((int)stuckBulletIDs.size() > maxStuckBullets) {
+	if ((int)bullets.size() > maxStuckBullets) {
 
-		//Get index of earlist stuck bullet that is not fading out already
-		int bulletIndex = -1;
-		for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
-			if (bullets[bulletsCnt].getStuck() == true && bullets[bulletsCnt].getFadeOut().delay == 0) {
-				bulletIndex = bulletsCnt;
-				break;
-			}
-		}
-
-		//Set bullet fade out
-		if (bulletIndex > -1) {
+		//If earliest bullet is not fading out then set bullet fade out
+		if (bullets[0].getFadeOut().delay == 0) {
 			delayStruct newFadeOut;
 			newFadeOut.startTicks = SDL_GetTicks();
 			newFadeOut.delay = 2000;
-			bullets[bulletIndex].setFadeOut(newFadeOut);
+			bullets[0].setFadeOut(newFadeOut);
 		}
 
 	}
@@ -3661,21 +3652,12 @@ void setStuckBulletsFadeOut() {
 void setExplosionsFadeOut() {
 	if ((int)explosions.size() > maxExplosions) {
 
-		//Get index of earliest explosion that is not fading out already
-		int explosionIndex = -1;
-		for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
-			if (explosions[explosionsCnt].getFadeOut().delay == 0) {
-				explosionIndex = explosionsCnt;
-				break;
-			}
-		}
-
-		//Set explosion fade out
-		if (explosionIndex > -1) {
+		//If earliest explosion is not fading out then set fade out
+		if (explosions[0].getFadeOut().delay == 0) {
 			delayStruct newFadeOut;
 			newFadeOut.startTicks = SDL_GetTicks();
 			newFadeOut.delay = 2000;
-			explosions[explosionIndex].setFadeOut(newFadeOut);
+			explosions[0].setFadeOut(newFadeOut);
 		}
 
 	}
@@ -4542,18 +4524,25 @@ bool Bullet::getStuck() {
 
 void Bullet::render() {
 	if (params.displaySprite == true) {
+		renderShadow(--;;);
+
 		SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
 		SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.height, params.size.w, params.size.h };
 
 		if (areaWithinCameraView({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }) == true && params.displaySprite == true) {
 
 			//Set transparency
-			--;;
+			if (params.fadeOut.delay > 0) {
+				int percentageTimePassed = ((SDL_GetTicks() - params.fadeOut.startTicks) * 100) / params.fadeOut.delay;
+				setSDLTextureTransparency(spriteSheets[params.sprite.spriteSheetIndex].texture, 100 - percentageTimePassed);
+			}
 
 			SDLRenderCopyEx(sRect, dRect, params.sprite);
 
 			//Remove transparency
-
+			if (params.fadeOut.delay > 0) {
+				setSDLTextureTransparency(spriteSheets[params.sprite.spriteSheetIndex].texture, 100);
+			}
 
 		}
 	}
@@ -4591,11 +4580,6 @@ void Bullet::ricochet(collisionDataStruct& collisionData) {
 	else {
 		params.directionMods.y = -1;
 	}
-}
-
-void Bullet::stuck() {
-	params.stuck = true;
-	stuckBulletIDs.push_back(params.ID);
 }
 
 void Bullet::ricochetPenetrateOrStayStuck() {
@@ -4650,7 +4634,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				//If bullet force is within range of stuck tolerance percentage of wall resistance then bullet stays stuck
 				/*params.stuck = true;
 				stuckBulletIDs.push_back(params.ID);*/
-				stuck();
+				params.stuck = true;
 
 			}
 			//else if (force > overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance + resistanceTolerance) {
@@ -4722,7 +4706,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				//If bullet force is within range of stuck tolerance percentage of character resistance then bullet stays stuck
 				/*params.stuck = true;
 				stuckBulletIDs.push_back(params.ID);*/
-				stuck();
+				params.stuck = true;
 
 			}
 			//else if (force > characterNewResistance + resistanceTolerance) {
@@ -4783,7 +4767,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 			else if (force >= newTableResistance - resistanceTolerance && force <= newTableResistance + resistanceTolerance) {
 
 				//If bullet force is within range of stuck tolerance percentage of table resistance then bullet stays stuck
-				stuck();
+				params.stuck = true;
 
 			}
 			//else if (force > newTableResistance + resistanceTolerance) {
@@ -4862,7 +4846,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				else if (force >= newOtherBulletResistance - resistanceTolerance && force <= newOtherBulletResistance + resistanceTolerance) {
 
 					//If bullet force is within range of stuck tolerance percentage of other bullet resistance then bullet stays stuck
-					stuck();
+					params.stuck = true;
 
 				}
 				//else if (force > newTableResistance + resistanceTolerance) {
@@ -4979,8 +4963,8 @@ void Explosion::createFragments() {
 					}
 				};
 				int angleTolerance = (params.sprite.angle * 10) / 100;
-				//fragment.sprite.angle = randInt(params.sprite.angle - angleTolerance, params.sprite.angle + angleTolerance);
-				fragment.sprite.angle = randInt(0, 360);
+				fragment.sprite.angle = randInt(params.sprite.angle - angleTolerance, params.sprite.angle + angleTolerance);
+				//fragment.sprite.angle = randInt(0, 360);
 				if (fragment.sprite.angle > 180) {
 					fragment.sprite.angle = -(180 - (fragment.sprite.angle - 180));
 				}

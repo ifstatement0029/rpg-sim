@@ -41,8 +41,9 @@ ranged weapon:
 	- walls, characters, objects, other bullets and current bullet explode if resistance < 0 - done
 	- stuck bullets need to be removed after a a maximum of stuck bullets is reached - done
 	- explosion fragments need to be removed after a maximum of explosions is reached - done
-	- when removing stuck bullets and explosion fragments, have a fading out effect on the bullet and fragment - ;;
-	- give bullets shadows
+	- when removing stuck bullets and explosion fragments, have a fading out effect on the bullet and fragment - done
+	- give bullets shadows - ;;
+	- have explosion fragments always appear under character
 	- have blood/dust/etc when character/object/etc explode
 melee weapon: 
 	- can aim 360 degrees with left or right stick - done
