@@ -1799,8 +1799,8 @@ void initLevel() {
 				if (areaWithinGrid({ wallXCnt, wallYCnt, 1, 1 }, 1) == true) {
 					overworldGrid.gridTile[1][wallXCnt][wallYCnt].collidable = true;
 					overworldGrid.gridTile[1][wallXCnt][wallYCnt].tileIndex = getTileIndex("wall");
-					overworldGrid.gridTile[1][wallXCnt][wallYCnt].resistance = 1;
-					overworldGrid.gridTile[1][wallXCnt][wallYCnt].stuckTolerancePercentage = 10;
+					overworldGrid.gridTile[1][wallXCnt][wallYCnt].resistance = 100;
+					overworldGrid.gridTile[1][wallXCnt][wallYCnt].stuckTolerancePercentage = 100;
 				}
 			}
 		}
@@ -3549,6 +3549,7 @@ void explosionActions() {
 	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
 		explosions[explosionsCnt].createFragments();
 		explosions[explosionsCnt].explode();
+		explosions[explosionsCnt].markForDestruction();
 	}
 }
 
@@ -3571,6 +3572,27 @@ void destroyBullets() {
 	}
 
 	bulletsToDestroyIDs.clear();
+}
+
+int getExplosionIndexByID(int ID) {
+	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
+		if (explosions[explosionsCnt].getID() == ID) {
+			return explosionsCnt;
+		}
+	}
+
+	return -1;
+}
+
+void destroyExplosions() {
+	for (int explosionsToDestroyIDsCnt = 0 ; explosionsToDestroyIDsCnt < (int)explosionsToDestroyIDs.size(); ++explosionsToDestroyIDsCnt) {
+		int explosionIndex = getExplosionIndexByID(explosionsToDestroyIDs[explosionsToDestroyIDsCnt]);
+		if (explosionIndex > -1) {
+			explosions.erase(explosions.begin() + explosionIndex);
+		}
+	}
+
+	explosionsToDestroyIDs.clear();
 }
 
 void renderShadow(areaStruct area, int transparencyPercentage) {
@@ -3613,15 +3635,50 @@ void initBullet(bulletParamsStruct newParams) {
 	bullets.push_back(newBullet);
 }
 
-void removeStuckBullets() {
+void setStuckBulletsFadeOut() {
 	if ((int)stuckBulletIDs.size() > maxStuckBullets) {
-		bulletsToDestroyIDs.push_back(stuckBulletIDs[0]);
-		stuckBulletIDs.erase(stuckBulletIDs.begin());
+
+		//Get index of earlist stuck bullet that is not fading out already
+		int bulletIndex = -1;
+		for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
+			if (bullets[bulletsCnt].getStuck() == true && bullets[bulletsCnt].getFadeOut().delay == 0) {
+				bulletIndex = bulletsCnt;
+				break;
+			}
+		}
+
+		//Set bullet fade out
+		if (bulletIndex > -1) {
+			delayStruct newFadeOut;
+			newFadeOut.startTicks = SDL_GetTicks();
+			newFadeOut.delay = 2000;
+			bullets[bulletIndex].setFadeOut(newFadeOut);
+		}
+
 	}
 }
 
-void removeExplosions() {
-	--;;
+void setExplosionsFadeOut() {
+	if ((int)explosions.size() > maxExplosions) {
+
+		//Get index of earliest explosion that is not fading out already
+		int explosionIndex = -1;
+		for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
+			if (explosions[explosionsCnt].getFadeOut().delay == 0) {
+				explosionIndex = explosionsCnt;
+				break;
+			}
+		}
+
+		//Set explosion fade out
+		if (explosionIndex > -1) {
+			delayStruct newFadeOut;
+			newFadeOut.startTicks = SDL_GetTicks();
+			newFadeOut.delay = 2000;
+			explosions[explosionIndex].setFadeOut(newFadeOut);
+		}
+
+	}
 }
 
 void initExplosion(explosionParamsStruct newParams) {
@@ -4471,13 +4528,33 @@ int Bullet::getCharacterID() {
 	return params.characterID;
 }
 
+delayStruct Bullet::getFadeOut() {
+	return params.fadeOut;
+}
+
+void Bullet::setFadeOut(delayStruct newFadeOut) {
+	params.fadeOut = newFadeOut;
+}
+
+bool Bullet::getStuck() {
+	return params.stuck;
+}
+
 void Bullet::render() {
 	if (params.displaySprite == true) {
 		SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
 		SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.height, params.size.w, params.size.h };
 
 		if (areaWithinCameraView({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }) == true && params.displaySprite == true) {
+
+			//Set transparency
+			--;;
+
 			SDLRenderCopyEx(sRect, dRect, params.sprite);
+
+			//Remove transparency
+
+
 		}
 	}
 }
@@ -4495,7 +4572,11 @@ void Bullet::move() {
 void Bullet::markForDestruction() {
 
 	//If bullet goes outside of overworld grid or destroy = true then destroy it
-	if (areaWithinArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { 0, 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false || params.destroy == true) {
+	/*if (areaWithinArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { 0, 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false || params.destroy == true) {
+		bulletsToDestroyIDs.push_back(params.ID);
+	}*/
+
+	if (params.fadeOut.delay > 0 && SDL_GetTicks() - params.fadeOut.startTicks >= params.fadeOut.delay) {
 		bulletsToDestroyIDs.push_back(params.ID);
 	}
 
@@ -4867,6 +4948,14 @@ vector<explosionParamsStruct::fragmentStruct> Explosion::getFragments() {
 	return params.fragments;
 }
 
+delayStruct Explosion::getFadeOut() {
+	return params.fadeOut;
+}
+
+void Explosion::setFadeOut(delayStruct newFadeOut) {
+	params.fadeOut = newFadeOut;
+}
+
 void Explosion::createFragments() {
 	if ((int)params.fragments.size() == 0) {
 		WHStruct fragmentSize = { params.sprite.areas[0][0].w / params.totalFragments.x, params.sprite.areas[0][0].h / params.totalFragments.y };
@@ -4927,7 +5016,20 @@ void Explosion::render() {
 		SDL_Rect dRect = { params.fragments[fragmentsCnt].position.x - camera.area.x, params.fragments[fragmentsCnt].position.y - camera.area.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h };
 
 		if (areaWithinCameraView({ params.fragments[fragmentsCnt].position.x, params.fragments[fragmentsCnt].position.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h }) == true) {
+
+			//Set transparency
+			if (params.fadeOut.delay > 0) {
+				int percentageTimePassed = ((SDL_GetTicks() - params.fadeOut.startTicks) * 100) / params.fadeOut.delay;
+				setSDLTextureTransparency(spriteSheets[params.fragments[fragmentsCnt].sprite.spriteSheetIndex].texture, 100 - percentageTimePassed);
+			}
+
 			SDLRenderCopyEx(sRect, dRect, params.fragments[fragmentsCnt].sprite);
+
+			//Reset transparency
+			if (params.fadeOut.delay > 0) {
+				setSDLTextureTransparency(spriteSheets[params.fragments[fragmentsCnt].sprite.spriteSheetIndex].texture, 100);
+			}
+
 		}
 	}
 
@@ -4952,6 +5054,12 @@ void Explosion::explode() {
 
 			}
 		}
+	}
+}
+
+void Explosion::markForDestruction() {
+	if (params.fadeOut.delay > 0 && SDL_GetTicks() - params.fadeOut.startTicks >= params.fadeOut.delay) {
+		explosionsToDestroyIDs.push_back(params.ID);
 	}
 }
 
@@ -5034,13 +5142,15 @@ int main(int argc, char* args[]) {
 				bulletActions();
 				explosionActions();
 
-				removeStuckBullets();
-				removeExplosions();
+				//Set objects to be removed
+				setStuckBulletsFadeOut();
+				setExplosionsFadeOut();
 
-				//Object destructions
+				//Destroy objects
 				destroyBullets();
 				destroyCharacters();
 				destroyTables();
+				destroyExplosions();
 
 				//Centre camera on controlled character
 				XYStruct characterPosition = characters[controlledCharacterIndex].getPosition();

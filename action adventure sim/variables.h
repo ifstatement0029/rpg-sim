@@ -18,11 +18,11 @@ namespace fs = filesystem;
 
 namespace game {
 
-	bool fullscreen = true;
+	bool fullscreen = false;
 	SDL_Window* window = NULL;
 	//WHStruct windowResolution = { 3840, 2160 };
-	WHStruct windowResolution = { 2560, 1440 };
-	//WHStruct windowResolution = { 1920, 1080 };
+	//WHStruct windowResolution = { 2560, 1440 };
+	WHStruct windowResolution = { 1920, 1080 };
 
 	int FPSCap = 60; // 0 for uncapped
 	bool vSyncOn = true;
@@ -291,12 +291,15 @@ namespace game {
 		Uint8 r = 0, g = 0, b = 0, a = 0;
 	};
 
-	int maxStuckBullets = 100;
+	int maxStuckBullets = 2;
 	vector<int> stuckBulletIDs;
 
 	vector<int> charactersToDestroyIDs;
 
 	vector<int> tablesToDestroyIDs;
+
+	int maxExplosions = 2;
+	vector<int> explosionsToDestroyIDs;
 
 	//classes start
 
@@ -489,6 +492,8 @@ namespace game {
 		bool stuck = false, destroy = false;
 
 		int characterID = -1;
+
+		delayStruct fadeOut;
 	};
 
 	class Bullet {
@@ -507,6 +512,9 @@ namespace game {
 		void setDisplaySprite(bool newDisplaySprite);
 		void setDestroy(bool newDestroy);
 		int getCharacterID();
+		delayStruct getFadeOut();
+		void setFadeOut(delayStruct newFadeOut);
+		bool getStuck();
 
 		void render();
 		void move();
@@ -544,6 +552,8 @@ namespace game {
 			int pixelIncrement = -1;
 		};
 		vector<fragmentStruct> fragments;
+
+		delayStruct fadeOut;
 	};
 
 	class Explosion {
@@ -555,16 +565,18 @@ namespace game {
 		XYStruct getFragmentPosition(int fragmentIndex);
 		int getTotalFragments();
 		vector<explosionParamsStruct::fragmentStruct> getFragments();
+		delayStruct getFadeOut();
+		void setFadeOut(delayStruct newFadeOut);
 
 		void createFragments();
 		void render();
 		void explode();
+		void markForDestruction();
 
 	private:
 		explosionParamsStruct params;
 	};
 
-	int maxExplosions = 100;
 	vector<Explosion> explosions;
 
 	//classes end
