@@ -4677,7 +4677,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				newExplosionParams.collisionData = overworldGridCollisionData;
 				newExplosionParams.collisionData.collidePosition = { newExplosionParams.collisionData.collidePosition.x * tileSize.w, newExplosionParams.collisionData.collidePosition.y * tileSize.h };
 				newExplosionParams.force = force;
-				newExplosionParams.shadowHeightRandMinMax = { tileSize.h, tileSize.h * 2 };
+				newExplosionParams.shadowHeightRandMinMax = { tileSize.h / 2, tileSize.h };
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
 				initExplosion(newExplosionParams);
@@ -4748,7 +4748,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				newExplosionParams.collisionData = characterCollisionData;
 				newExplosionParams.force = force;
 				int characterHeight = characters[characterIndex].getSize().h;
-				newExplosionParams.shadowHeightRandMinMax = { characterHeight, characterHeight * 2 };
+				newExplosionParams.shadowHeightRandMinMax = { characterHeight / 2, characterHeight };
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
 				initExplosion(newExplosionParams);
@@ -4811,7 +4811,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				newExplosionParams.collisionData = tableCollisionData;
 				newExplosionParams.force = force;
 				int tableHeight = tables[tableIndex].getSize().h;
-				newExplosionParams.shadowHeightRandMinMax = { tableHeight, tableHeight * 2 };
+				newExplosionParams.shadowHeightRandMinMax = { tableHeight / 2, tableHeight };
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
 				initExplosion(newExplosionParams);
@@ -4892,7 +4892,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 					newExplosionParams.collisionData = tableCollisionData;
 					newExplosionParams.force = force;
 					int otherBulletHeight = bullets[otherBulletIndex].getSize().h;
-					newExplosionParams.shadowHeightRandMinMax = { otherBulletHeight, otherBulletHeight * 2 };
+					newExplosionParams.shadowHeightRandMinMax = { otherBulletHeight / 2, otherBulletHeight };
 					//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 					newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
 					initExplosion(newExplosionParams);
@@ -4916,7 +4916,7 @@ void Bullet::explode() {
 		newExplosionParams.overworldGridLayer = params.layer;
 		newExplosionParams.sprite = params.sprite;
 		newExplosionParams.force = params.damage - params.totalDistanceTravelled;
-		newExplosionParams.shadowHeightRandMinMax = { params.size.h, params.size.h * 2 };
+		newExplosionParams.shadowHeightRandMinMax = { params.size.h / 2, params.size.h };
 		newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 		//newExplosionParams.totalFragments = { 2, 2 };
 		newExplosionParams.collisionData.collidePosition = params.position;
