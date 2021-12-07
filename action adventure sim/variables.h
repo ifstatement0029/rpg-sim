@@ -289,15 +289,14 @@ namespace game {
 		Uint8 r = 0, g = 0, b = 0, a = 0;
 	};
 
-	int maxStuckBullets = 2;
-	//vector<int> stuckBulletIDs;
+	int maxStuckBullets = 20;
 	vector<int> bulletsToDestroyIDs;
 
 	vector<int> charactersToDestroyIDs;
 
 	vector<int> tablesToDestroyIDs;
 
-	int maxExplosions = 2;
+	int maxExplosions = 20;
 	vector<int> explosionsToDestroyIDs;
 
 	//classes start
@@ -478,6 +477,8 @@ namespace game {
 		XYStruct position = { -1, -1 }, originalPosition = { -1, -1 }, previousPosition = { -1, -1 }, directionMods = { 1, 1 };
 		WHStruct size = { -1, -1 };
 
+		int shadowHeight = -1;
+
 		bool displaySprite = true;
 		spriteStruct sprite;
 
@@ -537,10 +538,14 @@ namespace game {
 
 		int force = -1;
 
+		minMaxStruct shadowHeightRandMinMax;
+
 		XYStruct totalFragments = { -1, -1 };
 		struct fragmentStruct {
 			XYStruct position = { -1, -1 }, originalPosition = { -1, -1 };
 			WHStruct size = { -1, -1 };
+
+			int shadowHeight = -1;
 
 			int distanceTravelled = 0, maxDistance = -1;
 

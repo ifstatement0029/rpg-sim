@@ -2874,8 +2874,21 @@ void renderBackgroundCharactersAndObjects() {
 			}
 		}
 
-		//Render characters and objects
 		if ((int)renderOrder.size() > 0) {
+
+			//First render (to guarantee graphics that need to are rendered below second render)
+			for (int renderOrderCnt = 0; renderOrderCnt < (int)renderOrder.size(); ++renderOrderCnt) {
+				if (renderOrder[renderOrderCnt].layerIndex == layersCnt) {
+					switch (renderOrder[renderOrderCnt].type) {
+						case renderOrderStruct::typeEnum::explosion: {
+							explosions[renderOrder[renderOrderCnt].index].render();
+							break;
+						}
+					}
+				}
+			}
+
+			//Second render
 			for (int renderOrderCnt = 0; renderOrderCnt < (int)renderOrder.size(); ++renderOrderCnt) {
 				if (renderOrder[renderOrderCnt].layerIndex == layersCnt) {
 					switch (renderOrder[renderOrderCnt].type) {
@@ -2905,13 +2918,10 @@ void renderBackgroundCharactersAndObjects() {
 							bullets[renderOrder[renderOrderCnt].index].render();
 							break;
 						}
-						case renderOrderStruct::typeEnum::explosion: {
-							explosions[renderOrder[renderOrderCnt].index].render();
-							break;
-						}
 					}
 				}
 			}
+
 		}
 
 	}
@@ -3595,7 +3605,7 @@ void destroyExplosions() {
 	explosionsToDestroyIDs.clear();
 }
 
-void renderShadow(areaStruct area, int transparencyPercentage) {
+void renderShadow(SDL_Rect dRect, int transparencyPercentage) {
 
 	/*Update transparencyPercentage based on how lit up the area is.
 	The more light in an area, the darker the shadow. The less light, the lighter the shadow.*/
@@ -3603,7 +3613,6 @@ void renderShadow(areaStruct area, int transparencyPercentage) {
 
 	//Render shadow
 	SDL_Rect sRect = shadowSprite.sRect;
-	SDL_Rect dRect = convertAreaToSDLRect(area);
 	setSDLTextureTransparency(spriteSheets[shadowSprite.spriteSheetIndex].texture, transparencyPercentage);
 	SDL_RenderCopy(renderer, spriteSheets[shadowSprite.spriteSheetIndex].texture, &sRect, &dRect);
 
@@ -3799,21 +3808,23 @@ vector<int> Character::getBulletsFiredIDs() {
 }
 
 void Character::render() {
+	if (params.displaySprites == true) {
 
-	//Render shadow
-	WHStruct shadowSize = { params.size.w, params.size.h / 5 };
-	XYStruct shadowPosition = { params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h - params.shadowHeight };
-	if (areaWithinCameraView({ shadowPosition.x + camera.area.x, shadowPosition.y + camera.area.y, shadowSize.w, shadowSize.h }) == true) {
-		renderShadow({ shadowPosition.x, shadowPosition.y, shadowSize.w, shadowSize.h }, 50);
-	}
-	
-	//Render character
-	if (areaWithinCameraView({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }) == true && params.displaySprites == true) {
-		SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
-		SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h };
-		SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
-	}
+		//Render shadow
+		WHStruct shadowSize = { params.size.w, params.size.h / 5 };
+		XYStruct shadowPosition = { params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h - params.shadowHeight };
+		if (areaWithinCameraView({ shadowPosition.x + camera.area.x, shadowPosition.y + camera.area.y, shadowSize.w, shadowSize.h }) == true) {
+			renderShadow({ shadowPosition.x, shadowPosition.y, shadowSize.w, shadowSize.h }, 50);
+		}
 
+		//Render character
+		if (areaWithinCameraView({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }) == true) {
+			SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
+			SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h };
+			SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
+		}
+
+	}
 }
 
 void Character::updateEquippedWeaponAngle() {
@@ -3842,86 +3853,88 @@ void Character::updateEquippedWeaponAngle() {
 }
 
 void Character::renderEquippedWeapon() {
-	switch (params.equippedWeaponType) {
-		case characterParams::equippedWeaponTypeEnum::ranged: {
-			
-			//Update position
-			params.equippedRangedWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedRangedWeapon.sprite.areas[0][0].h / 2) };
+	if (params.displaySprites == true) {
+		switch (params.equippedWeaponType) {
+			case characterParams::equippedWeaponTypeEnum::ranged: {
 
-			//Get weapon angle
-			/*if (rightStickXDir != 0 || rightStickYDir != 0) {
-				params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
-			}
-			else if (xDir != 0 || yDir != 0) {
-				params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
-			}*/
-			
-			//Flip weapon and adjust position
-			if (params.equippedRangedWeapon.sprite.angle >= -90 && params.equippedRangedWeapon.sprite.angle <= 90) {
-				
-				//Weapon is facing right
-				params.equippedRangedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+				//Update position
+				params.equippedRangedWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedRangedWeapon.sprite.areas[0][0].h / 2) };
 
-			}
-			else {
-
-				//Weapon is facing left
-				params.equippedRangedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
-
-			}
-
-			//Render
-			SDL_Rect sRect = convertAreaToSDLRect(params.equippedRangedWeapon.sprite.areas[0][0]);
-			SDL_Rect dRect = { params.equippedRangedWeapon.position.x - camera.area.x, params.equippedRangedWeapon.position.y - camera.area.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h };
-			if (areaWithinCameraView({ params.equippedRangedWeapon.position.x, params.equippedRangedWeapon.position.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h }) == true) {
-				SDLRenderCopyEx(sRect, dRect, params.equippedRangedWeapon.sprite);
-			}
-
-			break;
-		}
-		case characterParams::equippedWeaponTypeEnum::melee: {
-			
-			//Update position
-			params.equippedMeleeWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedMeleeWeapon.sprite.areas[0][0].h / 2) };
-
-			//Get weapon angle
-			/*if (params.equippedMeleeWeapon.swing.swinging == false) {
-				if (rightStickXDir != 0 || rightStickYDir != 0) {
-					params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+				//Get weapon angle
+				/*if (rightStickXDir != 0 || rightStickYDir != 0) {
+					params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
 				}
 				else if (xDir != 0 || yDir != 0) {
-					params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+					params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+				}*/
+
+				//Flip weapon and adjust position
+				if (params.equippedRangedWeapon.sprite.angle >= -90 && params.equippedRangedWeapon.sprite.angle <= 90) {
+
+					//Weapon is facing right
+					params.equippedRangedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+
 				}
-			}*/
+				else {
 
-			//Flip weapon and adjust position
-			if (params.equippedMeleeWeapon.sprite.angle >= -90 && params.equippedMeleeWeapon.sprite.angle <= 90) {
+					//Weapon is facing left
+					params.equippedRangedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
 
-				//Weapon is facing right
-				params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
-
-			}
-			else {
-
-				//Weapon is facing left
-				params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
-
-			}
-
-			//Render
-			SDL_Rect sRect = convertAreaToSDLRect(params.equippedMeleeWeapon.sprite.areas[0][0]);
-			SDL_Rect dRect = { params.equippedMeleeWeapon.position.x - camera.area.x, params.equippedMeleeWeapon.position.y - camera.area.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h };
-			if (areaWithinCameraView({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }) == true) {
-
-				//Update weapon angle
-				if (params.equippedMeleeWeapon.swing.swinging == true) {
-					params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.currentAngle;
 				}
 
-				SDLRenderCopyEx(sRect, dRect, params.equippedMeleeWeapon.sprite);
-			}
+				//Render
+				SDL_Rect sRect = convertAreaToSDLRect(params.equippedRangedWeapon.sprite.areas[0][0]);
+				SDL_Rect dRect = { params.equippedRangedWeapon.position.x - camera.area.x, params.equippedRangedWeapon.position.y - camera.area.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h };
+				if (areaWithinCameraView({ params.equippedRangedWeapon.position.x, params.equippedRangedWeapon.position.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h }) == true) {
+					SDLRenderCopyEx(sRect, dRect, params.equippedRangedWeapon.sprite);
+				}
 
-			break;
+				break;
+			}
+			case characterParams::equippedWeaponTypeEnum::melee: {
+
+				//Update position
+				params.equippedMeleeWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedMeleeWeapon.sprite.areas[0][0].h / 2) };
+
+				//Get weapon angle
+				/*if (params.equippedMeleeWeapon.swing.swinging == false) {
+					if (rightStickXDir != 0 || rightStickYDir != 0) {
+						params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+					}
+					else if (xDir != 0 || yDir != 0) {
+						params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+					}
+				}*/
+
+				//Flip weapon and adjust position
+				if (params.equippedMeleeWeapon.sprite.angle >= -90 && params.equippedMeleeWeapon.sprite.angle <= 90) {
+
+					//Weapon is facing right
+					params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+
+				}
+				else {
+
+					//Weapon is facing left
+					params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
+
+				}
+
+				//Render
+				SDL_Rect sRect = convertAreaToSDLRect(params.equippedMeleeWeapon.sprite.areas[0][0]);
+				SDL_Rect dRect = { params.equippedMeleeWeapon.position.x - camera.area.x, params.equippedMeleeWeapon.position.y - camera.area.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h };
+				if (areaWithinCameraView({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }) == true) {
+
+					//Update weapon angle
+					if (params.equippedMeleeWeapon.swing.swinging == true) {
+						params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.currentAngle;
+					}
+
+					SDLRenderCopyEx(sRect, dRect, params.equippedMeleeWeapon.sprite);
+				}
+
+				break;
+			}
 		}
 	}
 }
@@ -4295,6 +4308,10 @@ void Character::useEquippedWeapon() {
 						bulletParams.height = params.jump.currentHeight;
 						bulletParams.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) - params.jump.currentHeight };
 						bulletParams.originalPosition = bulletParams.position;
+						int characterIndex = getCharacterIndexByID(params.ID);
+						XYStruct characterPosition = characters[characterIndex].getPosition();
+						WHStruct characterSize = characters[characterIndex].getSize();
+						bulletParams.shadowHeight = (characterPosition.y + characterSize.h) - bulletParams.position.y;
 						//bulletParams.size = { tileSize.w / 2, tileSize.h / 2 };
 						bulletParams.size = tileSize;
 						bulletParams.sprite.spriteSheetIndex = getSpriteSheetIndex("bullets");
@@ -4524,12 +4541,13 @@ bool Bullet::getStuck() {
 
 void Bullet::render() {
 	if (params.displaySprite == true) {
-		renderShadow(--;;);
-
 		SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
 		SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.height, params.size.w, params.size.h };
 
 		if (areaWithinCameraView({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }) == true && params.displaySprite == true) {
+			
+			//Render shadow
+			renderShadow({ dRect.x, dRect.y + params.shadowHeight, dRect.w, dRect.h / 5 }, 50--;;);
 
 			//Set transparency
 			if (params.fadeOut.delay > 0) {
@@ -4632,8 +4650,6 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 			else if (force >= overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance - resistanceTolerance && force <= overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance + resistanceTolerance) {
 
 				//If bullet force is within range of stuck tolerance percentage of wall resistance then bullet stays stuck
-				/*params.stuck = true;
-				stuckBulletIDs.push_back(params.ID);*/
 				params.stuck = true;
 
 			}
@@ -4661,6 +4677,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				newExplosionParams.collisionData = overworldGridCollisionData;
 				newExplosionParams.collisionData.collidePosition = { newExplosionParams.collisionData.collidePosition.x * tileSize.w, newExplosionParams.collisionData.collidePosition.y * tileSize.h };
 				newExplosionParams.force = force;
+				newExplosionParams.shadowHeightRandMinMax = { tileSize.h, tileSize.h * 2 };
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
 				initExplosion(newExplosionParams);
@@ -4704,8 +4721,6 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 			else if (force >= characterNewResistance - resistanceTolerance && force <= characterNewResistance + resistanceTolerance) {
 
 				//If bullet force is within range of stuck tolerance percentage of character resistance then bullet stays stuck
-				/*params.stuck = true;
-				stuckBulletIDs.push_back(params.ID);*/
 				params.stuck = true;
 
 			}
@@ -4732,6 +4747,8 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				newExplosionParams.sprite.angle = params.sprite.angle;
 				newExplosionParams.collisionData = characterCollisionData;
 				newExplosionParams.force = force;
+				int characterHeight = characters[characterIndex].getSize().h;
+				newExplosionParams.shadowHeightRandMinMax = { characterHeight, characterHeight * 2 };
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
 				initExplosion(newExplosionParams);
@@ -4793,6 +4810,8 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				newExplosionParams.sprite.angle = params.sprite.angle;
 				newExplosionParams.collisionData = tableCollisionData;
 				newExplosionParams.force = force;
+				int tableHeight = tables[tableIndex].getSize().h;
+				newExplosionParams.shadowHeightRandMinMax = { tableHeight, tableHeight * 2 };
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
 				initExplosion(newExplosionParams);
@@ -4872,6 +4891,8 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 					newExplosionParams.sprite.angle = params.sprite.angle;
 					newExplosionParams.collisionData = tableCollisionData;
 					newExplosionParams.force = force;
+					int otherBulletHeight = bullets[otherBulletIndex].getSize().h;
+					newExplosionParams.shadowHeightRandMinMax = { otherBulletHeight, otherBulletHeight * 2 };
 					//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 					newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
 					initExplosion(newExplosionParams);
@@ -4889,12 +4910,13 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 }
 
 void Bullet::explode() {
-	if (params.resistance <= 0) {
+	if (params.resistance <= 0 && params.destroy == false) {
 		explosionParamsStruct newExplosionParams;
 		newExplosionParams.ID = getFreeID(getExplosionIDs());
 		newExplosionParams.overworldGridLayer = params.layer;
 		newExplosionParams.sprite = params.sprite;
 		newExplosionParams.force = params.damage - params.totalDistanceTravelled;
+		newExplosionParams.shadowHeightRandMinMax = { params.size.h, params.size.h * 2 };
 		newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 		//newExplosionParams.totalFragments = { 2, 2 };
 		newExplosionParams.collisionData.collidePosition = params.position;
@@ -4952,6 +4974,7 @@ void Explosion::createFragments() {
 				fragment.position = params.collisionData.collidePosition;
 				fragment.originalPosition = fragment.position;
 				fragment.size = fragmentSize;
+				fragment.shadowHeight = randInt(params.shadowHeightRandMinMax.min, params.shadowHeightRandMinMax.max);
 				//fragment.maxDistance = randInt(fragment.size.w * 4, fragment.size.w * 8);
 				fragment.maxDistance = randInt(params.force / 2, params.force);
 				fragment.sprite.spriteSheetIndex = params.sprite.spriteSheetIndex;
@@ -5001,6 +5024,9 @@ void Explosion::render() {
 
 		if (areaWithinCameraView({ params.fragments[fragmentsCnt].position.x, params.fragments[fragmentsCnt].position.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h }) == true) {
 
+			//Render shadow
+			renderShadow({ dRect.x, dRect.y + params.fragments[fragmentsCnt].shadowHeight, dRect.w, dRect.h }, 50);
+
 			//Set transparency
 			if (params.fadeOut.delay > 0) {
 				int percentageTimePassed = ((SDL_GetTicks() - params.fadeOut.startTicks) * 100) / params.fadeOut.delay;
@@ -5035,6 +5061,15 @@ void Explosion::explode() {
 				if (params.fragments[fragmentsCnt].sprite.angle > 180) {
 					params.fragments[fragmentsCnt].sprite.angle = -(180 - (params.fragments[fragmentsCnt].sprite.angle - 180));
 				}
+
+				//Update shadow height
+				params.fragments[fragmentsCnt].shadowHeight -= params.fragments[fragmentsCnt].pixelIncrement;
+
+			}
+			else {
+				
+				//Update shadow height
+				params.fragments[fragmentsCnt].shadowHeight = params.fragments[fragmentsCnt].size.h / 2;
 
 			}
 		}

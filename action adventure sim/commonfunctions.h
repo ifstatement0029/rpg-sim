@@ -4,6 +4,10 @@ using namespace std;
 
 void pauseAtConsole();
 
+struct minMaxStruct {
+	int min = -1, max = -1;
+};
+
 struct delayStruct {
 	Uint32 startTicks = 0, delay = 0;
 };
