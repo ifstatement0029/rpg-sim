@@ -4546,14 +4546,15 @@ void Bullet::render() {
 
 		if (areaWithinCameraView({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }) == true && params.displaySprite == true) {
 			
-			//Render shadow
-			renderShadow({ dRect.x, dRect.y + params.shadowHeight, dRect.w, dRect.h / 5 }, 50--;;);
-
 			//Set transparency
+			int percentageTimePassed = 0;
 			if (params.fadeOut.delay > 0) {
-				int percentageTimePassed = ((SDL_GetTicks() - params.fadeOut.startTicks) * 100) / params.fadeOut.delay;
+				percentageTimePassed = ((SDL_GetTicks() - params.fadeOut.startTicks) * 100) / params.fadeOut.delay;
 				setSDLTextureTransparency(spriteSheets[params.sprite.spriteSheetIndex].texture, 100 - percentageTimePassed);
 			}
+
+			//Render shadow
+			renderShadow({ dRect.x, dRect.y + params.shadowHeight, dRect.w, dRect.h / 5 }, 50 - (percentageTimePassed / 2));
 
 			SDLRenderCopyEx(sRect, dRect, params.sprite);
 
@@ -5005,6 +5006,7 @@ void Explosion::createFragments() {
 				fragment.speed.startTicks = SDL_GetTicks();
 				fragment.speed.delay = 1;
 				fragment.pixelIncrement = 2;
+				fragment.blood.--;;
 
 				params.fragments.push_back(fragment);
 
@@ -5024,14 +5026,15 @@ void Explosion::render() {
 
 		if (areaWithinCameraView({ params.fragments[fragmentsCnt].position.x, params.fragments[fragmentsCnt].position.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h }) == true) {
 
-			//Render shadow
-			renderShadow({ dRect.x, dRect.y + params.fragments[fragmentsCnt].shadowHeight, dRect.w, dRect.h }, 50);
-
 			//Set transparency
+			int percentageTimePassed = 0;
 			if (params.fadeOut.delay > 0) {
-				int percentageTimePassed = ((SDL_GetTicks() - params.fadeOut.startTicks) * 100) / params.fadeOut.delay;
+				percentageTimePassed = ((SDL_GetTicks() - params.fadeOut.startTicks) * 100) / params.fadeOut.delay;
 				setSDLTextureTransparency(spriteSheets[params.fragments[fragmentsCnt].sprite.spriteSheetIndex].texture, 100 - percentageTimePassed);
 			}
+
+			//Render shadow
+			renderShadow({ dRect.x, dRect.y + params.fragments[fragmentsCnt].shadowHeight, dRect.w, dRect.h }, 50 - (percentageTimePassed / 2));
 
 			SDLRenderCopyEx(sRect, dRect, params.fragments[fragmentsCnt].sprite);
 

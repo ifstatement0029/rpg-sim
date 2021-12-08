@@ -289,14 +289,14 @@ namespace game {
 		Uint8 r = 0, g = 0, b = 0, a = 0;
 	};
 
-	int maxStuckBullets = 20;
+	int maxStuckBullets = 2;
 	vector<int> bulletsToDestroyIDs;
 
 	vector<int> charactersToDestroyIDs;
 
 	vector<int> tablesToDestroyIDs;
 
-	int maxExplosions = 20;
+	int maxExplosions = 2;
 	vector<int> explosionsToDestroyIDs;
 
 	//classes start
@@ -553,6 +553,13 @@ namespace game {
 			
 			delayStruct speed;
 			int pixelIncrement = -1;
+
+			struct bloodStruct {
+				spriteStruct sprites;
+				int currentSpriteArea = 0;
+
+				delayStruct frameDelay;
+			} blood;
 		};
 		vector<fragmentStruct> fragments;
 
