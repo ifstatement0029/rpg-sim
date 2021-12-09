@@ -3677,6 +3677,14 @@ void initExplosion(explosionParamsStruct newParams) {
 	explosions.push_back(newExplosion);
 }
 
+void initSplatter(explosionParamsStruct explosionParams, spriteStruct splatterSprite) {
+	explosionParamsStruct newSplatter;
+
+	--;;
+
+	initExplosion(newSplatter);
+}
+
 vector<int> getExplosionIDs() {
 	vector<int> explosionIDs;
 
@@ -4965,10 +4973,19 @@ void Explosion::setFadeOut(delayStruct newFadeOut) {
 
 void Explosion::createFragments() {
 	if ((int)params.fragments.size() == 0) {
-		WHStruct fragmentSize = { params.sprite.areas[0][0].w / params.totalFragments.x, params.sprite.areas[0][0].h / params.totalFragments.y };
+		WHStruct fragmentSize = { -1, -1 };
+		if (params.fragmentIsEntireSprite == false) {
+			WHStruct fragmentSize = { params.sprite.areas[0][0].w / params.totalFragments.x, params.sprite.areas[0][0].h / params.totalFragments.y };
+		}
+		else {
+			WHStruct fragmentSize = { params.sprite.areas[0][0].w, params.sprite.areas[0][0].h };
+		}
+
 		areaStruct fragmentArea = { params.sprite.areas[0][0].x, params.sprite.areas[0][0].y, fragmentSize.w, fragmentSize.h };
+
 		for (int totalFragmentsXCnt = 0; totalFragmentsXCnt < params.totalFragments.x; ++totalFragmentsXCnt) {
 			fragmentArea.y = params.sprite.areas[0][0].y;
+			
 			for (int totalFragmentsYCnt = 0; totalFragmentsYCnt < params.totalFragments.y; ++totalFragmentsYCnt) {
 				explosionParamsStruct::fragmentStruct fragment;
 
@@ -5006,12 +5023,12 @@ void Explosion::createFragments() {
 				fragment.speed.startTicks = SDL_GetTicks();
 				fragment.speed.delay = 1;
 				fragment.pixelIncrement = 2;
-				fragment.blood.--;;
 
 				params.fragments.push_back(fragment);
 
 				fragmentArea.y += fragmentArea.h;
 			}
+
 			fragmentArea.x += fragmentArea.w;
 		}
 	}
@@ -5034,7 +5051,9 @@ void Explosion::render() {
 			}
 
 			//Render shadow
-			renderShadow({ dRect.x, dRect.y + params.fragments[fragmentsCnt].shadowHeight, dRect.w, dRect.h }, 50 - (percentageTimePassed / 2));
+			if (params.enableShadows == true) {
+				renderShadow({ dRect.x, dRect.y + params.fragments[fragmentsCnt].shadowHeight, dRect.w, dRect.h }, 50 - (percentageTimePassed / 2));
+			}
 
 			SDLRenderCopyEx(sRect, dRect, params.fragments[fragmentsCnt].sprite);
 

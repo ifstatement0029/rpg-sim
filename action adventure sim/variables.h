@@ -540,6 +540,7 @@ namespace game {
 
 		minMaxStruct shadowHeightRandMinMax;
 
+		bool fragmentIsEntireSprite = false;
 		XYStruct totalFragments = { -1, -1 };
 		struct fragmentStruct {
 			XYStruct position = { -1, -1 }, originalPosition = { -1, -1 };
@@ -553,17 +554,12 @@ namespace game {
 			
 			delayStruct speed;
 			int pixelIncrement = -1;
-
-			struct bloodStruct {
-				spriteStruct sprites;
-				int currentSpriteArea = 0;
-
-				delayStruct frameDelay;
-			} blood;
 		};
 		vector<fragmentStruct> fragments;
 
 		delayStruct fadeOut;
+
+		bool enableShadows = true;
 	};
 
 	class Explosion {
