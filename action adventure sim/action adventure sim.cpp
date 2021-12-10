@@ -4999,14 +4999,22 @@ void Explosion::createFragments() {
 		}
 
 		areaStruct fragmentArea = { params.sprite.areas[0][0].x, params.sprite.areas[0][0].y, fragmentSize.w, fragmentSize.h };
-
 		for (int totalFragmentsXCnt = 0; totalFragmentsXCnt < params.totalFragments.x; ++totalFragmentsXCnt) {
 			fragmentArea.y = params.sprite.areas[0][0].y;
 			
 			for (int totalFragmentsYCnt = 0; totalFragmentsYCnt < params.totalFragments.y; ++totalFragmentsYCnt) {
 				explosionParamsStruct::fragmentStruct fragment;
 
-				fragment.position = params.collisionData.collidePosition;
+				if (params.fragmentIsEntireSprite == false) {
+					fragment.position = params.collisionData.collidePosition;
+				}
+				else {
+
+					//Offset collide position to give each fragment a different starting position
+					fragment.position = { params.collisionData.collidePosition.x + --;; };
+
+				}
+
 				fragment.originalPosition = fragment.position;
 				fragment.size = fragmentSize;
 				
