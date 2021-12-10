@@ -563,6 +563,16 @@ void initGlobalSprites() {
 	shadowSprite.spriteSheetIndex = getSpriteSheetIndex("shadow");
 	shadowSprite.sRect = { 0, 0, 32, 32 };
 
+	//Init splatter sprite
+	bloodSplatterSprite.spriteSheetIndex = getSpriteSheetIndex("splatter");
+	bloodSplatterSprite.areas = {
+		{
+			{
+				{ 0, 0, 2, 2 }
+			}
+		}
+	};
+
 }
 
 void destroySpriteSheets() {
@@ -3677,14 +3687,6 @@ void initExplosion(explosionParamsStruct newParams) {
 	explosions.push_back(newExplosion);
 }
 
-void initSplatter(explosionParamsStruct explosionParams, spriteStruct splatterSprite) {
-	explosionParamsStruct newSplatter;
-
-	--;;
-
-	initExplosion(newSplatter);
-}
-
 vector<int> getExplosionIDs() {
 	vector<int> explosionIDs;
 
@@ -3693,6 +3695,20 @@ vector<int> getExplosionIDs() {
 	}
 
 	return explosionIDs;
+}
+
+void initSplatter(explosionParamsStruct explosionParams, spriteStruct splatterSprite) {
+	explosionParamsStruct newSplatter;
+
+	newSplatter = explosionParams;
+	newSplatter.ID = getFreeID(getExplosionIDs());
+	newSplatter.sprite = splatterSprite;
+	newSplatter.fragmentIsEntireSprite = true;
+	newSplatter.randomizeFragmentAngle = true;
+	newSplatter.totalFragments = { explosionParams.sprite.areas[0][0].w / 2, explosionParams.sprite.areas[0][0].h / 2 };
+	newSplatter.enableShadows = false;
+
+	initExplosion(newSplatter);
 }
 
 int getCharacterIndexByID(int ID) {
@@ -4761,6 +4777,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
 				initExplosion(newExplosionParams);
+				initSplatter(newExplosionParams, bloodSplatterSprite);
 
 				//Disable character sprite display
 				characters[characterIndex].setDisplaySprites(false);
@@ -4802,7 +4819,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 			//	
 			//}
 
-			//If resistance of character <= 0 then explode
+			//If resistance of table <= 0 then explode
 			if (newTableResistance <= 0) {
 				explosionParamsStruct newExplosionParams;
 				newExplosionParams.ID = getFreeID(getExplosionIDs());
@@ -4975,10 +4992,10 @@ void Explosion::createFragments() {
 	if ((int)params.fragments.size() == 0) {
 		WHStruct fragmentSize = { -1, -1 };
 		if (params.fragmentIsEntireSprite == false) {
-			WHStruct fragmentSize = { params.sprite.areas[0][0].w / params.totalFragments.x, params.sprite.areas[0][0].h / params.totalFragments.y };
+			fragmentSize = { params.sprite.areas[0][0].w / params.totalFragments.x, params.sprite.areas[0][0].h / params.totalFragments.y };
 		}
 		else {
-			WHStruct fragmentSize = { params.sprite.areas[0][0].w, params.sprite.areas[0][0].h };
+			fragmentSize = { params.sprite.areas[0][0].w, params.sprite.areas[0][0].h };
 		}
 
 		areaStruct fragmentArea = { params.sprite.areas[0][0].x, params.sprite.areas[0][0].y, fragmentSize.w, fragmentSize.h };
@@ -4992,9 +5009,12 @@ void Explosion::createFragments() {
 				fragment.position = params.collisionData.collidePosition;
 				fragment.originalPosition = fragment.position;
 				fragment.size = fragmentSize;
+				
 				fragment.shadowHeight = randInt(params.shadowHeightRandMinMax.min, params.shadowHeightRandMinMax.max);
+				
 				//fragment.maxDistance = randInt(fragment.size.w * 4, fragment.size.w * 8);
 				fragment.maxDistance = randInt(params.force / 2, params.force);
+				
 				fragment.sprite.spriteSheetIndex = params.sprite.spriteSheetIndex;
 				fragment.sprite.areas = {
 					{
@@ -5003,13 +5023,20 @@ void Explosion::createFragments() {
 						}
 					}
 				};
-				int angleTolerance = (params.sprite.angle * 10) / 100;
-				fragment.sprite.angle = randInt(params.sprite.angle - angleTolerance, params.sprite.angle + angleTolerance);
-				//fragment.sprite.angle = randInt(0, 360);
+				
+				if (params.randomizeFragmentAngle == false) {
+					int angleTolerance = (params.sprite.angle * 10) / 100;
+					fragment.sprite.angle = randInt(params.sprite.angle - angleTolerance, params.sprite.angle + angleTolerance);
+				}
+				else {
+					fragment.sprite.angle = randInt(0, 360);
+				}
 				if (fragment.sprite.angle > 180) {
 					fragment.sprite.angle = -(180 - (fragment.sprite.angle - 180));
 				}
+
 				fragment.sprite.center = { randInt(0, fragmentSize.w), randInt(0, fragmentSize.h) };
+				
 				int randomFlip = randInt(1, 3);
 				if (randomFlip == 1) {
 					fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
@@ -5020,6 +5047,7 @@ void Explosion::createFragments() {
 				else if (randomFlip == 3) {
 					fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
 				}
+
 				fragment.speed.startTicks = SDL_GetTicks();
 				fragment.speed.delay = 1;
 				fragment.pixelIncrement = 2;

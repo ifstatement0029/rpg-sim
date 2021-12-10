@@ -279,6 +279,8 @@ namespace game {
 		SDL_Rect sRect = { -1, -1, -1, -1 };
 	} shadowSprite;
 
+	spriteStruct bloodSplatterSprite;
+
 	struct collidableObjectStruct {
 		areaStruct area = { -1, -1, -1, -1 };
 		int height = -1;
@@ -540,7 +542,7 @@ namespace game {
 
 		minMaxStruct shadowHeightRandMinMax;
 
-		bool fragmentIsEntireSprite = false;
+		bool fragmentIsEntireSprite = false, randomizeFragmentAngle = false;
 		XYStruct totalFragments = { -1, -1 };
 		struct fragmentStruct {
 			XYStruct position = { -1, -1 }, originalPosition = { -1, -1 };
