@@ -47,7 +47,7 @@ ranged weapon:
 	- bullet shadows must fade out if bullet is fading out - done
 	- explosion fragment shadows must fade out if fragment is fading out - done
 	- have explosion fragments always appear under character - done
-	- have blood/dust/etc when character/object/etc explodes - ;;
+	- have blood/dust/etc when character/object/etc explodes - done
 	- when character explodes, their equipped weapon is sent flying (their equipped weapon can be picked up on the floor)
 melee weapon: 
 	- can aim 360 degrees with left or right stick - done

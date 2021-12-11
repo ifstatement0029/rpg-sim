@@ -366,17 +366,19 @@ namespace game {
 		struct meleeWeaponStruct {
 			string name = "";
 
-			XYStruct position = { -1, -1 };
+			XYStruct position = { -1, -1 }, previousPosition = { -1, -1 };
 			WHStruct size = { -1, -1 };
 
 			spriteStruct sprite;
 
 			struct swingStruct {
-				bool swinging = false;
+				bool swinging = false, recoil = false;
 				double originalAngle = -1;
 				int angle = 180, currentAngle = -1, startAngle = -1, endAngle = -1, pixelIncrement = 12;
 				delayStruct delay;
 			} swing;
+
+			int damage = -1, resistance = -1;
 		} equippedMeleeWeapon;
 
 		int resistance = -1, stuckTolerancePercentage = 10;
@@ -420,6 +422,7 @@ namespace game {
 		void jumpOnTile();
 		void useEquippedWeapon();
 		void markForDestruction();
+		void detectEquippedMeleeWeaponHit();
 
 	private:
 		characterParams params;

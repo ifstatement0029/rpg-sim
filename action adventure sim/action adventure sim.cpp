@@ -909,9 +909,11 @@ bool checkCollisionWithCollidableObjectFactoringHeight(areaStruct gridArea, int 
 //Need to factor height in areas
 collisionDataStruct checkCollisionWithCharacter(areaStruct sourcePixelArea, areaStruct previousPixelArea) {
 	collisionDataStruct collisionData;
+
 	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
 		XYStruct characterPosition = characters[charactersCnt].getPosition();
 		WHStruct characterSize = characters[charactersCnt].getSize();
+		
 		if (areaWithinArea(sourcePixelArea, { characterPosition.x, characterPosition.y, characterSize.w, characterSize.h }) == true) {
 			collisionData.collision = true;
 			collisionData.collidePosition = characterPosition;
@@ -1877,7 +1879,7 @@ void initCharacters() {
 		currentCharacterParams.layer = 1;
 
 		//Init equipped weapon
-		currentCharacterParams.equippedWeaponType = characterParams::equippedWeaponTypeEnum::ranged;
+		currentCharacterParams.equippedWeaponType = characterParams::equippedWeaponTypeEnum::melee;
 		switch (currentCharacterParams.equippedWeaponType) {
 			case characterParams::equippedWeaponTypeEnum::ranged: {
 				currentCharacterParams.equippedRangedWeapon.name = "Gun";
@@ -1915,11 +1917,13 @@ void initCharacters() {
 				};
 				currentCharacterParams.equippedMeleeWeapon.sprite.center = { 0, currentCharacterParams.equippedMeleeWeapon.sprite.areas[0][0].h / 2 };
 				currentCharacterParams.equippedMeleeWeapon.swing.delay.delay = 1;
+				currentCharacterParams.equippedMeleeWeapon.damage = 50;
+				currentCharacterParams.equippedMeleeWeapon.resistance = 50;
 				break;
 			}
 		}
 
-		currentCharacterParams.resistance = 1;
+		currentCharacterParams.resistance = 100;
 
 		Character currentCharacter(currentCharacterParams);
 		characters.push_back(currentCharacter);
@@ -3543,6 +3547,7 @@ void characterActions() {
 			characters[charactersCnt].jumpOnTile();
 			characters[charactersCnt].updateEquippedWeaponAngle();
 			characters[charactersCnt].useEquippedWeapon();
+			characters[charactersCnt].detectEquippedMeleeWeaponHit();
 		}
 		else {
 			characters[charactersCnt].idleAnimation();
@@ -3697,15 +3702,21 @@ vector<int> getExplosionIDs() {
 	return explosionIDs;
 }
 
-void initSplatter(explosionParamsStruct explosionParams, spriteStruct splatterSprite) {
+void initSplatter(explosionParamsStruct explosionParams, spriteStruct splatterSprite, areaStruct impactArea) {
 	explosionParamsStruct newSplatter;
 
 	newSplatter = explosionParams;
 	newSplatter.ID = getFreeID(getExplosionIDs());
 	newSplatter.sprite = splatterSprite;
+	newSplatter.sprite.angle = explosionParams.sprite.angle;
+
+	if (impactArea.x > -1 && impactArea.y > -1) {
+		newSplatter.collisionData.collidePosition = { impactArea.x, impactArea.y };
+	}
+
 	newSplatter.fragmentIsEntireSprite = true;
-	newSplatter.randomizeFragmentAngle = true;
-	newSplatter.totalFragments = { explosionParams.sprite.areas[0][0].w / 2, explosionParams.sprite.areas[0][0].h / 2 };
+	newSplatter.totalFragments = { impactArea.w / 2, impactArea.h / 2 };
+
 	newSplatter.enableShadows = false;
 
 	initExplosion(newSplatter);
@@ -3918,6 +3929,7 @@ void Character::renderEquippedWeapon() {
 			case characterParams::equippedWeaponTypeEnum::melee: {
 
 				//Update position
+				params.equippedMeleeWeapon.previousPosition = params.equippedMeleeWeapon.position;
 				params.equippedMeleeWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedMeleeWeapon.sprite.areas[0][0].h / 2) };
 
 				//Get weapon angle
@@ -4410,8 +4422,10 @@ void Character::useEquippedWeapon() {
 	//Swing equipped melee weapon
 	if (params.equippedMeleeWeapon.swing.swinging == true && SDL_GetTicks() - params.equippedMeleeWeapon.swing.delay.startTicks >= params.equippedMeleeWeapon.swing.delay.delay / FPSTimerMod) {
 		params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
+			
 		if (params.equippedMeleeWeapon.swing.currentAngle < params.equippedMeleeWeapon.swing.endAngle) {
 			params.equippedMeleeWeapon.swing.currentAngle += params.equippedMeleeWeapon.swing.pixelIncrement;
+				
 			if (params.equippedMeleeWeapon.swing.currentAngle > params.equippedMeleeWeapon.swing.endAngle) {
 				params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.endAngle;
 			}
@@ -4422,11 +4436,49 @@ void Character::useEquippedWeapon() {
 		}
 	}
 
+	//Recoil equipped melee weapon
+	if (params.equippedMeleeWeapon.swing.recoil == true && SDL_GetTicks() - params.equippedMeleeWeapon.swing.delay.startTicks >= params.equippedMeleeWeapon.swing.delay.delay / FPSTimerMod) {
+		params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
+
+		if (params.equippedMeleeWeapon.swing.currentAngle > params.equippedMeleeWeapon.swing.startAngle) {
+			params.equippedMeleeWeapon.swing.currentAngle -= params.equippedMeleeWeapon.swing.pixelIncrement;
+
+			if (params.equippedMeleeWeapon.swing.currentAngle < params.equippedMeleeWeapon.swing.startAngle) {
+				params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.startAngle;
+			}
+		}
+		else {
+			params.equippedMeleeWeapon.swing.recoil = false;
+			params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.originalAngle;
+		}
+	}
 }
 
 void Character::markForDestruction() {
 	if (params.destroy == true) {
 		charactersToDestroyIDs.push_back(params.ID);
+	}
+}
+
+void Character::detectEquippedMeleeWeaponHit() {
+	if (params.equippedMeleeWeapon.swing.swinging == true) {
+		collisionDataStruct collisionData = checkCollisionWithCharacter({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }, { params.equippedMeleeWeapon.previousPosition.x, params.equippedMeleeWeapon.previousPosition.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h });
+
+		if (collisionData.collision == true && collisionData.instanceID != params.ID) {
+
+			//Update equipped melee weapon resistance
+			--params.equippedMeleeWeapon.resistance;
+
+			//Get character index
+			int characterIndex = getCharacterIndexByID(collisionData.instanceID);
+
+			//If equipped melee weapon damage lower than character resistance then sword recoils
+			if (params.equippedMeleeWeapon.damage < characters[characterIndex].getResistance()) {
+				params.equippedMeleeWeapon.swing.swinging = false;
+				params.equippedMeleeWeapon.swing.recoil = true;
+			}
+
+		}
 	}
 }
 
@@ -4777,7 +4829,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
 				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
 				initExplosion(newExplosionParams);
-				initSplatter(newExplosionParams, bloodSplatterSprite);
+				initSplatter(newExplosionParams, bloodSplatterSprite, { params.position.x, params.position.y, params.size.w, params.size.h });
 
 				//Disable character sprite display
 				characters[characterIndex].setDisplaySprites(false);
@@ -4999,21 +5051,17 @@ void Explosion::createFragments() {
 		}
 
 		areaStruct fragmentArea = { params.sprite.areas[0][0].x, params.sprite.areas[0][0].y, fragmentSize.w, fragmentSize.h };
+
 		for (int totalFragmentsXCnt = 0; totalFragmentsXCnt < params.totalFragments.x; ++totalFragmentsXCnt) {
-			fragmentArea.y = params.sprite.areas[0][0].y;
+			if (params.fragmentIsEntireSprite == false) {
+				fragmentArea.y = params.sprite.areas[0][0].y;
+			}
 			
 			for (int totalFragmentsYCnt = 0; totalFragmentsYCnt < params.totalFragments.y; ++totalFragmentsYCnt) {
 				explosionParamsStruct::fragmentStruct fragment;
 
-				if (params.fragmentIsEntireSprite == false) {
-					fragment.position = params.collisionData.collidePosition;
-				}
-				else {
-
-					//Offset collide position to give each fragment a different starting position
-					fragment.position = { params.collisionData.collidePosition.x + --;; };
-
-				}
+				//Offset collide position to give each fragment a different starting position
+				fragment.position = { params.collisionData.collidePosition.x + (fragmentSize.w * totalFragmentsXCnt) - fragmentSize.w, params.collisionData.collidePosition.y + (fragmentSize.h * totalFragmentsYCnt) - fragmentSize.h };
 
 				fragment.originalPosition = fragment.position;
 				fragment.size = fragmentSize;
@@ -5062,10 +5110,14 @@ void Explosion::createFragments() {
 
 				params.fragments.push_back(fragment);
 
-				fragmentArea.y += fragmentArea.h;
+				if (params.fragmentIsEntireSprite == false) {
+					fragmentArea.y += fragmentArea.h;
+				}
 			}
 
-			fragmentArea.x += fragmentArea.w;
+			if (params.fragmentIsEntireSprite == false) {
+				fragmentArea.x += fragmentArea.w;
+			}
 		}
 	}
 }
@@ -5088,7 +5140,7 @@ void Explosion::render() {
 
 			//Render shadow
 			if (params.enableShadows == true) {
-				renderShadow({ dRect.x, dRect.y + params.fragments[fragmentsCnt].shadowHeight, dRect.w, dRect.h }, 50 - (percentageTimePassed / 2));
+				renderShadow({ dRect.x, dRect.y + params.fragments[fragmentsCnt].shadowHeight, dRect.w, dRect.h / 5 }, 50 - (percentageTimePassed / 2));
 			}
 
 			SDLRenderCopyEx(sRect, dRect, params.fragments[fragmentsCnt].sprite);
