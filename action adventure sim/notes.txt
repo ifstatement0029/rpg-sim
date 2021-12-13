@@ -53,6 +53,8 @@ melee weapon:
 	- can aim 360 degrees with left or right stick - done
 	- can attack in 360 degrees - done
 	- attack animation: 180 (or whatever angle value is) degrees arc - done
+	- if melee weapon hits character, wall, object or bullet:
+		- if weapon damage < target resistance then recoil (swing weapon half way then back) - ;;
 
 gear:
 

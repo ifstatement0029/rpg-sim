@@ -377,7 +377,7 @@ namespace game {
 			spriteStruct sprite;
 
 			struct swingStruct {
-				bool swinging = false, recoil = false;
+				bool swinging = false, recoil = false, swingBack = false;
 				double originalAngle = -1;
 				int angle = 180, currentAngle = -1, startAngle = -1, endAngle = -1, pixelIncrement = 12;
 				delayStruct delay;
@@ -420,6 +420,7 @@ namespace game {
 		void updateEquippedWeaponAngle();
 		void renderEquippedWeapon();
 		void renderReloadAnimation();
+		void renderEquippedMeleeWeaponArea();
 		void move();
 		void idleAnimation();
 		void jump();

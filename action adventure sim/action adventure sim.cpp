@@ -911,35 +911,39 @@ bool checkCollisionWithCollidableObjectFactoringHeight(areaStruct gridArea, int 
 }
 
 //Need to factor height in areas
-collisionDataStruct checkCollisionWithCharacter(areaStruct sourcePixelArea, areaStruct previousPixelArea) {
+collisionDataStruct checkCollisionWithCharacter(areaStruct sourcePixelArea, areaStruct previousPixelArea, int characterToIgnoreID) {
 	collisionDataStruct collisionData;
 
 	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
 		XYStruct characterPosition = characters[charactersCnt].getPosition();
 		WHStruct characterSize = characters[charactersCnt].getSize();
 		
+		int characterID = characters[charactersCnt].getID();
+
 		if (areaWithinArea(sourcePixelArea, { characterPosition.x, characterPosition.y, characterSize.w, characterSize.h }) == true) {
-			collisionData.collision = true;
-			collisionData.collidePosition = characterPosition;
-			collisionData.instanceID = characters[charactersCnt].getID();
+			if ((characterToIgnoreID > -1 && characterToIgnoreID != characterID) || characterToIgnoreID == -1) {
+				collisionData.collision = true;
+				collisionData.collidePosition = characterPosition;
+				collisionData.instanceID = characterID;
 
-			//Get side of character hit
-			if (previousPixelArea.x > -1 && previousPixelArea.y > -1 && previousPixelArea.w > -1 && previousPixelArea.h > -1) {
-				if (previousPixelArea.x + previousPixelArea.w - 1 < sourcePixelArea.x) {
-					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::left;
+				//Get side of character hit
+				if (previousPixelArea.x > -1 && previousPixelArea.y > -1 && previousPixelArea.w > -1 && previousPixelArea.h > -1) {
+					if (previousPixelArea.x + previousPixelArea.w - 1 < sourcePixelArea.x) {
+						collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::left;
+					}
+					else if (previousPixelArea.x > sourcePixelArea.x + sourcePixelArea.w - 1) {
+						collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::right;
+					}
+					else if (previousPixelArea.y + previousPixelArea.h - 1 < sourcePixelArea.y) {
+						collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::up;
+					}
+					else if (previousPixelArea.y > sourcePixelArea.y + sourcePixelArea.h - 1) {
+						collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::down;
+					}
 				}
-				else if (previousPixelArea.x > sourcePixelArea.x + sourcePixelArea.w - 1) {
-					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::right;
-				}
-				else if (previousPixelArea.y + previousPixelArea.h - 1 < sourcePixelArea.y) {
-					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::up;
-				}
-				else if (previousPixelArea.y > sourcePixelArea.y + sourcePixelArea.h - 1) {
-					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::down;
-				}
+
+				return collisionData;
 			}
-
-			return collisionData;
 		}
 	}
 	return collisionData;
@@ -2925,7 +2929,8 @@ void renderBackgroundCharactersAndObjects() {
 							if (characterDirection == directionEnum::down || characterDirection == directionEnum::downLeft || characterDirection == directionEnum::downRight || characterDirection == directionEnum::right) {
 								characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
 							}
-							
+
+							//characters[renderOrder[renderOrderCnt].index].renderEquippedMeleeWeaponArea();							
 							break;
 						}
 						case renderOrderStruct::typeEnum::table: {
@@ -4027,6 +4032,15 @@ void Character::renderReloadAnimation() {
 	}
 }
 
+void Character::renderEquippedMeleeWeaponArea() {
+	if (areaWithinCameraView({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }) == true) {
+		SDL_Rect sRect = convertAreaToSDLRect(areaSprite.spriteSheetArea);
+		SDL_Rect dRect = { params.equippedMeleeWeapon.area.x - camera.area.x, params.equippedMeleeWeapon.area.y - camera.area.y, params.equippedMeleeWeapon.area.w, params.equippedMeleeWeapon.area.h };
+
+		SDL_RenderCopy(renderer, spriteSheets[areaSprite.spriteSheetIndex].texture, &sRect, &dRect);
+	}
+}
+
 void Character::swapFrame() {
 	if (SDL_GetTicks() - params.move.frameSwap.startTicks >= params.move.frameSwap.delay / FPSTimerMod) {
 		params.move.frameSwap.startTicks = SDL_GetTicks();
@@ -4445,22 +4459,36 @@ void Character::useEquippedWeapon() {
 	//Swing equipped melee weapon
 	if (params.equippedMeleeWeapon.swing.swinging == true && SDL_GetTicks() - params.equippedMeleeWeapon.swing.delay.startTicks >= params.equippedMeleeWeapon.swing.delay.delay / FPSTimerMod) {
 		params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
-			
-		if (params.equippedMeleeWeapon.swing.currentAngle < params.equippedMeleeWeapon.swing.endAngle) {
-			params.equippedMeleeWeapon.swing.currentAngle += params.equippedMeleeWeapon.swing.pixelIncrement;
-				
-			if (params.equippedMeleeWeapon.swing.currentAngle > params.equippedMeleeWeapon.swing.endAngle) {
-				params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.endAngle;
+		
+		if (params.equippedMeleeWeapon.swing.swingBack == false) {
+			if (params.equippedMeleeWeapon.swing.currentAngle < params.equippedMeleeWeapon.swing.endAngle) {
+				params.equippedMeleeWeapon.swing.currentAngle += params.equippedMeleeWeapon.swing.pixelIncrement;
+
+				if (params.equippedMeleeWeapon.swing.currentAngle > params.equippedMeleeWeapon.swing.endAngle) {
+					params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.endAngle;
+				}
+			}
+			else {
+				params.equippedMeleeWeapon.swing.swinging = false;
+				params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.originalAngle;
 			}
 		}
 		else {
-			params.equippedMeleeWeapon.swing.swinging = false;
-			params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.originalAngle;
+
+			//Swing back
+			--;;
+
 		}
+
+		//Recoil
+		if (params.equippedMeleeWeapon.swing.recoil == true && params.equippedMeleeWeapon.swing.currentAngle == abs(params.equippedMeleeWeapon.swing.endAngle - params.equippedMeleeWeapon.swing.startAngle) / 2) {
+			params.equippedMeleeWeapon.swing.swingBack = true;
+		}
+
 	}
 
 	//Recoil equipped melee weapon
-	if (params.equippedMeleeWeapon.swing.recoil == true && SDL_GetTicks() - params.equippedMeleeWeapon.swing.delay.startTicks >= params.equippedMeleeWeapon.swing.delay.delay / FPSTimerMod) {
+	/*if (params.equippedMeleeWeapon.swing.recoil == true && SDL_GetTicks() - params.equippedMeleeWeapon.swing.delay.startTicks >= params.equippedMeleeWeapon.swing.delay.delay / FPSTimerMod) {
 		params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
 
 		if (params.equippedMeleeWeapon.swing.currentAngle > params.equippedMeleeWeapon.swing.startAngle) {
@@ -4474,7 +4502,8 @@ void Character::useEquippedWeapon() {
 			params.equippedMeleeWeapon.swing.recoil = false;
 			params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.originalAngle;
 		}
-	}
+	}*/
+
 }
 
 void Character::markForDestruction() {
@@ -4498,20 +4527,11 @@ void Character::detectEquippedMeleeWeaponHit() {
 			}
 		}
 
-		if ((int)areas.size() == 0) {
-			--;;
-			areaParamsStruct newAreaParams;
-			newAreaParams.ID = getFreeID(getAreaIDs());
-			newAreaParams.position = { params.equippedMeleeWeapon.area.x, params.equippedMeleeWeapon.area.y };
-			newAreaParams.size = { params.equippedMeleeWeapon.area.w, params.equippedMeleeWeapon.area.h };
-			initArea(newAreaParams);
-		}
-
 		if (params.equippedMeleeWeapon.previousArea.x == -1) {
 			params.equippedMeleeWeapon.previousArea = params.equippedMeleeWeapon.area;
 		}
 
-		collisionDataStruct collisionData = checkCollisionWithCharacter(params.equippedMeleeWeapon.area, params.equippedMeleeWeapon.previousArea);
+		collisionDataStruct collisionData = checkCollisionWithCharacter(params.equippedMeleeWeapon.area, params.equippedMeleeWeapon.previousArea, params.ID);
 
 		if (collisionData.collision == true && collisionData.instanceID != params.ID) {
 
@@ -4523,8 +4543,8 @@ void Character::detectEquippedMeleeWeaponHit() {
 
 			//If equipped melee weapon damage lower than character resistance then sword recoils
 			if (params.equippedMeleeWeapon.damage < characters[characterIndex].getResistance()) {
-				params.equippedMeleeWeapon.swing.swinging = false;
 				params.equippedMeleeWeapon.swing.recoil = true;
+				params.equippedMeleeWeapon.swing.swingBack = false;
 			}
 
 		}
@@ -4739,7 +4759,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 		collisionDataStruct overworldGridCollisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }), { -1, -1, -1 - 1 }, params.layer, params.height);
 
 		//Check for collision with characters
-		collisionDataStruct characterCollisionData = checkCollisionWithCharacter({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h });
+		collisionDataStruct characterCollisionData = checkCollisionWithCharacter({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h }, params.characterID);
 
 		//Check for collision with tables
 		collisionDataStruct tableCollisionData = checkCollisionWithTable({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h });
@@ -4817,7 +4837,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 		}
 
 		//Character collision
-		if (characterCollisionData.collision == true && characterCollisionData.instanceID != params.characterID && characters[getCharacterIndexByID(characterCollisionData.instanceID)].getDisplaySprites() == true) {
+		if (characterCollisionData.collision == true /*&& characterCollisionData.instanceID != params.characterID*/ && characters[getCharacterIndexByID(characterCollisionData.instanceID)].getDisplaySprites() == true) {
 
 			//Decrease character resistance by the amount of force that hits
 			int characterIndex = getCharacterIndexByID(characterCollisionData.instanceID);
