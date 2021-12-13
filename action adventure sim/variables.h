@@ -301,6 +301,8 @@ namespace game {
 	int maxExplosions = 2;
 	vector<int> explosionsToDestroyIDs;
 
+	iconStruct areaSprite;
+
 	//classes start
 
 	struct characterParams {
@@ -366,8 +368,11 @@ namespace game {
 		struct meleeWeaponStruct {
 			string name = "";
 
-			XYStruct position = { -1, -1 }, previousPosition = { -1, -1 };
+			XYStruct position = { -1, -1 };
 			WHStruct size = { -1, -1 };
+
+
+			areaStruct area = { -1, -1, -1, -1 }, previousArea = { -1, -1, -1, -1 };
 
 			spriteStruct sprite;
 
@@ -589,6 +594,27 @@ namespace game {
 	};
 
 	vector<Explosion> explosions;
+
+	struct areaParamsStruct {
+		int ID = -1;
+
+		XYStruct position = { -1, -1 };
+		WHStruct size = { -1, -1 };
+	};
+
+	class Area {
+	public:
+		Area(areaParamsStruct newParams);
+
+		int getID();
+
+		void render();
+
+	private:
+		areaParamsStruct params;
+	};
+
+	vector<Area> areas;
 
 	//classes end
 

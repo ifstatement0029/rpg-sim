@@ -573,6 +573,10 @@ void initGlobalSprites() {
 		}
 	};
 
+	//Init area sprite
+	areaSprite.spriteSheetIndex = getSpriteSheetIndex("area");
+	areaSprite.spriteSheetArea = { 0, 0, 2, 2 };
+
 }
 
 void destroySpriteSheets() {
@@ -2940,6 +2944,11 @@ void renderBackgroundCharactersAndObjects() {
 
 	}
 
+	//Render areas
+	for (int areasCnt = 0; areasCnt < (int)areas.size(); ++areasCnt) {
+		areas[areasCnt].render();
+	}
+
 	//Render pre-render texture to screen
 	setSDLRenderTarget(NULL);
 	WHStruct preRenderTextureSize = getSDLTextureSize(preRenderTexture);
@@ -3762,6 +3771,21 @@ void destroyTables() {
 	}
 }
 
+void initArea(areaParamsStruct newParams) {
+	Area newArea(newParams);
+	areas.push_back(newArea);
+}
+
+vector<int> getAreaIDs() {
+	vector<int> areaIDs;
+
+	for (int areasCnt = 0; areasCnt < (int)areas.size(); ++areasCnt) {
+		areaIDs.push_back(areas[areasCnt].getID());
+	}
+
+	return areaIDs;
+}
+
 //functions end
 
 //class functions start
@@ -3929,7 +3953,6 @@ void Character::renderEquippedWeapon() {
 			case characterParams::equippedWeaponTypeEnum::melee: {
 
 				//Update position
-				params.equippedMeleeWeapon.previousPosition = params.equippedMeleeWeapon.position;
 				params.equippedMeleeWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedMeleeWeapon.sprite.areas[0][0].h / 2) };
 
 				//Get weapon angle
@@ -4462,7 +4485,33 @@ void Character::markForDestruction() {
 
 void Character::detectEquippedMeleeWeaponHit() {
 	if (params.equippedMeleeWeapon.swing.swinging == true) {
-		collisionDataStruct collisionData = checkCollisionWithCharacter({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }, { params.equippedMeleeWeapon.previousPosition.x, params.equippedMeleeWeapon.previousPosition.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h });
+
+		if (params.equippedMeleeWeapon.area.x != -1) {
+			params.equippedMeleeWeapon.previousArea = params.equippedMeleeWeapon.area;
+		}
+
+		//Set source pixel area based on character direction
+		switch (params.direction) {
+			case directionEnum::up: {
+				params.equippedMeleeWeapon.area = { params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w * 2, params.equippedMeleeWeapon.size.w };
+				break;
+			}
+		}
+
+		if ((int)areas.size() == 0) {
+			--;;
+			areaParamsStruct newAreaParams;
+			newAreaParams.ID = getFreeID(getAreaIDs());
+			newAreaParams.position = { params.equippedMeleeWeapon.area.x, params.equippedMeleeWeapon.area.y };
+			newAreaParams.size = { params.equippedMeleeWeapon.area.w, params.equippedMeleeWeapon.area.h };
+			initArea(newAreaParams);
+		}
+
+		if (params.equippedMeleeWeapon.previousArea.x == -1) {
+			params.equippedMeleeWeapon.previousArea = params.equippedMeleeWeapon.area;
+		}
+
+		collisionDataStruct collisionData = checkCollisionWithCharacter(params.equippedMeleeWeapon.area, params.equippedMeleeWeapon.previousArea);
 
 		if (collisionData.collision == true && collisionData.instanceID != params.ID) {
 
@@ -5189,6 +5238,23 @@ void Explosion::explode() {
 void Explosion::markForDestruction() {
 	if (params.fadeOut.delay > 0 && SDL_GetTicks() - params.fadeOut.startTicks >= params.fadeOut.delay) {
 		explosionsToDestroyIDs.push_back(params.ID);
+	}
+}
+
+Area::Area(areaParamsStruct newParams) {
+	params = newParams;
+}
+
+int Area::getID() {
+	return params.ID;
+}
+
+void Area::render() {
+	if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h }) == true) {
+		SDL_Rect sRect = convertAreaToSDLRect(areaSprite.spriteSheetArea);
+		SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h };
+
+		SDL_RenderCopy(renderer, spriteSheets[areaSprite.spriteSheetIndex].texture, &sRect, &dRect);
 	}
 }
 
