@@ -2930,7 +2930,7 @@ void renderBackgroundCharactersAndObjects() {
 								characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
 							}
 
-							//characters[renderOrder[renderOrderCnt].index].renderEquippedMeleeWeaponArea();							
+							characters[renderOrder[renderOrderCnt].index].renderEquippedMeleeWeaponArea();							
 							break;
 						}
 						case renderOrderStruct::typeEnum::table: {
@@ -4518,7 +4518,31 @@ void Character::detectEquippedMeleeWeaponHit() {
 				break;
 			}
 			case directionEnum::down: {
+				params.equippedMeleeWeapon.area = { params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w * 2, params.equippedMeleeWeapon.size.w };
+				break;
+			}
+			case directionEnum::left: {
+				params.equippedMeleeWeapon.area = { params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w * 2 };
+				break;
+			}
+			case directionEnum::right: {
 				params.equippedMeleeWeapon.area = { --;; };
+				break;
+			}
+			case directionEnum::upRight: {
+				params.equippedMeleeWeapon.area = {  };
+				break;
+			}
+			case directionEnum::downRight: {
+				params.equippedMeleeWeapon.area = {  };
+				break;
+			}
+			case directionEnum::downLeft: {
+				params.equippedMeleeWeapon.area = {  };
+				break;
+			}
+			case directionEnum::upLeft: {
+				params.equippedMeleeWeapon.area = {  };
 				break;
 			}
 		}
