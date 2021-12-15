@@ -4475,7 +4475,6 @@ void Character::useEquippedWeapon() {
 				}
 				else {
 					params.equippedMeleeWeapon.swing.swingBack = true;
-					params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.endAngle;
 				}
 			}
 		}
@@ -4485,15 +4484,13 @@ void Character::useEquippedWeapon() {
 			if (params.equippedMeleeWeapon.swing.currentAngle > params.equippedMeleeWeapon.swing.startAngle) {
 				params.equippedMeleeWeapon.swing.currentAngle -= params.equippedMeleeWeapon.swing.pixelIncrement;
 
-				if (params.equippedMeleeWeapon.swing.currentAngle < params.equippedMeleeWeapon.swing.startAngle) {
+				if (params.equippedMeleeWeapon.swing.currentAngle <= params.equippedMeleeWeapon.swing.startAngle) {
 					params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.startAngle;
+					params.equippedMeleeWeapon.swing.swingBack = false;
+					params.equippedMeleeWeapon.swing.swinging = false;
+					params.equippedMeleeWeapon.swing.recoil = false;
+					params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.originalAngle;
 				}
-			}
-			else {
-				params.equippedMeleeWeapon.swing.swingBack = false;
-				params.equippedMeleeWeapon.swing.recoil = false;
-				params.equippedMeleeWeapon.swing.swinging = false;
-				params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.originalAngle;
 			}
 
 		}
@@ -4508,7 +4505,7 @@ void Character::markForDestruction() {
 }
 
 void Character::detectEquippedMeleeWeaponHit() {
-	if (params.equippedMeleeWeapon.swing.swinging == true) {
+	if (params.equippedMeleeWeapon.swing.swinging == true && params.equippedMeleeWeapon.swing.recoil == false) {
 
 		if (params.equippedMeleeWeapon.area.x != -1) {
 			params.equippedMeleeWeapon.previousArea = params.equippedMeleeWeapon.area;
@@ -4518,6 +4515,10 @@ void Character::detectEquippedMeleeWeaponHit() {
 		switch (params.direction) {
 			case directionEnum::up: {
 				params.equippedMeleeWeapon.area = { params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w * 2, params.equippedMeleeWeapon.size.w };
+				break;
+			}
+			case directionEnum::down: {
+				params.equippedMeleeWeapon.area = { --;; };
 				break;
 			}
 		}
@@ -4537,9 +4538,10 @@ void Character::detectEquippedMeleeWeaponHit() {
 			int characterIndex = getCharacterIndexByID(collisionData.instanceID);
 
 			//If equipped melee weapon damage lower than character resistance then sword recoils
-			if (params.equippedMeleeWeapon.swing.recoil == false && params.equippedMeleeWeapon.damage < characters[characterIndex].getResistance()) {
+			if (params.equippedMeleeWeapon.damage < characters[characterIndex].getResistance()) {
 				params.equippedMeleeWeapon.swing.recoil = true;
 				params.equippedMeleeWeapon.swing.swingBack = false;
+				params.equippedMeleeWeapon.swing.endAngle = params.equippedMeleeWeapon.swing.startAngle + abs(params.equippedMeleeWeapon.swing.endAngle - params.equippedMeleeWeapon.swing.startAngle) / 2;
 			}
 
 		}
