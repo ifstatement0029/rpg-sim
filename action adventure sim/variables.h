@@ -391,6 +391,21 @@ namespace game {
 		bool destroy = false;
 
 		vector<int> bulletsFiredIDs;
+
+		bool renderEquippedMeleeWeaponAreaBool = false;
+
+		struct meleeRecoilSparkAnimationStruct {
+			bool active = false;
+
+			XYStruct position = { -1, -1 };
+			WHStruct size = { -1, -1 };
+
+			spriteStruct sprites;
+			
+			delayStruct frameDelay;
+			
+			int currentFrame = 0;
+		} meleeRecoilSparkAnimation;
 	};
 
 	class Character {
@@ -421,6 +436,7 @@ namespace game {
 		void renderEquippedWeapon();
 		void renderReloadAnimation();
 		void renderEquippedMeleeWeaponArea();
+		void renderMeleeRecoilSparkAnimation();
 		void move();
 		void idleAnimation();
 		void jump();
@@ -429,6 +445,7 @@ namespace game {
 		void useEquippedWeapon();
 		void markForDestruction();
 		void detectEquippedMeleeWeaponHit();
+		void animateMeleeRecoilSpark();
 
 	private:
 		characterParams params;
