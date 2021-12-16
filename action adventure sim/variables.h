@@ -372,7 +372,7 @@ namespace game {
 			WHStruct size = { -1, -1 };
 
 
-			areaStruct area = { -1, -1, -1, -1 }, previousArea = { -1, -1, -1, -1 };
+			vector<areaStruct> areas, previousAreas;
 
 			spriteStruct sprite;
 
@@ -434,6 +434,7 @@ namespace game {
 		characterParams params;
 
 		void swapFrame();
+		void updateEquippedMeleeWeaponPreviousAreas();
 	};
 
 	vector<Character> characters;

@@ -4035,9 +4035,12 @@ void Character::renderReloadAnimation() {
 void Character::renderEquippedMeleeWeaponArea() {
 	if (areaWithinCameraView({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }) == true) {
 		SDL_Rect sRect = convertAreaToSDLRect(areaSprite.spriteSheetArea);
-		SDL_Rect dRect = { params.equippedMeleeWeapon.area.x - camera.area.x, params.equippedMeleeWeapon.area.y - camera.area.y, params.equippedMeleeWeapon.area.w, params.equippedMeleeWeapon.area.h };
 
-		SDL_RenderCopy(renderer, spriteSheets[areaSprite.spriteSheetIndex].texture, &sRect, &dRect);
+		for (int areasCnt = 0; areasCnt < (int)params.equippedMeleeWeapon.areas.size(); ++areasCnt) {
+			SDL_Rect dRect = { params.equippedMeleeWeapon.areas[areasCnt].x - camera.area.x, params.equippedMeleeWeapon.areas[areasCnt].y - camera.area.y, params.equippedMeleeWeapon.areas[areasCnt].w, params.equippedMeleeWeapon.areas[areasCnt].h };
+
+			SDL_RenderCopy(renderer, spriteSheets[areaSprite.spriteSheetIndex].texture, &sRect, &dRect);
+		}
 	}
 }
 
@@ -4504,54 +4507,82 @@ void Character::markForDestruction() {
 	}
 }
 
+void Character::updateEquippedMeleeWeaponPreviousAreas() {
+	params.equippedMeleeWeapon.previousAreas.clear();
+	
+	for (int areasCnt = 0; areasCnt < (int)params.equippedMeleeWeapon.areas.size(); ++areasCnt) {
+		params.equippedMeleeWeapon.previousAreas.push_back(params.equippedMeleeWeapon.areas[areasCnt]);
+	}
+}
+
 void Character::detectEquippedMeleeWeaponHit() {
 	if (params.equippedMeleeWeapon.swing.swinging == true && params.equippedMeleeWeapon.swing.recoil == false) {
 
-		if (params.equippedMeleeWeapon.area.x != -1) {
-			params.equippedMeleeWeapon.previousArea = params.equippedMeleeWeapon.area;
+		if ((int)params.equippedMeleeWeapon.areas.size() > 0 && params.equippedMeleeWeapon.areas[0].x != -1) {
+			updateEquippedMeleeWeaponPreviousAreas();
 		}
 
 		//Set source pixel area based on character direction
 		switch (params.direction) {
 			case directionEnum::up: {
-				params.equippedMeleeWeapon.area = { params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w * 2, params.equippedMeleeWeapon.size.w };
+				params.equippedMeleeWeapon.areas = {
+					{ params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w * 2, params.equippedMeleeWeapon.size.w }
+				};
 				break;
 			}
 			case directionEnum::down: {
-				params.equippedMeleeWeapon.area = { params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w * 2, params.equippedMeleeWeapon.size.w };
+				params.equippedMeleeWeapon.areas = {
+					{ params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w * 2, params.equippedMeleeWeapon.size.w }
+				};
 				break;
 			}
 			case directionEnum::left: {
-				params.equippedMeleeWeapon.area = { params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w * 2 };
+				params.equippedMeleeWeapon.areas = {
+					{ params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w * 2 }
+				};
 				break;
 			}
 			case directionEnum::right: {
-				params.equippedMeleeWeapon.area = { --;; };
+				params.equippedMeleeWeapon.areas = {
+					{ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w * 2 }
+				};
 				break;
 			}
 			case directionEnum::upRight: {
-				params.equippedMeleeWeapon.area = {  };
+				params.equippedMeleeWeapon.areas = { 
+					{ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w },
+					{ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w * 2, params.equippedMeleeWeapon.size.w }
+				};
 				break;
 			}
 			case directionEnum::downRight: {
-				params.equippedMeleeWeapon.area = {  };
+				params.equippedMeleeWeapon.areas = {
+
+				};
 				break;
 			}
 			case directionEnum::downLeft: {
-				params.equippedMeleeWeapon.area = {  };
+				params.equippedMeleeWeapon.areas = {
+
+				};
 				break;
 			}
 			case directionEnum::upLeft: {
-				params.equippedMeleeWeapon.area = {  };
+				params.equippedMeleeWeapon.areas = {
+
+				};
 				break;
 			}
 		}
 
-		if (params.equippedMeleeWeapon.previousArea.x == -1) {
-			params.equippedMeleeWeapon.previousArea = params.equippedMeleeWeapon.area;
+		if ((int)params.equippedMeleeWeapon.previousAreas.size() > 0 && params.equippedMeleeWeapon.previousAreas[0].x == -1 || (int)params.equippedMeleeWeapon.previousAreas.size() == 0) {
+			updateEquippedMeleeWeaponPreviousAreas();
 		}
 
-		collisionDataStruct collisionData = checkCollisionWithCharacter(params.equippedMeleeWeapon.area, params.equippedMeleeWeapon.previousArea, params.ID);
+		collisionDataStruct collisionData;
+		for (int areasCnt = 0; areasCnt < (int)params.equippedMeleeWeapon.areas.size() && collisionData.collision == false; ++areasCnt) {
+			collisionData = checkCollisionWithCharacter(params.equippedMeleeWeapon.areas[areasCnt], params.equippedMeleeWeapon.previousAreas[areasCnt], params.ID);
+		}
 
 		if (collisionData.collision == true && collisionData.instanceID != params.ID) {
 
