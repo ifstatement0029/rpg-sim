@@ -1846,7 +1846,7 @@ void initCharacters() {
 	controlledCharacterIndex = 0;
 	int characterID = 0;
 	XYStruct characterPosition = { 191, 193 };
-	for (int charactersCnt = 0; charactersCnt < 10; ++charactersCnt) {
+	for (int charactersCnt = 0; charactersCnt < 2; ++charactersCnt) {
 		characterParams currentCharacterParams;
 
 		currentCharacterParams.ID = characterID;
@@ -4534,56 +4534,63 @@ void Character::detectEquippedMeleeWeaponHit() {
 			updateEquippedMeleeWeaponPreviousAreas();
 		}
 
-		//Set source pixel area based on character direction
-		XYStruct meleeRecoilSparkPosition = { -1, -1 };
+		//Set source pixel area and melee recoil spark position based on character direction
+		//XYStruct meleeRecoilSparkPosition = { -1, -1 };
 		switch (params.direction) {
 			case directionEnum::up: {
 				params.equippedMeleeWeapon.areas = {
 					{ params.equippedMeleeWeapon.position.x - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
-				meleeRecoilSparkPosition = { --;; };
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x + (params.equippedMeleeWeapon.areas[0].w / 2), params.equippedMeleeWeapon.areas[0].y };
 				break;
 			}
 			case directionEnum::down: {
 				params.equippedMeleeWeapon.areas = {
 					{ params.equippedMeleeWeapon.position.x - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x + (params.equippedMeleeWeapon.areas[0].w / 2), params.equippedMeleeWeapon.areas[0].y + params.equippedMeleeWeapon.areas[0].h };
 				break;
 			}
 			case directionEnum::left: {
 				params.equippedMeleeWeapon.areas = {
 					{ params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x, params.equippedMeleeWeapon.areas[0].y + (params.equippedMeleeWeapon.areas[0].h / 2) };
 				break;
 			}
 			case directionEnum::right: {
 				params.equippedMeleeWeapon.areas = {
 					{ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x + params.equippedMeleeWeapon.areas[0].w, params.equippedMeleeWeapon.areas[0].y + (params.equippedMeleeWeapon.areas[0].h / 2) };
 				break;
 			}
 			case directionEnum::upRight: {
 				params.equippedMeleeWeapon.areas = { 
 					{ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x + params.equippedMeleeWeapon.areas[0].w, params.equippedMeleeWeapon.areas[0].y };
 				break;
 			}
 			case directionEnum::downRight: {
 				params.equippedMeleeWeapon.areas = {
 					{ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x + params.equippedMeleeWeapon.areas[0].w, params.equippedMeleeWeapon.areas[0].y + params.equippedMeleeWeapon.areas[0].h };
 				break;
 			}
 			case directionEnum::downLeft: {
 				params.equippedMeleeWeapon.areas = {
 					{ params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x, params.equippedMeleeWeapon.areas[0].y + params.equippedMeleeWeapon.areas[0].h };
 				break;
 			}
 			case directionEnum::upLeft: {
 				params.equippedMeleeWeapon.areas = {
 					{ params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x, params.equippedMeleeWeapon.areas[0].y };
 				break;
 			}
 		}
@@ -4613,8 +4620,9 @@ void Character::detectEquippedMeleeWeaponHit() {
 
 				//Init melee recoil spark
 				params.meleeRecoilSparkAnimation.active = true;
-				params.meleeRecoilSparkAnimation.position = meleeRecoilSparkPosition;
-				params.meleeRecoilSparkAnimation.size = tileSize;
+				params.meleeRecoilSparkAnimation.size = { tileSize.w * 2, tileSize.h * 2 };
+				params.meleeRecoilSparkAnimation.position = { (params.equippedMeleeWeapon.areas[0].x / 2) - (params.meleeRecoilSparkAnimation.size.w / 2), (params.equippedMeleeWeapon.areas[0].y / 2) - (params.meleeRecoilSparkAnimation.size.h / 2) };
+
 				params.meleeRecoilSparkAnimation.sprites.spriteSheetIndex = getSpriteSheetIndex("spark");
 				params.meleeRecoilSparkAnimation.sprites.areas = {
 					{
