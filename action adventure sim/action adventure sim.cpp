@@ -1926,13 +1926,13 @@ void initCharacters() {
 				};
 				currentCharacterParams.equippedMeleeWeapon.sprite.center = { 0, currentCharacterParams.equippedMeleeWeapon.sprite.areas[0][0].h / 2 };
 				currentCharacterParams.equippedMeleeWeapon.swing.delay.delay = 1;
-				currentCharacterParams.equippedMeleeWeapon.damage = 50;
+				currentCharacterParams.equippedMeleeWeapon.damage = 100;
 				currentCharacterParams.equippedMeleeWeapon.resistance = 50;
 				break;
 			}
 		}
 
-		currentCharacterParams.resistance = 100;
+		currentCharacterParams.resistance = 50;
 
 		Character currentCharacter(currentCharacterParams);
 		characters.push_back(currentCharacter);
@@ -4039,8 +4039,8 @@ void Character::renderEquippedMeleeWeaponArea() {
 	if (params.renderEquippedMeleeWeaponAreaBool == true && areaWithinCameraView({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }) == true) {
 		SDL_Rect sRect = convertAreaToSDLRect(areaSprite.spriteSheetArea);
 
-		for (int areasCnt = 0; areasCnt < (int)params.equippedMeleeWeapon.areas.size(); ++areasCnt) {
-			SDL_Rect dRect = { params.equippedMeleeWeapon.areas[areasCnt].x - camera.area.x, params.equippedMeleeWeapon.areas[areasCnt].y - camera.area.y, params.equippedMeleeWeapon.areas[areasCnt].w, params.equippedMeleeWeapon.areas[areasCnt].h };
+		for (int attackAreasCnt = 0; attackAreasCnt < (int)params.equippedMeleeWeapon.attackAreas.size(); ++attackAreasCnt) {
+			SDL_Rect dRect = { params.equippedMeleeWeapon.attackAreas[attackAreasCnt].x - camera.area.x, params.equippedMeleeWeapon.attackAreas[attackAreasCnt].y - camera.area.y, params.equippedMeleeWeapon.attackAreas[attackAreasCnt].w, params.equippedMeleeWeapon.attackAreas[attackAreasCnt].h };
 
 			SDL_RenderCopy(renderer, spriteSheets[areaSprite.spriteSheetIndex].texture, &sRect, &dRect);
 		}
@@ -4048,7 +4048,7 @@ void Character::renderEquippedMeleeWeaponArea() {
 }
 
 void Character::renderMeleeRecoilSparkAnimation() {
-	if (params.meleeRecoilSparkAnimation.active == true && areaWithinCameraView(params.equippedMeleeWeapon.areas[0]) == true) {
+	if (params.meleeRecoilSparkAnimation.active == true && areaWithinCameraView(params.equippedMeleeWeapon.attackAreas[0]) == true) {
 		SDL_Rect sRect = convertAreaToSDLRect(params.meleeRecoilSparkAnimation.sprites.areas[0][params.meleeRecoilSparkAnimation.currentFrame]);
 		SDL_Rect dRect = { params.meleeRecoilSparkAnimation.position.x - camera.area.x, params.meleeRecoilSparkAnimation.position.y - camera.area.y, params.meleeRecoilSparkAnimation.size.w, params.meleeRecoilSparkAnimation.size.h };
 
@@ -4520,17 +4520,17 @@ void Character::markForDestruction() {
 }
 
 void Character::updateEquippedMeleeWeaponPreviousAreas() {
-	params.equippedMeleeWeapon.previousAreas.clear();
+	params.equippedMeleeWeapon.previousAttackAreas.clear();
 	
-	for (int areasCnt = 0; areasCnt < (int)params.equippedMeleeWeapon.areas.size(); ++areasCnt) {
-		params.equippedMeleeWeapon.previousAreas.push_back(params.equippedMeleeWeapon.areas[areasCnt]);
+	for (int attackAreasCnt = 0; attackAreasCnt < (int)params.equippedMeleeWeapon.attackAreas.size(); ++attackAreasCnt) {
+		params.equippedMeleeWeapon.previousAttackAreas.push_back(params.equippedMeleeWeapon.attackAreas[attackAreasCnt]);
 	}
 }
 
 void Character::detectEquippedMeleeWeaponHit() {
 	if (params.equippedMeleeWeapon.swing.swinging == true && params.equippedMeleeWeapon.swing.recoil == false) {
 
-		if ((int)params.equippedMeleeWeapon.areas.size() > 0 && params.equippedMeleeWeapon.areas[0].x != -1) {
+		if ((int)params.equippedMeleeWeapon.attackAreas.size() > 0 && params.equippedMeleeWeapon.attackAreas[0].x != -1) {
 			updateEquippedMeleeWeaponPreviousAreas();
 		}
 
@@ -4538,56 +4538,56 @@ void Character::detectEquippedMeleeWeaponHit() {
 		//XYStruct meleeRecoilSparkPosition = { -1, -1 };
 		switch (params.direction) {
 			case directionEnum::up: {
-				params.equippedMeleeWeapon.areas = {
+				params.equippedMeleeWeapon.attackAreas = {
 					{ params.equippedMeleeWeapon.position.x - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
-				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x + (params.equippedMeleeWeapon.areas[0].w / 2), params.equippedMeleeWeapon.areas[0].y };
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.attackAreas[0].x + (params.equippedMeleeWeapon.attackAreas[0].w / 2), params.equippedMeleeWeapon.attackAreas[0].y };
 				break;
 			}
 			case directionEnum::down: {
-				params.equippedMeleeWeapon.areas = {
+				params.equippedMeleeWeapon.attackAreas = {
 					{ params.equippedMeleeWeapon.position.x - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
-				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x + (params.equippedMeleeWeapon.areas[0].w / 2), params.equippedMeleeWeapon.areas[0].y + params.equippedMeleeWeapon.areas[0].h };
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.attackAreas[0].x + (params.equippedMeleeWeapon.attackAreas[0].w / 2), params.equippedMeleeWeapon.attackAreas[0].y + params.equippedMeleeWeapon.attackAreas[0].h };
 				break;
 			}
 			case directionEnum::left: {
-				params.equippedMeleeWeapon.areas = {
+				params.equippedMeleeWeapon.attackAreas = {
 					{ params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
-				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x, params.equippedMeleeWeapon.areas[0].y + (params.equippedMeleeWeapon.areas[0].h / 2) };
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.attackAreas[0].x, params.equippedMeleeWeapon.attackAreas[0].y + (params.equippedMeleeWeapon.attackAreas[0].h / 2) };
 				break;
 			}
 			case directionEnum::right: {
-				params.equippedMeleeWeapon.areas = {
+				params.equippedMeleeWeapon.attackAreas = {
 					{ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
-				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x + params.equippedMeleeWeapon.areas[0].w, params.equippedMeleeWeapon.areas[0].y + (params.equippedMeleeWeapon.areas[0].h / 2) };
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.attackAreas[0].x + params.equippedMeleeWeapon.attackAreas[0].w, params.equippedMeleeWeapon.attackAreas[0].y + (params.equippedMeleeWeapon.attackAreas[0].h / 2) };
 				break;
 			}
 			case directionEnum::upRight: {
-				params.equippedMeleeWeapon.areas = { 
+				params.equippedMeleeWeapon.attackAreas = { 
 					{ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
-				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x + params.equippedMeleeWeapon.areas[0].w, params.equippedMeleeWeapon.areas[0].y };
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.attackAreas[0].x + params.equippedMeleeWeapon.attackAreas[0].w, params.equippedMeleeWeapon.attackAreas[0].y };
 				break;
 			}
 			case directionEnum::downRight: {
-				params.equippedMeleeWeapon.areas = {
+				params.equippedMeleeWeapon.attackAreas = {
 					{ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
-				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x + params.equippedMeleeWeapon.areas[0].w, params.equippedMeleeWeapon.areas[0].y + params.equippedMeleeWeapon.areas[0].h };
+				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.attackAreas[0].x + params.equippedMeleeWeapon.attackAreas[0].w, params.equippedMeleeWeapon.attackAreas[0].y + params.equippedMeleeWeapon.areas[0].h };
 				break;
 			}
 			case directionEnum::downLeft: {
-				params.equippedMeleeWeapon.areas = {
+				params.equippedMeleeWeapon.attackAreas = {
 					{ params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
 				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x, params.equippedMeleeWeapon.areas[0].y + params.equippedMeleeWeapon.areas[0].h };
 				break;
 			}
 			case directionEnum::upLeft: {
-				params.equippedMeleeWeapon.areas = {
+				params.equippedMeleeWeapon.attackAreas = {
 					{ params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w }
 				};
 				//meleeRecoilSparkPosition = { params.equippedMeleeWeapon.areas[0].x, params.equippedMeleeWeapon.areas[0].y };
@@ -4595,48 +4595,79 @@ void Character::detectEquippedMeleeWeaponHit() {
 			}
 		}
 
-		if ((int)params.equippedMeleeWeapon.previousAreas.size() > 0 && params.equippedMeleeWeapon.previousAreas[0].x == -1 || (int)params.equippedMeleeWeapon.previousAreas.size() == 0) {
+		if ((int)params.equippedMeleeWeapon.previousAttackAreas.size() > 0 && params.equippedMeleeWeapon.previousAttackAreas[0].x == -1 || (int)params.equippedMeleeWeapon.previousAttackAreas.size() == 0) {
 			updateEquippedMeleeWeaponPreviousAreas();
 		}
 
-		collisionDataStruct collisionData;
-		for (int areasCnt = 0; areasCnt < (int)params.equippedMeleeWeapon.areas.size() && collisionData.collision == false; ++areasCnt) {
-			collisionData = checkCollisionWithCharacter(params.equippedMeleeWeapon.areas[areasCnt], params.equippedMeleeWeapon.previousAreas[areasCnt], params.ID);
+		//Check collision with characters
+		collisionDataStruct characterCollisionData;
+		for (int areasCnt = 0; areasCnt < (int)params.equippedMeleeWeapon.attackAreas.size() && characterCollisionData.collision == false; ++areasCnt) {
+			characterCollisionData = checkCollisionWithCharacter(params.equippedMeleeWeapon.attackAreas[areasCnt], params.equippedMeleeWeapon.previousAttackAreas[areasCnt], params.ID);
 		}
+		
+		int characterIndex = getCharacterIndexByID(characterCollisionData.instanceID);
+		if (characters[characterIndex].getDisplaySprites() == true) {
+			if (characterCollisionData.collision == true && characterCollisionData.instanceID != params.ID) {
 
-		if (collisionData.collision == true && collisionData.instanceID != params.ID) {
+				//Update equipped melee weapon resistance
+				--params.equippedMeleeWeapon.resistance;
 
-			//Update equipped melee weapon resistance
-			--params.equippedMeleeWeapon.resistance;
+				//Update target character resistance
+				int characterResistance = characters[characterIndex].getResistance() - params.equippedMeleeWeapon.damage;
+				characters[characterIndex].setResistance(characterResistance);
 
-			//Get character index
-			int characterIndex = getCharacterIndexByID(collisionData.instanceID);
+				//If equipped melee weapon damage lower than character resistance then sword recoils
+				if (params.equippedMeleeWeapon.damage < characterResistance) {
+					params.equippedMeleeWeapon.swing.recoil = true;
+					params.equippedMeleeWeapon.swing.swingBack = false;
+					params.equippedMeleeWeapon.swing.endAngle = params.equippedMeleeWeapon.swing.startAngle + abs(params.equippedMeleeWeapon.swing.endAngle - params.equippedMeleeWeapon.swing.startAngle) / 2;
 
-			//If equipped melee weapon damage lower than character resistance then sword recoils
-			if (params.equippedMeleeWeapon.damage < characters[characterIndex].getResistance()) {
-				params.equippedMeleeWeapon.swing.recoil = true;
-				params.equippedMeleeWeapon.swing.swingBack = false;
-				params.equippedMeleeWeapon.swing.endAngle = params.equippedMeleeWeapon.swing.startAngle + abs(params.equippedMeleeWeapon.swing.endAngle - params.equippedMeleeWeapon.swing.startAngle) / 2;
+					//Init melee recoil spark
+					params.meleeRecoilSparkAnimation.active = true;
+					params.meleeRecoilSparkAnimation.size = { tileSize.w * 2, tileSize.h * 2 };
+					params.meleeRecoilSparkAnimation.position = { params.equippedMeleeWeapon.attackAreas[0].x + (params.equippedMeleeWeapon.size.w / 2) - (params.meleeRecoilSparkAnimation.size.w / 2), params.equippedMeleeWeapon.attackAreas[0].y + (params.equippedMeleeWeapon.size.h / 2) - (params.meleeRecoilSparkAnimation.size.h / 2) };
 
-				//Init melee recoil spark
-				params.meleeRecoilSparkAnimation.active = true;
-				params.meleeRecoilSparkAnimation.size = { tileSize.w * 2, tileSize.h * 2 };
-				params.meleeRecoilSparkAnimation.position = { (params.equippedMeleeWeapon.areas[0].x / 2) - (params.meleeRecoilSparkAnimation.size.w / 2), (params.equippedMeleeWeapon.areas[0].y / 2) - (params.meleeRecoilSparkAnimation.size.h / 2) };
+					params.meleeRecoilSparkAnimation.sprites.spriteSheetIndex = getSpriteSheetIndex("spark");
+					params.meleeRecoilSparkAnimation.sprites.areas = {
+						{
+							{ 47, 40, 112, 112 },
+							{ 205, 40, 112, 112 },
+							{ 363, 40, 112, 112 },
+							{ 522, 40, 112, 112 }
+						}
+					};
+					params.meleeRecoilSparkAnimation.frameDelay.delay = 100;
+					params.meleeRecoilSparkAnimation.currentFrame = 0;
 
-				params.meleeRecoilSparkAnimation.sprites.spriteSheetIndex = getSpriteSheetIndex("spark");
-				params.meleeRecoilSparkAnimation.sprites.areas = {
-					{
-						{ 47, 40, 112, 112 },
-						{ 205, 40, 112, 112 },
-						{ 363, 40, 112, 112 },
-						{ 522, 40, 112, 112 }
-					}
-				};
-				params.meleeRecoilSparkAnimation.frameDelay.delay = 100;
-				params.meleeRecoilSparkAnimation.currentFrame = 0;
+				}
+				else {
+
+					//Character explodes
+					explosionParamsStruct characterExplosion;
+					characterExplosion.ID = getFreeID(getExplosionIDs());
+					characterExplosion.overworldGridLayer = characters[characterIndex].getLayer();
+					areaStruct characterArea = characters[characterIndex].getSpriteSheetArea(characters[characterIndex].getDirection(), characters[characterIndex].getFrame());
+					characterExplosion.sprite.spriteSheetIndex = characters[characterIndex].getCharacterSpriteSheetIndex();
+					characterExplosion.sprite.areas = {
+						{
+							{
+								{ characterArea.x, characterArea.y, characterArea.w, characterArea.h }
+							}
+						}
+					};
+					characterExplosion.sprite.angle = params.sprites.angle;
+					characterExplosion.collisionData = characterCollisionData;
+					characterExplosion.force = params.equippedMeleeWeapon.damage;
+					int characterHeight = characters[characterIndex].getSize().h;
+					characterExplosion.shadowHeightRandMinMax = { characterHeight / 2, characterHeight };
+					//characterExplosion.totalFragments = { randInt(1, characterExplosion.sprite.areas[0][0].w), randInt(1, characterExplosion.sprite.areas[0][0].h) };
+					characterExplosion.totalFragments = { characterExplosion.sprite.areas[0][0].w / 4, characterExplosion.sprite.areas[0][0].h / 4 };
+					initExplosion(characterExplosion);
+
+					characters[characterIndex].setDisplaySprites(false);
+				}
 
 			}
-
 		}
 	}
 }

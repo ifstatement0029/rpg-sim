@@ -372,7 +372,7 @@ namespace game {
 			WHStruct size = { -1, -1 };
 
 
-			vector<areaStruct> areas, previousAreas;
+			vector<areaStruct> attackAreas, previousAttackAreas;
 
 			spriteStruct sprite;
 
