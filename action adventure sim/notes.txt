@@ -56,6 +56,7 @@ melee weapon:
 	- if melee weapon hits character, wall, object or bullet:
 		- if weapon damage < target resistance then recoil (swing weapon half way then back) - ;;
 			- have spark animation - ;;
+		- if weapon damage >= target resistance then character, wall, object or bullet explodes - ;;
 
 gear:
 
