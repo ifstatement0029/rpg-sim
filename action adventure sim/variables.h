@@ -298,7 +298,7 @@ namespace game {
 
 	vector<int> tablesToDestroyIDs;
 
-	int maxExplosions = 2;
+	int maxExplosions = 20;
 	vector<int> explosionsToDestroyIDs;
 
 	iconStruct areaSprite;

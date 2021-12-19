@@ -714,6 +714,10 @@ XYStruct getGridPosition(XYStruct position) {
 	return { lround((float)position.x / tileSize.w), lround((float)position.y / tileSize.h) };
 }
 
+XYStruct getPixelPosition(XYStruct position) {
+	return { position.x * tileSize.w, position.y * tileSize.h };
+}
+
 WHStruct getGridSize(WHStruct size) {
 	return { lround((float)size.w / tileSize.w), lround((float)size.h / tileSize.h) };
 }
@@ -2886,7 +2890,7 @@ void renderBackgroundCharactersAndObjects() {
 			for (int gridYCnt = overworldGrid.camera.y; gridYCnt < overworldGrid.camera.y + overworldGrid.camera.h + 1; ++gridYCnt) {
 				if (layersCnt >= 0 && layersCnt <= (int)overworldGrid.gridTile.size() - 1 && gridXCnt >= 0 && gridXCnt <= (int)overworldGrid.gridTile[layersCnt].size() - 1 && gridYCnt >= 0 && gridYCnt <= (int)overworldGrid.gridTile[layersCnt][gridXCnt].size() - 1 && overworldGrid.gridTile[layersCnt][gridXCnt][gridYCnt].tileIndex > -1) {
 
-					XYStruct tilePosition = { gridXCnt * tileSize.w, gridYCnt * tileSize.h };
+					XYStruct tilePosition = getPixelPosition({ gridXCnt, gridYCnt });
 
 					SDL_Rect sRect = convertAreaToSDLRect(tiles[overworldGrid.gridTile[layersCnt][gridXCnt][gridYCnt].tileIndex].spriteSheetArea);
 
@@ -4128,8 +4132,6 @@ void Character::move() {
 
 			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), { -1, -1, -1 -1 }, params.layer, params.jump.currentHeight);
 			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
-				/*XYStruct tilePixelPosition = { collisionData.collidePosition.x * tileSize.w, collisionData.collidePosition.y * tileSize.h };
-				params.position.x = tilePixelPosition.x + tileSize.w;*/
 				params.position.x += params.move.pixelIncrement;
 			}
 
@@ -4143,8 +4145,6 @@ void Character::move() {
 
 			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), { -1, -1, -1 - 1 }, params.layer, params.jump.currentHeight);
 			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
-				/*XYStruct tilePixelPosition = { collisionData.collidePosition.x * tileSize.w, collisionData.collidePosition.y * tileSize.h };
-				params.position.x = tilePixelPosition.x - params.size.w;*/
 				params.position.x -= params.move.pixelIncrement;
 			}
 
@@ -4158,8 +4158,6 @@ void Character::move() {
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), { -1, -1, -1 - 1 }, params.layer, params.jump.currentHeight);
 			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
-				/*XYStruct tilePixelPosition = { collisionData.collidePosition.x * tileSize.w, collisionData.collidePosition.y * tileSize.h };
-				params.position.y = tilePixelPosition.y + tileSize.h;*/
 				params.position.y += params.move.pixelIncrement;
 			}
 
@@ -4173,8 +4171,6 @@ void Character::move() {
 			
 			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), { -1, -1, -1 - 1 }, params.layer, params.jump.currentHeight);
 			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
-				/*XYStruct tilePixelPosition = { collisionData.collidePosition.x * tileSize.w, collisionData.collidePosition.y * tileSize.h };
-				params.position.y = tilePixelPosition.y - params.size.h;*/
 				params.position.y -= params.move.pixelIncrement;
 			}
 
@@ -4658,7 +4654,7 @@ void Character::detectEquippedMeleeWeaponHit() {
 		}
 
 		//Check collision with wall
-		collisionDataStruct wallCollisionData = checkCollisionWithOverworldGridFactoringHeight(params.equippedMeleeWeapon.attackArea, params.equippedMeleeWeapon.previousAttackArea, params.layer, params.jump.currentHeight);
+		collisionDataStruct wallCollisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea(params.equippedMeleeWeapon.attackArea), getGridAreaFromPixelArea(params.equippedMeleeWeapon.previousAttackArea), params.layer, params.jump.currentHeight);
 
 		if (wallCollisionData.collision == true) {
 
@@ -4666,10 +4662,10 @@ void Character::detectEquippedMeleeWeaponHit() {
 			--params.equippedMeleeWeapon.resistance;
 
 			//Update wall resistance
-			overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].resistance - params.equippedMeleeWeapon.damage;
+			overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].resistance -= params.equippedMeleeWeapon.damage;
 
 			//If weapon damage < wall resistance then recoil
-			if (params.equippedMeleeWeapon.damage < overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].resistance) {
+			if (overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].resistance > 0) {
 				recoil();
 			}
 			else {
@@ -4686,19 +4682,21 @@ void Character::detectEquippedMeleeWeaponHit() {
 						}
 					}
 				};
-				wallExplosion.sprite.angle = params.equippedMeleeWeapon.sprite.angle;;
+				wallExplosion.sprite.angle = params.equippedMeleeWeapon.sprite.angle;
 				wallExplosion.sprite.center = { randInt(0, wallExplosion.sprite.areas[0][0].w), randInt(0, wallExplosion.sprite.areas[0][0].h) };
 				wallExplosion.sprite.flip = randFlip({ { 0, 33 }, { 34, 66 }, { 67, 100 } });
 				wallExplosion.collisionData = wallCollisionData;
-				wallExplosion.collisionData.collidePosition = { wallCollisionData.collidePosition.x * tileSize.w, wallCollisionData.collidePosition.y * tileSize.h };
-				wallExplosion.force = params.equippedMeleeWeapon.damage;
+				wallExplosion.collisionData.collidePosition = getPixelPosition(wallCollisionData.collidePosition);
+				//wallExplosion.force = params.equippedMeleeWeapon.damage;
+				wallExplosion.force = 10;
 				wallExplosion.shadowHeightRandRange = { tileSize.h / 2, tileSize.h };
-				wallExplosion.totalFragments = { wallExplosion.sprite.areas[0][0].w / 2, wallExplosion.sprite.areas[0][0].h / 2 };
+				wallExplosion.totalFragments = { wallExplosion.sprite.areas[0][0].w / 4, wallExplosion.sprite.areas[0][0].h / 4 };
 				wallExplosion.fadeOut.delay = 2000;
 				initExplosion(wallExplosion);
 
 				//Remove wall from overworld grid
-
+				gridTileStruct blankTile;
+				overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y] = blankTile;
 
 			}
 
@@ -4988,7 +4986,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				};
 				newExplosionParams.sprite.angle = params.sprite.angle;
 				newExplosionParams.collisionData = overworldGridCollisionData;
-				newExplosionParams.collisionData.collidePosition = { newExplosionParams.collisionData.collidePosition.x * tileSize.w, newExplosionParams.collisionData.collidePosition.y * tileSize.h };
+				newExplosionParams.collisionData.collidePosition = getPixelPosition(newExplosionParams.collisionData.collidePosition);
 				newExplosionParams.force = force;
 				newExplosionParams.shadowHeightRandRange = { tileSize.h / 2, tileSize.h };
 				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
@@ -5360,10 +5358,9 @@ void Explosion::render() {
 
 	//Render all fragments
 	for (int fragmentsCnt = 0; fragmentsCnt < (int)params.fragments.size(); ++fragmentsCnt) {
-		SDL_Rect sRect = convertAreaToSDLRect(params.fragments[fragmentsCnt].sprite.areas[0][0]);
-		SDL_Rect dRect = { params.fragments[fragmentsCnt].position.x - camera.area.x, params.fragments[fragmentsCnt].position.y - camera.area.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h };
-
 		if (areaWithinCameraView({ params.fragments[fragmentsCnt].position.x, params.fragments[fragmentsCnt].position.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h }) == true) {
+			SDL_Rect sRect = convertAreaToSDLRect(params.fragments[fragmentsCnt].sprite.areas[0][0]);
+			SDL_Rect dRect = { params.fragments[fragmentsCnt].position.x - camera.area.x, params.fragments[fragmentsCnt].position.y - camera.area.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h };
 
 			//Set transparency
 			int percentageTimePassed = 0;
@@ -5377,6 +5374,7 @@ void Explosion::render() {
 				renderShadow({ dRect.x, dRect.y + params.fragments[fragmentsCnt].shadowHeight, dRect.w, dRect.h / 5 }, 50 - (percentageTimePassed / 2));
 			}
 
+			//Render fragment
 			SDLRenderCopyEx(sRect, dRect, params.fragments[fragmentsCnt].sprite);
 
 			//Reset transparency
