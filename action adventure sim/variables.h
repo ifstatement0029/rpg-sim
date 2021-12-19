@@ -303,6 +303,10 @@ namespace game {
 
 	iconStruct areaSprite;
 
+	struct flipPercentagesStruct { 
+		rangeStruct none, vertical, horizontal;
+	};
+
 	//classes start
 
 	struct characterParams {
@@ -567,7 +571,7 @@ namespace game {
 
 		int force = -1;
 
-		minMaxStruct shadowHeightRandMinMax;
+		rangeStruct shadowHeightRandRange;
 
 		bool fragmentIsEntireSprite = false, randomizeFragmentAngle = false;
 		XYStruct totalFragments = { -1, -1 };

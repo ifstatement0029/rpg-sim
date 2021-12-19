@@ -17,7 +17,7 @@ void pauseAtConsole() {
 	}
 }
 
-struct minMaxStruct {
+struct rangeStruct {
 	int min = -1, max = -1;
 };
 
