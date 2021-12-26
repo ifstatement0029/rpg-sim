@@ -340,7 +340,7 @@ namespace game {
 			directionEnum direction = directionEnum::up;
 		} jump;
 
-		enum class equippedWeaponTypeEnum { ranged, melee } equippedWeaponType = characterParams::equippedWeaponTypeEnum::melee;
+		enum class equippedWeaponTypeEnum { ranged, melee, throwable } equippedWeaponType = characterParams::equippedWeaponTypeEnum::melee;
 
 		struct rangedWeaponStruct {
 			string name = "";

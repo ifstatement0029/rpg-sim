@@ -1876,7 +1876,7 @@ void initCharacters() {
 		currentCharacterParams.layer = 1;
 
 		//Init equipped weapon
-		currentCharacterParams.equippedWeaponType = characterParams::equippedWeaponTypeEnum::melee;
+		currentCharacterParams.equippedWeaponType = characterParams::equippedWeaponTypeEnum::throwable;
 		switch (currentCharacterParams.equippedWeaponType) {
 			case characterParams::equippedWeaponTypeEnum::ranged: {
 				currentCharacterParams.equippedRangedWeapon.name = "Gun";
@@ -1916,6 +1916,18 @@ void initCharacters() {
 				currentCharacterParams.equippedMeleeWeapon.swing.delay.delay = 1;
 				currentCharacterParams.equippedMeleeWeapon.damage = 100;
 				currentCharacterParams.equippedMeleeWeapon.resistance = 100;
+				break;
+			}
+			case characterParams::equippedWeaponTypeEnum::throwable: {
+				currentCharacterParams.equippedMeleeWeapon.name = "Grenade";
+				currentCharacterParams.equippedMeleeWeapon.position = currentCharacterParams.position;
+				currentCharacterParams.equippedMeleeWeapon.size = { tileSize.w, tileSize.h };
+				currentCharacterParams.equippedMeleeWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("grenades");
+				currentCharacterParams.equippedMeleeWeapon.sprite.areas = {
+					{
+						{ --;; }
+					}
+				};
 				break;
 			}
 		}
