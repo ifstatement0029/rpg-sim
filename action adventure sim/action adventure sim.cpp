@@ -35,22 +35,6 @@ WHStruct getSDLTextureSize(SDL_Texture* texture) {
 	return textureSize;
 }
 
-//DO NOT USE. Does not work. Seems texture that is passed to function is not affected
-void initSDLTexture(SDL_Texture* texture, WHStruct size) {
-	WHStruct textureSize = getSDLTextureSize(texture);
-	if (texture == NULL || textureSize.w == -1) {
-		texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, size.w, size.h);
-	}
-}
-
-//DO NOT USE. Does not work. Seems texture that is passed to function is not affected
-void destroySDLTexture(SDL_Texture* texture) {
-	if (texture != NULL) {
-		SDL_DestroyTexture(texture);
-		texture = NULL;
-	}
-}
-
 void setSDLTextureTransparency(SDL_Texture* texture, int transparencyPercentage) {
 	/*SDL_BlendMode* blendMode = NULL;
 	SDL_GetTextureBlendMode(texture, blendMode);
@@ -285,7 +269,7 @@ void initWindowAndRenderer() {
 
 	//Init window
 	if (fullscreen == false) {
-		window = SDL_CreateWindow("game", 2560 - windowResolution.w - 10, 50, windowResolution.w, windowResolution.h, SDL_WINDOW_SHOWN);
+		window = SDL_CreateWindow("game", 1920 - windowResolution.w - 10, 50, windowResolution.w, windowResolution.h, SDL_WINDOW_SHOWN);
 	}
 	else {
 		window = SDL_CreateWindow("game", 0, 0, windowResolution.w, windowResolution.h, SDL_WINDOW_FULLSCREEN);
@@ -4198,9 +4182,10 @@ void Character::move() {
 		}
 
 		//Face where weapon is aimed if aiming weapon
-		if (rightStickYDir != 0 || rightStickXDir != 0) {
-			int angle = 0;
-			switch (params.equippedWeaponType) {
+		if (params.equippedMeleeWeapon.swing.swinging == false) {
+			if (rightStickYDir != 0 || rightStickXDir != 0) {
+				int angle = 0;
+				switch (params.equippedWeaponType) {
 				case characterParams::equippedWeaponTypeEnum::ranged: {
 					angle = (int)params.equippedRangedWeapon.sprite.angle;
 					break;
@@ -4209,31 +4194,32 @@ void Character::move() {
 					angle = (int)params.equippedMeleeWeapon.sprite.angle;
 					break;
 				}
-			}
-			int selectionAngle = 45, halfSelectionAngle = selectionAngle / 2;
-			if (angle >= -90 - halfSelectionAngle && angle <= -90 + halfSelectionAngle) {
-				params.direction = directionEnum::up;
-			}
-			else if (angle >= 90 - halfSelectionAngle && angle <= 90 + halfSelectionAngle) {
-				params.direction = directionEnum::down;
-			}
-			else if ((angle >= -180 && angle <= -180 + halfSelectionAngle) || (angle >= 180 - halfSelectionAngle && angle <= 180)) {
-				params.direction = directionEnum::left;
-			}
-			else if (angle >= -halfSelectionAngle && angle <= halfSelectionAngle) {
-				params.direction = directionEnum::right;
-			}
-			else if (angle >= -90 - halfSelectionAngle - selectionAngle && angle <= -90 - halfSelectionAngle) {
-				params.direction = directionEnum::upLeft;
-			}
-			else if (angle >= -90 + halfSelectionAngle && angle <= -90 + halfSelectionAngle + selectionAngle) {
-				params.direction = directionEnum::upRight;
-			}
-			else if (angle >= 90 + halfSelectionAngle && angle <= 90 + halfSelectionAngle + selectionAngle) {
-				params.direction = directionEnum::downLeft;
-			}
-			else if (angle >= 90 - halfSelectionAngle - selectionAngle && angle <= 90 - halfSelectionAngle) {
-				params.direction = directionEnum::downRight;
+				}
+				int selectionAngle = 45, halfSelectionAngle = selectionAngle / 2;
+				if (angle >= -90 - halfSelectionAngle && angle <= -90 + halfSelectionAngle) {
+					params.direction = directionEnum::up;
+				}
+				else if (angle >= 90 - halfSelectionAngle && angle <= 90 + halfSelectionAngle) {
+					params.direction = directionEnum::down;
+				}
+				else if ((angle >= -180 && angle <= -180 + halfSelectionAngle) || (angle >= 180 - halfSelectionAngle && angle <= 180)) {
+					params.direction = directionEnum::left;
+				}
+				else if (angle >= -halfSelectionAngle && angle <= halfSelectionAngle) {
+					params.direction = directionEnum::right;
+				}
+				else if (angle >= -90 - halfSelectionAngle - selectionAngle && angle <= -90 - halfSelectionAngle) {
+					params.direction = directionEnum::upLeft;
+				}
+				else if (angle >= -90 + halfSelectionAngle && angle <= -90 + halfSelectionAngle + selectionAngle) {
+					params.direction = directionEnum::upRight;
+				}
+				else if (angle >= 90 + halfSelectionAngle && angle <= 90 + halfSelectionAngle + selectionAngle) {
+					params.direction = directionEnum::downLeft;
+				}
+				else if (angle >= 90 - halfSelectionAngle - selectionAngle && angle <= 90 - halfSelectionAngle) {
+					params.direction = directionEnum::downRight;
+				}
 			}
 		}
 
@@ -4563,7 +4549,6 @@ void Character::detectEquippedMeleeWeaponHit() {
 		}
 
 		//Set source pixel area and melee recoil spark position based on character direction
-		//XYStruct meleeRecoilSparkPosition = { -1, -1 };
 		switch (params.direction) {
 			case directionEnum::up: {
 				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
@@ -4664,7 +4649,7 @@ void Character::detectEquippedMeleeWeaponHit() {
 			//Update wall resistance
 			overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].resistance -= params.equippedMeleeWeapon.damage;
 
-			//If weapon damage < wall resistance then recoil
+			//If wall resistance > 0 then recoil
 			if (overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].resistance > 0) {
 				recoil();
 			}
@@ -4691,7 +4676,6 @@ void Character::detectEquippedMeleeWeaponHit() {
 				wallExplosion.force = 10;
 				wallExplosion.shadowHeightRandRange = { tileSize.h / 2, tileSize.h };
 				wallExplosion.totalFragments = { wallExplosion.sprite.areas[0][0].w / 4, wallExplosion.sprite.areas[0][0].h / 4 };
-				wallExplosion.fadeOut.delay = 2000;
 				initExplosion(wallExplosion);
 
 				//Remove wall from overworld grid
@@ -4701,6 +4685,61 @@ void Character::detectEquippedMeleeWeaponHit() {
 			}
 
 		}
+
+		//Check collision with object
+		collisionDataStruct tableCollisionData = checkCollisionWithTable(params.equippedMeleeWeapon.attackArea, params.equippedMeleeWeapon.previousAttackArea);
+
+		if (tableCollisionData.collision == true) {
+			
+			//If table has not already exploded
+			int tableIndex = getTableIndexByID(tableCollisionData.instanceID);
+			if (tables[tableIndex].getDisplaySprite() == true) {
+
+				//Update equipped melee weapon resistance
+				--params.equippedMeleeWeapon.resistance;
+
+				//Update table resistance
+				int newTableResistance = tables[tableIndex].getResistance() - params.equippedMeleeWeapon.damage;
+				tables[tableIndex].setResistance(newTableResistance);
+
+				//If table resistance > 0 then recoil
+				if (newTableResistance > 0) {
+					recoil();
+				}
+				else {
+
+					//Table explodes
+					explosionParamsStruct tableExplosion;
+					tableExplosion.ID = getFreeID(getExplosionIDs());
+					tableExplosion.overworldGridLayer = tables[tableIndex].getLayer();
+					tableExplosion.sprite.spriteSheetIndex = tables[tableIndex].getTableSpriteSheetIndex();
+					tableExplosion.sprite.areas = {
+						{
+							{
+								tables[tableIndex].getSpriteSheetArea()
+							}
+						}
+					};
+					tableExplosion.sprite.angle = params.equippedMeleeWeapon.sprite.angle;
+					tableExplosion.sprite.center = { randInt(0, tableExplosion.sprite.areas[0][0].w), randInt(0, tableExplosion.sprite.areas[0][0].h) };
+					tableExplosion.sprite.flip = randFlip({ { 0, 33 }, { 34, 66 }, { 67, 100 } });
+					tableExplosion.collisionData = tableCollisionData;
+					tableExplosion.force = 10;
+					int tableHeight = tables[tableIndex].getHeight();
+					tableExplosion.shadowHeightRandRange = { tableHeight / 2, tableHeight };
+					tableExplosion.totalFragments = { tableExplosion.sprite.areas[0][0].w / 4, tableExplosion.sprite.areas[0][0].h / 4 };
+					initExplosion(tableExplosion);
+
+					tables[tableIndex].setDisplaySprite(false);
+				}
+
+			}
+
+		}
+
+		//Check collision with bullet
+		--;;
+
 	}
 }
 
@@ -4772,7 +4811,11 @@ areaStruct Table::getSpriteSheetArea() {
 	return params.sprite.areas[0][0];
 }
 
-void Table::setDisplaySprites(bool newDisplaySprite) {
+bool Table::getDisplaySprite() {
+	return params.displaySprite;
+}
+
+void Table::setDisplaySprite(bool newDisplaySprite) {
 	params.displaySprite = newDisplaySprite;
 }
 
@@ -5127,7 +5170,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 				initExplosion(newExplosionParams);
 
 				//Disable table sprite display
-				tables[tableIndex].setDisplaySprites(false);
+				tables[tableIndex].setDisplaySprite(false);
 				tables[tableIndex].setDestroy(true);
 
 				//Remove table collision from overworld grid

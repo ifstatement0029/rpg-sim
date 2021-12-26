@@ -22,7 +22,8 @@ namespace game {
 	SDL_Window* window = NULL;
 	//WHStruct windowResolution = { 3840, 2160 };
 	//WHStruct windowResolution = { 2560, 1440 };
-	WHStruct windowResolution = { 1920, 1080 };
+	//WHStruct windowResolution = { 1920, 1080 };
+	WHStruct windowResolution = { 1280, 720 };
 
 	int FPSCap = 60; // 0 for uncapped
 	bool vSyncOn = true;
@@ -491,7 +492,8 @@ namespace game {
 		int getStuckTolerancePercentage();
 		int getTableSpriteSheetIndex();
 		areaStruct getSpriteSheetArea();
-		void setDisplaySprites(bool newDisplaySprite);
+		bool getDisplaySprite();
+		void setDisplaySprite(bool newDisplaySprite);
 		void setDestroy(bool newDestroy);
 
 		void markForDestruction();
