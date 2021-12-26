@@ -4690,7 +4690,7 @@ void Character::detectEquippedMeleeWeaponHit() {
 		collisionDataStruct tableCollisionData = checkCollisionWithTable(params.equippedMeleeWeapon.attackArea, params.equippedMeleeWeapon.previousAttackArea);
 
 		if (tableCollisionData.collision == true) {
-			
+
 			//If table has not already exploded
 			int tableIndex = getTableIndexByID(tableCollisionData.instanceID);
 			if (tables[tableIndex].getDisplaySprite() == true) {
@@ -4738,8 +4738,54 @@ void Character::detectEquippedMeleeWeaponHit() {
 		}
 
 		//Check collision with bullet
-		--;;
+		collisionDataStruct bulletCollision = checkCollisionWithBullet(params.equippedMeleeWeapon.attackArea, params.equippedMeleeWeapon.previousAttackArea);
 
+		if (bulletCollision.collision == true) {
+
+			//If bullet has not already exploded
+			int bulletIndex = getBulletIndexByID(bulletCollision.instanceID);
+			if (bullets[bulletIndex].getDisplaySprite() == true) {
+
+				//Update equipped melee weapon resistance
+				--params.equippedMeleeWeapon.resistance;
+
+				//Update bullet resistance
+				int newBulletResistance = bullets[bulletIndex].getResistance() - params.equippedMeleeWeapon.damage;
+				bullets[bulletIndex].setResistance(newBulletResistance);
+
+				//If bullet resistance > 0 then recoil
+				if (newBulletResistance > 0) {
+					recoil();
+				}
+				else {
+
+					//Bullet explodes
+					explosionParamsStruct bulletExplosion;
+					bulletExplosion.ID = getFreeID(getExplosionIDs());
+					bulletExplosion.overworldGridLayer = params.layer;
+					bulletExplosion.sprite.spriteSheetIndex = bullets[bulletIndex].getBulletSpriteSheetIndex();
+					bulletExplosion.sprite.areas = {
+						{
+							{
+								bullets[bulletIndex].getSpriteSheetArea()
+							}
+						}
+					};
+					bulletExplosion.sprite.angle = params.equippedMeleeWeapon.sprite.angle;
+					bulletExplosion.collisionData = tableCollisionData;
+					bulletExplosion.force = 10;
+					int otherBulletHeight = bullets[bulletIndex].getSize().h;
+					bulletExplosion.shadowHeightRandRange = { otherBulletHeight / 2, otherBulletHeight };
+					bulletExplosion.totalFragments = { bulletExplosion.sprite.areas[0][0].w / 4, bulletExplosion.sprite.areas[0][0].h / 4 };
+					initExplosion(bulletExplosion);
+
+					//Disable other bullet sprite display
+					bullets[bulletIndex].setDisplaySprite(false);
+
+				}
+			}
+
+		}
 	}
 }
 
@@ -4867,6 +4913,10 @@ int Bullet::getBulletSpriteSheetIndex() {
 
 areaStruct Bullet::getSpriteSheetArea() {
 	return params.sprite.areas[0][0];
+}
+
+bool Bullet::getDisplaySprite() {
+	return params.displaySprite;
 }
 
 void Bullet::setDisplaySprite(bool newDisplaySprite) {
@@ -5251,7 +5301,7 @@ void Bullet::ricochetPenetrateOrStayStuck() {
 
 					//Disable other bullet sprite display
 					bullets[otherBulletIndex].setDisplaySprite(false);
-					bullets[otherBulletIndex].setDestroy(true);
+					//bullets[otherBulletIndex].setDestroy(true);
 
 				}
 

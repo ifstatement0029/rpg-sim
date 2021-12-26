@@ -544,6 +544,7 @@ namespace game {
 		int getStuckTolerancePercentage();
 		int getBulletSpriteSheetIndex();
 		areaStruct getSpriteSheetArea();
+		bool getDisplaySprite();
 		void setDisplaySprite(bool newDisplaySprite);
 		void setDestroy(bool newDestroy);
 		int getCharacterID();

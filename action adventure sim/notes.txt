@@ -57,7 +57,9 @@ melee weapon:
 	- if melee weapon hits character, wall, object or bullet:
 		- if weapon damage < target resistance then recoil (swing weapon half way then back) - done
 			- have spark animation - done
-		- if weapon damage >= target resistance then character, wall, object or bullet explodes - ;;
+		- if weapon damage >= target resistance then character, wall, object or bullet explodes - done
+throwable:
+	- press LB to hold throwable, ready for throw - ;;
 
 gear:
 
