@@ -1919,8 +1919,18 @@ void initCharacters() {
 				break;
 			}
 			case characterParams::equippedWeaponTypeEnum::throwable: {
-				
-				//{ 143, 67, 98, 117 }
+				currentCharacterParams.throwableWeapon.name = "Grenade";
+				currentCharacterParams.throwableWeapon.position = currentCharacterParams.position;
+				currentCharacterParams.throwableWeapon.size = tileSize;
+				currentCharacterParams.throwableWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("grenades");
+				currentCharacterParams.throwableWeapon.sprite.areas = {
+					{
+						{
+							{ 143, 67, 98, 117 }
+						}
+					}
+				};
+				currentCharacterParams.throwableWeapon.sprite.center = { currentCharacterParams.throwableWeapon.sprite.areas[0][0].w / 2, currentCharacterParams.throwableWeapon.sprite.areas[0][0].h / 2 };
 				break;
 			}
 		}
@@ -4011,6 +4021,11 @@ void Character::renderEquippedWeapon() {
 					SDLRenderCopyEx(sRect, dRect, params.equippedMeleeWeapon.sprite);
 				}
 
+				break;
+			}
+			case characterParams::equippedWeaponTypeEnum::throwable: {
+				SDL_Rect sRect = convertAreaToSDLRect(params.throwableWeapon.sprite.areas[0][0]);
+				SDL_Rect dRect = { --;; };
 				break;
 			}
 		}

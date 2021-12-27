@@ -397,8 +397,8 @@ namespace game {
 			XYStruct position = { -1, -1 };
 			WHStruct size = { -1, -1 };
 
-			--;;
-		};
+			spriteStruct sprite;
+		} throwableWeapon;
 
 		int resistance = -1, stuckTolerancePercentage = 10;
 
