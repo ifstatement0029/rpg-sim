@@ -1919,15 +1919,8 @@ void initCharacters() {
 				break;
 			}
 			case characterParams::equippedWeaponTypeEnum::throwable: {
-				currentCharacterParams.equippedMeleeWeapon.name = "Grenade";
-				currentCharacterParams.equippedMeleeWeapon.position = currentCharacterParams.position;
-				currentCharacterParams.equippedMeleeWeapon.size = { tileSize.w, tileSize.h };
-				currentCharacterParams.equippedMeleeWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("grenades");
-				currentCharacterParams.equippedMeleeWeapon.sprite.areas = {
-					{
-						{ --;; }
-					}
-				};
+				
+				//{ 143, 67, 98, 117 }
 				break;
 			}
 		}

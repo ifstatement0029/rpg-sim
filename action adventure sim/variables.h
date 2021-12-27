@@ -391,6 +391,15 @@ namespace game {
 			int damage = -1, resistance = -1;
 		} equippedMeleeWeapon;
 
+		struct throwableWeaponStruct {
+			string name = "";
+
+			XYStruct position = { -1, -1 };
+			WHStruct size = { -1, -1 };
+
+			--;;
+		};
+
 		int resistance = -1, stuckTolerancePercentage = 10;
 
 		bool destroy = false;
