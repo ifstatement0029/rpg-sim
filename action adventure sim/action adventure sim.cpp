@@ -1834,7 +1834,7 @@ void initCharacters() {
 	controlledCharacterIndex = 0;
 	int characterID = 0;
 	XYStruct characterPosition = { 191, 193 };
-	for (int charactersCnt = 0; charactersCnt < 2; ++charactersCnt) {
+	for (int charactersCnt = 0; charactersCnt < 20; ++charactersCnt) {
 		characterParams currentCharacterParams;
 
 		currentCharacterParams.ID = characterID;
@@ -1919,18 +1919,17 @@ void initCharacters() {
 				break;
 			}
 			case characterParams::equippedWeaponTypeEnum::throwable: {
-				currentCharacterParams.throwableWeapon.name = "Grenade";
-				currentCharacterParams.throwableWeapon.position = currentCharacterParams.position;
-				currentCharacterParams.throwableWeapon.size = tileSize;
-				currentCharacterParams.throwableWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("grenades");
-				currentCharacterParams.throwableWeapon.sprite.areas = {
+				currentCharacterParams.equippedThrowableWeapon.name = "Grenade";
+				currentCharacterParams.equippedThrowableWeapon.size = tileSize;
+				currentCharacterParams.equippedThrowableWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("grenades");
+				currentCharacterParams.equippedThrowableWeapon.sprite.areas = {
 					{
 						{
 							{ 143, 67, 98, 117 }
 						}
 					}
 				};
-				currentCharacterParams.throwableWeapon.sprite.center = { currentCharacterParams.throwableWeapon.sprite.areas[0][0].w / 2, currentCharacterParams.throwableWeapon.sprite.areas[0][0].h / 2 };
+				currentCharacterParams.equippedThrowableWeapon.sprite.center = { currentCharacterParams.equippedThrowableWeapon.sprite.areas[0][0].w / 2, currentCharacterParams.equippedThrowableWeapon.sprite.areas[0][0].h / 2 };
 				break;
 			}
 		}
@@ -2922,7 +2921,7 @@ void renderBackgroundCharactersAndObjects() {
 
 							//If character is facing up then render weapon before character
 							directionEnum characterDirection = characters[renderOrder[renderOrderCnt].index].getDirection();
-							if (characterDirection == directionEnum::up || characterDirection == directionEnum::upLeft || characterDirection == directionEnum::upRight || characterDirection == directionEnum::left) {
+							if (characterDirection == directionEnum::up || characterDirection == directionEnum::upLeft || characterDirection == directionEnum::downLeft || characterDirection == directionEnum::left) {
 								characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
 							}
 							
@@ -2930,7 +2929,7 @@ void renderBackgroundCharactersAndObjects() {
 							characters[renderOrder[renderOrderCnt].index].renderReloadAnimation();
 							
 							//If character if facing down then render weapon after character
-							if (characterDirection == directionEnum::down || characterDirection == directionEnum::downLeft || characterDirection == directionEnum::downRight || characterDirection == directionEnum::right) {
+							if (characterDirection == directionEnum::down || characterDirection == directionEnum::downRight || characterDirection == directionEnum::right || characterDirection == directionEnum::upRight) {
 								characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
 							}
 
@@ -3568,6 +3567,8 @@ void characterActions() {
 			characters[charactersCnt].useEquippedWeapon();
 			characters[charactersCnt].detectEquippedMeleeWeaponHit();
 			characters[charactersCnt].animateMeleeRecoilSpark();
+			characters[charactersCnt].readyEquippedThrowable();
+			characters[charactersCnt].aimEquippedThrowable();
 		}
 		else {
 			characters[charactersCnt].idleAnimation();
@@ -4024,8 +4025,86 @@ void Character::renderEquippedWeapon() {
 				break;
 			}
 			case characterParams::equippedWeaponTypeEnum::throwable: {
-				SDL_Rect sRect = convertAreaToSDLRect(params.throwableWeapon.sprite.areas[0][0]);
-				SDL_Rect dRect = { --;; };
+				
+				//Update position for when throwable is not readied
+				if (params.equippedThrowableWeapon.readied == false) {
+					switch (params.direction) {
+						case directionEnum::down: {
+							params.equippedThrowableWeapon.position = { params.position.x, params.position.y + (params.size.h / 2) };
+							break;
+						}
+						case directionEnum::up: {
+							params.equippedThrowableWeapon.position = { params.position.x + params.size.w, params.position.y + (params.size.h / 2) };
+							break;
+						}
+						case directionEnum::left: {
+							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+							break;
+						}
+						case directionEnum::right: {
+							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+							break;
+						}
+						case directionEnum::upRight: {
+							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+							break;
+						}
+						case directionEnum::upLeft: {
+							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+							break;
+						}
+						case directionEnum::downRight: {
+							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+							break;
+						}
+						case directionEnum::downLeft: {
+							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+							break;
+						}
+					}
+				}
+				else {
+					switch (params.direction) {
+						case directionEnum::down: {
+							params.equippedThrowableWeapon.position = { params.position.x, params.position.y };
+							break;
+						}
+						case directionEnum::up: {
+							params.equippedThrowableWeapon.position = { params.position.x + params.size.w, params.position.y };
+							break;
+						}
+						case directionEnum::left: {
+							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
+							break;
+						}
+						case directionEnum::right: {
+							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
+							break;
+						}
+						case directionEnum::upRight: {
+							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
+							break;
+						}
+						case directionEnum::upLeft: {
+							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
+							break;
+						}
+						case directionEnum::downRight: {
+							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
+							break;
+						}
+						case directionEnum::downLeft: {
+							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
+							break;
+						}
+					}
+				}
+				
+				//Render throwable
+				SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.sprite.areas[0][0]);
+				SDL_Rect dRect = { params.equippedThrowableWeapon.position.x - camera.area.x, params.equippedThrowableWeapon.position.y - camera.area.y, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h };
+				SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.sprite);
+
 				break;
 			}
 		}
@@ -4206,14 +4285,18 @@ void Character::move() {
 			if (rightStickYDir != 0 || rightStickXDir != 0) {
 				int angle = 0;
 				switch (params.equippedWeaponType) {
-				case characterParams::equippedWeaponTypeEnum::ranged: {
-					angle = (int)params.equippedRangedWeapon.sprite.angle;
-					break;
-				}
-				case characterParams::equippedWeaponTypeEnum::melee: {
-					angle = (int)params.equippedMeleeWeapon.sprite.angle;
-					break;
-				}
+					case characterParams::equippedWeaponTypeEnum::ranged: {
+						angle = (int)params.equippedRangedWeapon.sprite.angle;
+						break;
+					}
+					case characterParams::equippedWeaponTypeEnum::melee: {
+						angle = (int)params.equippedMeleeWeapon.sprite.angle;
+						break;
+					}
+					case characterParams::equippedWeaponTypeEnum::throwable: {
+						angle = (int)params.equippedThrowableWeapon.sprite.angle;
+						break;
+					}
 				}
 				int selectionAngle = 45, halfSelectionAngle = selectionAngle / 2;
 				if (angle >= -90 - halfSelectionAngle && angle <= -90 + halfSelectionAngle) {
@@ -4496,6 +4579,10 @@ void Character::useEquippedWeapon() {
 					params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.startAngle;
 					params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
 				}
+				break;
+			}
+			case characterParams::equippedWeaponTypeEnum::throwable: {
+
 				break;
 			}
 		}
@@ -4819,6 +4906,18 @@ void Character::animateMeleeRecoilSpark() {
 		else {
 			params.meleeRecoilSparkAnimation.active = false;
 		}
+	}
+}
+
+void Character::readyEquippedThrowable() {
+	if (params.equippedWeaponType == characterParams::equippedWeaponTypeEnum::throwable) {
+		params.equippedThrowableWeapon.readied = controllerButtons.LB;
+	}
+}
+
+void Character::aimEquippedThrowable() {
+	if (params.equippedWeaponType == characterParams::equippedWeaponTypeEnum::throwable) {
+		--;;
 	}
 }
 

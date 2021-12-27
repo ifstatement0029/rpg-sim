@@ -59,10 +59,10 @@ melee weapon:
 			- have spark animation - done
 		- if weapon damage >= target resistance then character, wall, object or bullet explodes - done
 throwable:
-	- press LB to hold throwable, ready for throw - ;;
+	- press LB to hold throwable, ready for throw - done
 	- press RB to throw
 	- right stick:
-		- aim
+		- aim - ;;
 		- tilt determines throw distance
 
 gear:

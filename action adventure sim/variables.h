@@ -329,7 +329,7 @@ namespace game {
 		} move;
 
 		struct idleAnimationStruct {
-			delayStruct delayBeforeAnimation = { SDL_GetTicks(), 60000 }, frameDuration = { 0, 0 };
+			delayStruct delayBeforeAnimation = { SDL_GetTicks(), 5000 }, frameDuration = { 0, 0 };
 			bool animationRunning = false;
 		} idleAnimation;
 
@@ -398,7 +398,9 @@ namespace game {
 			WHStruct size = { -1, -1 };
 
 			spriteStruct sprite;
-		} throwableWeapon;
+
+			bool readied = false;
+		} equippedThrowableWeapon;
 
 		int resistance = -1, stuckTolerancePercentage = 10;
 
@@ -460,6 +462,8 @@ namespace game {
 		void markForDestruction();
 		void detectEquippedMeleeWeaponHit();
 		void animateMeleeRecoilSpark();
+		void readyEquippedThrowable();
+		void aimEquippedThrowable();
 
 	private:
 		characterParams params;
