@@ -469,7 +469,6 @@ namespace game {
 		void detectEquippedMeleeWeaponHit();
 		void animateMeleeRecoilSpark();
 		void readyEquippedThrowable();
-		void aimEquippedThrowable();
 
 	private:
 		characterParams params;

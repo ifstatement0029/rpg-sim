@@ -1929,7 +1929,7 @@ void initCharacters() {
 						}
 					}
 				};
-				currentCharacterParams.equippedThrowableWeapon.sprite.center = { currentCharacterParams.equippedThrowableWeapon.sprite.areas[0][0].w / 2, currentCharacterParams.equippedThrowableWeapon.sprite.areas[0][0].h / 2 };
+				currentCharacterParams.equippedThrowableWeapon.sprite.center = { 0, currentCharacterParams.equippedThrowableWeapon.sprite.areas[0][0].h / 2 };
 				currentCharacterParams.equippedThrowableWeapon.indicator.size = { tileSize.w * 2, tileSize.h * 2 };
 				currentCharacterParams.equippedThrowableWeapon.indicator.sprite.spriteSheetIndex = getSpriteSheetIndex("throwable indicator");
 				currentCharacterParams.equippedThrowableWeapon.indicator.sprite.areas = {
@@ -3578,7 +3578,6 @@ void characterActions() {
 			characters[charactersCnt].detectEquippedMeleeWeaponHit();
 			characters[charactersCnt].animateMeleeRecoilSpark();
 			characters[charactersCnt].readyEquippedThrowable();
-			characters[charactersCnt].aimEquippedThrowable();
 		}
 		else {
 			characters[charactersCnt].idleAnimation();
@@ -3948,6 +3947,15 @@ void Character::updateEquippedWeaponAngle() {
 			}
 			break;
 		}
+		case characterParams::equippedWeaponTypeEnum::throwable: {
+			if (rightStickXDir != 0 || rightStickYDir != 0) {
+				params.equippedThrowableWeapon.indicator.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+			}
+			else if (xDir != 0 || yDir != 0) {
+				params.equippedThrowableWeapon.indicator.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+			}
+			break;
+		}
 	}
 }
 
@@ -3958,14 +3966,6 @@ void Character::renderEquippedWeapon() {
 
 				//Update position
 				params.equippedRangedWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedRangedWeapon.sprite.areas[0][0].h / 2) };
-
-				//Get weapon angle
-				/*if (rightStickXDir != 0 || rightStickYDir != 0) {
-					params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
-				}
-				else if (xDir != 0 || yDir != 0) {
-					params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
-				}*/
 
 				//Flip weapon and adjust position
 				if (params.equippedRangedWeapon.sprite.angle >= -90 && params.equippedRangedWeapon.sprite.angle <= 90) {
@@ -3994,16 +3994,6 @@ void Character::renderEquippedWeapon() {
 
 				//Update position
 				params.equippedMeleeWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedMeleeWeapon.sprite.areas[0][0].h / 2) };
-
-				//Get weapon angle
-				/*if (params.equippedMeleeWeapon.swing.swinging == false) {
-					if (rightStickXDir != 0 || rightStickYDir != 0) {
-						params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
-					}
-					else if (xDir != 0 || yDir != 0) {
-						params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
-					}
-				}*/
 
 				//Flip weapon and adjust position
 				if (params.equippedMeleeWeapon.sprite.angle >= -90 && params.equippedMeleeWeapon.sprite.angle <= 90) {
@@ -4035,9 +4025,9 @@ void Character::renderEquippedWeapon() {
 				break;
 			}
 			case characterParams::equippedWeaponTypeEnum::throwable: {
-				
-				//Update position for when throwable is not readied
 				if (params.equippedThrowableWeapon.readied == false) {
+					
+					//Update position for when throwable is not readied
 					switch (params.direction) {
 						case directionEnum::down: {
 							params.equippedThrowableWeapon.position = { params.position.x, params.position.y + (params.size.h / 2) };
@@ -4072,8 +4062,11 @@ void Character::renderEquippedWeapon() {
 							break;
 						}
 					}
+
 				}
 				else {
+
+					//Update position for when throwable is readied
 					switch (params.direction) {
 						case directionEnum::down: {
 							params.equippedThrowableWeapon.position = { params.position.x, params.position.y };
@@ -4108,6 +4101,7 @@ void Character::renderEquippedWeapon() {
 							break;
 						}
 					}
+
 				}
 				
 				//Render throwable
@@ -4121,7 +4115,21 @@ void Character::renderEquippedWeapon() {
 				if (params.equippedThrowableWeapon.readied == true) {
 
 					//Update position
-					params.equippedThrowableWeapon.indicator.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+					params.equippedThrowableWeapon.indicator.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedThrowableWeapon.indicator.sprite.areas[0][0].h / 2) };
+
+					//Flip weapon and adjust position
+					if (params.equippedThrowableWeapon.indicator.sprite.angle >= -90 && params.equippedThrowableWeapon.indicator.sprite.angle <= 90) {
+
+						//Weapon is facing right
+						params.equippedThrowableWeapon.indicator.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+
+					}
+					else {
+
+						//Weapon is facing left
+						params.equippedThrowableWeapon.indicator.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
+
+					}
 
 					//Render
 					if (areaWithinCameraView({ params.equippedThrowableWeapon.indicator.position.x, params.equippedThrowableWeapon.indicator.position.y, params.equippedThrowableWeapon.indicator.size.w, params.equippedThrowableWeapon.indicator.size.h }) == true) {
@@ -4939,12 +4947,6 @@ void Character::animateMeleeRecoilSpark() {
 void Character::readyEquippedThrowable() {
 	if (params.equippedWeaponType == characterParams::equippedWeaponTypeEnum::throwable) {
 		params.equippedThrowableWeapon.readied = controllerButtons.LB;
-	}
-}
-
-void Character::aimEquippedThrowable() {
-	if (params.equippedWeaponType == characterParams::equippedWeaponTypeEnum::throwable) {
-		params.equippedThrowableWeapon.indicator.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
 	}
 }
 
