@@ -1930,6 +1930,16 @@ void initCharacters() {
 					}
 				};
 				currentCharacterParams.equippedThrowableWeapon.sprite.center = { currentCharacterParams.equippedThrowableWeapon.sprite.areas[0][0].w / 2, currentCharacterParams.equippedThrowableWeapon.sprite.areas[0][0].h / 2 };
+				currentCharacterParams.equippedThrowableWeapon.indicator.size = { tileSize.w * 2, tileSize.h * 2 };
+				currentCharacterParams.equippedThrowableWeapon.indicator.sprite.spriteSheetIndex = getSpriteSheetIndex("throwable indicator");
+				currentCharacterParams.equippedThrowableWeapon.indicator.sprite.areas = {
+					{
+						{
+							{ 644, 94, 56, 60 }
+						}
+					}
+				};
+				currentCharacterParams.equippedThrowableWeapon.indicator.sprite.center = { 0, currentCharacterParams.equippedThrowableWeapon.indicator.sprite.areas[0][0].h / 2 };
 				break;
 			}
 		}
@@ -4101,9 +4111,26 @@ void Character::renderEquippedWeapon() {
 				}
 				
 				//Render throwable
-				SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.sprite.areas[0][0]);
-				SDL_Rect dRect = { params.equippedThrowableWeapon.position.x - camera.area.x, params.equippedThrowableWeapon.position.y - camera.area.y, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h };
-				SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.sprite);
+				if (areaWithinCameraView({ params.equippedThrowableWeapon.position.x, params.equippedThrowableWeapon.position.y, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h }) == true) {
+					SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.sprite.areas[0][0]);
+					SDL_Rect dRect = { params.equippedThrowableWeapon.position.x - camera.area.x, params.equippedThrowableWeapon.position.y - camera.area.y, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h };
+					SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.sprite);
+				}
+
+				//Render throwable indicator
+				if (params.equippedThrowableWeapon.readied == true) {
+
+					//Update position
+					params.equippedThrowableWeapon.indicator.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+
+					//Render
+					if (areaWithinCameraView({ params.equippedThrowableWeapon.indicator.position.x, params.equippedThrowableWeapon.indicator.position.y, params.equippedThrowableWeapon.indicator.size.w, params.equippedThrowableWeapon.indicator.size.h }) == true) {
+						SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.indicator.sprite.areas[0][0]);
+						SDL_Rect dRect = { params.equippedThrowableWeapon.indicator.position.x - camera.area.x, params.equippedThrowableWeapon.indicator.position.y - camera.area.y, params.equippedThrowableWeapon.indicator.size.w, params.equippedThrowableWeapon.indicator.size.h };
+						SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.indicator.sprite);
+					}
+
+				}
 
 				break;
 			}
@@ -4294,7 +4321,7 @@ void Character::move() {
 						break;
 					}
 					case characterParams::equippedWeaponTypeEnum::throwable: {
-						angle = (int)params.equippedThrowableWeapon.sprite.angle;
+						angle = params.equippedThrowableWeapon.indicator.sprite.angle;
 						break;
 					}
 				}
@@ -4917,7 +4944,7 @@ void Character::readyEquippedThrowable() {
 
 void Character::aimEquippedThrowable() {
 	if (params.equippedWeaponType == characterParams::equippedWeaponTypeEnum::throwable) {
-		--;;
+		params.equippedThrowableWeapon.indicator.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
 	}
 }
 

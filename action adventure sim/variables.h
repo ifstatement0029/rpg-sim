@@ -400,6 +400,12 @@ namespace game {
 			spriteStruct sprite;
 
 			bool readied = false;
+
+			struct indicatorStruct {
+				XYStruct position = { -1, -1 };
+				WHStruct size = { -1, -1 };
+				spriteStruct sprite;
+			} indicator;
 		} equippedThrowableWeapon;
 
 		int resistance = -1, stuckTolerancePercentage = 10;
