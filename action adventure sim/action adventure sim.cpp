@@ -1930,12 +1930,12 @@ void initCharacters() {
 					}
 				};
 				currentCharacterParams.equippedThrowableWeapon.sprite.center = { 0, currentCharacterParams.equippedThrowableWeapon.sprite.areas[0][0].h / 2 };
-				currentCharacterParams.equippedThrowableWeapon.indicator.size = { tileSize.w * 2, tileSize.h * 2 };
+				currentCharacterParams.equippedThrowableWeapon.indicator.size = { tileSize.w, tileSize.h * 2 };
 				currentCharacterParams.equippedThrowableWeapon.indicator.sprite.spriteSheetIndex = getSpriteSheetIndex("throwable indicator");
 				currentCharacterParams.equippedThrowableWeapon.indicator.sprite.areas = {
 					{
 						{
-							{ 644, 94, 56, 60 }
+							{ 724, 94, 36, 61 }
 						}
 					}
 				};
@@ -4115,7 +4115,7 @@ void Character::renderEquippedWeapon() {
 				if (params.equippedThrowableWeapon.readied == true) {
 
 					//Update position
-					params.equippedThrowableWeapon.indicator.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedThrowableWeapon.indicator.sprite.areas[0][0].h / 2) };
+					params.equippedThrowableWeapon.indicator.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedThrowableWeapon.indicator.size.h / 2) };
 
 					//Flip weapon and adjust position
 					if (params.equippedThrowableWeapon.indicator.sprite.angle >= -90 && params.equippedThrowableWeapon.indicator.sprite.angle <= 90) {
