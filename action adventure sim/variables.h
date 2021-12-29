@@ -405,7 +405,19 @@ namespace game {
 				XYStruct position = { -1, -1 };
 				WHStruct size = { -1, -1 };
 				spriteStruct sprite;
-			} indicator;
+			};
+
+			indicatorStruct aimIndicator;
+
+			struct throwDistanceStruct {
+				int max = -1, current = 0;
+			} throwDistance;
+
+			struct throwIndicatorStruct {
+				WHStruct maxSize = { -1, -1 };
+				indicatorStruct indicator;
+				int frame = 0, sizeIncrementMultiplier = -1, sizePixelIncrement = 1;
+			} throwIndicator;
 		} equippedThrowableWeapon;
 
 		int resistance = -1, stuckTolerancePercentage = 10;

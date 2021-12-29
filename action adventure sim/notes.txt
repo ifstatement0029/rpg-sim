@@ -62,8 +62,8 @@ throwable:
 	- press LB to hold throwable, ready for throw - done
 	- press RB to throw
 	- right stick:
-		- aim - ;;
-		- tilt determines throw distance
+		- aim (show indicator) - done
+		- tilt determines throw distance - ;;
 
 gear:
 
