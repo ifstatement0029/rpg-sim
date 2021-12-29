@@ -4217,13 +4217,21 @@ void Character::renderEquippedWeapon() {
 
 					}
 
-					//Update throw arc indicator position and size
-					params.equippedThrowableWeapon.throwArcIndicator.position = params.equippedThrowableWeapon.position;
-					params.equippedThrowableWeapon.throwArcIndicator.size = { abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.x - params.equippedThrowableWeapon.throwArcIndicator.position.x), abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.y - params.equippedThrowableWeapon.throwArcIndicator.position.y) };
-
 					//Update throw arc indicator angle and flip
 					params.equippedThrowableWeapon.throwArcIndicator.sprite.angle = params.equippedThrowableWeapon.aimIndicator.sprite.angle;
 					params.equippedThrowableWeapon.throwArcIndicator.sprite.flip = params.equippedThrowableWeapon.aimIndicator.sprite.flip;
+
+					//Update throw arc indicator position and size
+					params.equippedThrowableWeapon.throwArcIndicator.position = params.equippedThrowableWeapon.position;
+					params.equippedThrowableWeapon.throwArcIndicator.size = { abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.x - params.equippedThrowableWeapon.throwArcIndicator.position.x), tileSize.h };
+					/*if ((params.equippedThrowableWeapon.throwArcIndicator.sprite.angle >= (double)-45 && params.equippedThrowableWeapon.throwArcIndicator.sprite.angle <= (double)45)
+						|| (params.equippedThrowableWeapon.throwArcIndicator.sprite.angle >= (double)-180 && params.equippedThrowableWeapon.throwArcIndicator.sprite.angle <= (double)-180 + 45)
+						|| (params.equippedThrowableWeapon.throwArcIndicator.sprite.angle >= (double)180 - 45 && params.equippedThrowableWeapon.throwArcIndicator.sprite.angle <= (double)180)) {
+						params.equippedThrowableWeapon.throwArcIndicator.size = { abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.x - params.equippedThrowableWeapon.throwArcIndicator.position.x), tileSize.h };
+					}
+					else {
+						params.equippedThrowableWeapon.throwArcIndicator.size = { tileSize.w, abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.y - params.equippedThrowableWeapon.throwArcIndicator.position.y)};
+					}*/
 
 					//Render throw arc indicator
 					if (areaWithinCameraView({ params.equippedThrowableWeapon.throwArcIndicator.position.x, params.equippedThrowableWeapon.throwArcIndicator.position.y - params.jump.currentHeight, params.equippedThrowableWeapon.throwArcIndicator.size.w, params.equippedThrowableWeapon.throwArcIndicator.size.h }) == true) {
