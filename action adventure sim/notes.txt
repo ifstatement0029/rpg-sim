@@ -60,10 +60,10 @@ melee weapon:
 		- if weapon damage >= target resistance then character, wall, object or bullet explodes - done
 throwable:
 	- press LB to hold throwable, ready for throw - done
-	- press RB to throw
+	- press RB to throw - ;;
 	- right stick:
 		- aim (show indicator) - done
-		- tilt determines throw distance - ;;
+		- tilt determines throw distance - done
 
 gear:
 

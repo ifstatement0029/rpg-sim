@@ -340,7 +340,7 @@ namespace game {
 			directionEnum direction = directionEnum::up;
 		} jump;
 
-		enum class equippedWeaponTypeEnum { ranged, melee, throwable } equippedWeaponType = characterParams::equippedWeaponTypeEnum::melee;
+		enum class equippedWeaponTypeEnum { none, ranged, melee, throwable } equippedWeaponType = characterParams::equippedWeaponTypeEnum::melee;
 
 		struct rangedWeaponStruct {
 			string name = "";
@@ -423,6 +423,12 @@ namespace game {
 			} throwIndicator;
 
 			indicatorStruct throwArcIndicator;
+
+			struct throwableThrowStruct {
+				bool thrown = false;
+				delayStruct delay;
+				int pixelIncrement = 1;
+			} throwableThrow;
 		} equippedThrowableWeapon;
 
 		int resistance = -1, stuckTolerancePercentage = 10;
@@ -486,6 +492,7 @@ namespace game {
 		void detectEquippedMeleeWeaponHit();
 		void animateMeleeRecoilSpark();
 		void readyEquippedThrowable();
+		void throwEquippedThrowable();
 
 	private:
 		characterParams params;
