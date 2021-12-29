@@ -416,7 +416,10 @@ namespace game {
 			struct throwIndicatorStruct {
 				WHStruct maxSize = { -1, -1 };
 				indicatorStruct indicator;
+				
 				int frame = 0, sizeIncrementMultiplier = -1, sizePixelIncrement = 1;
+
+				delayStruct sizeUpdateDelay, frameSwapDelay;
 			} throwIndicator;
 		} equippedThrowableWeapon;
 

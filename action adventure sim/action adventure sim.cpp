@@ -1940,7 +1940,7 @@ void initCharacters() {
 					}
 				};
 				currentCharacterParams.equippedThrowableWeapon.throwDistance.max = currentCharacterParams.size.w * randInt(2, 4);
-				currentCharacterParams.equippedThrowableWeapon.throwIndicator.maxSize = tileSize;
+				currentCharacterParams.equippedThrowableWeapon.throwIndicator.maxSize = { tileSize.w * 2, tileSize.h * 2 };
 				currentCharacterParams.equippedThrowableWeapon.throwIndicator.indicator.size = currentCharacterParams.equippedThrowableWeapon.throwIndicator.maxSize;
 				currentCharacterParams.equippedThrowableWeapon.throwIndicator.indicator.sprite.spriteSheetIndex = getSpriteSheetIndex("throwable throw indicator");
 				currentCharacterParams.equippedThrowableWeapon.throwIndicator.indicator.sprite.areas = {
@@ -1951,6 +1951,10 @@ void initCharacters() {
 						}
 					}
 				};
+				currentCharacterParams.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.startTicks = SDL_GetTicks();
+				currentCharacterParams.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.delay = 1;
+				currentCharacterParams.equippedThrowableWeapon.throwIndicator.frameSwapDelay.startTicks = SDL_GetTicks();
+				currentCharacterParams.equippedThrowableWeapon.throwIndicator.frameSwapDelay.delay = 100;
 				break;
 			}
 		}
@@ -3678,10 +3682,11 @@ const double convertCoordinatesToAngle(int x, int y) {
 	return (atan2(y, x)) * (180 / M_PI);
 }
 
-XYStruct convertAngleToCoordinates(double angle, int radius) {
+XYStruct convertAngleToCoordinates(double angleInDegrees, int radius) {
 	XYStruct coordinates = { -1, -1 };
-	coordinates.x = (int)(radius * cos(angle));
-	coordinates.y = (int)(radius * sin(angle));
+	double angleInRadians = (M_PI * angleInDegrees) / 180;
+	coordinates.x = (int)(radius * cos(angleInRadians));
+	coordinates.y = (int)(radius * sin(angleInRadians));
 	return coordinates;
 }
 
@@ -4149,22 +4154,33 @@ void Character::renderEquippedWeapon() {
 					}
 
 					//Update throwable throw indicator size
-					if ((params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier == -1 && params.equippedThrowableWeapon.throwIndicator.indicator.size.w > params.equippedThrowableWeapon.throwIndicator.maxSize.w / 2)
-						|| (params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier == 1 && params.equippedThrowableWeapon.throwIndicator.indicator.size.w < params.equippedThrowableWeapon.throwIndicator.maxSize.w)) {
-						params.equippedThrowableWeapon.throwIndicator.indicator.size.w += params.equippedThrowableWeapon.throwIndicator.sizePixelIncrement * params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier;
-						params.equippedThrowableWeapon.throwIndicator.indicator.size.h += params.equippedThrowableWeapon.throwIndicator.sizePixelIncrement * params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier;
-					}
-					else {
-						if (params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier == -1) {
-							params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier = 1;
+					if (SDL_GetTicks() - params.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.startTicks >= params.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.delay) {
+						params.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.startTicks = SDL_GetTicks();
+						
+						if ((params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier == -1 && params.equippedThrowableWeapon.throwIndicator.indicator.size.w > params.equippedThrowableWeapon.throwIndicator.maxSize.w / 2)
+							|| (params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier == 1 && params.equippedThrowableWeapon.throwIndicator.indicator.size.w < params.equippedThrowableWeapon.throwIndicator.maxSize.w)) {
+							params.equippedThrowableWeapon.throwIndicator.indicator.size.w += params.equippedThrowableWeapon.throwIndicator.sizePixelIncrement * params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier;
+							params.equippedThrowableWeapon.throwIndicator.indicator.size.h += params.equippedThrowableWeapon.throwIndicator.sizePixelIncrement * params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier;
 						}
 						else {
-							params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier = -1;
+							if (params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier == -1) {
+								params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier = 1;
+							}
+							else {
+								params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier = -1;
+							}
 						}
 					}
 
+					//Get current throw distance
+					--;;
+					//printIntL({ rightJoystickAxisY, rightJoystickAxisX });
+					//joystickAxisMaxValue, deadZone
+					//rightJoystickAxisY: -joystickAxisMaxValue (left), joystickAxisMaxValue (right)
+					//rightJoystickAxisX: -joystickAxisMaxValue (up), joystickAxisMaxValue (down)
+
 					//Update throwable throw indicator position
-					XYStruct throwIndicatorPositionOffset = convertAngleToCoordinates(params.equippedThrowableWeapon.aimIndicator.sprite.angle, params.size.h);
+					XYStruct throwIndicatorPositionOffset = convertAngleToCoordinates(params.equippedThrowableWeapon.aimIndicator.sprite.angle, params.size.w / 2);
 					params.equippedThrowableWeapon.throwIndicator.indicator.position = { params.position.x + (params.size.w / 2) - (params.equippedThrowableWeapon.throwIndicator.indicator.size.w / 2) + throwIndicatorPositionOffset.x, params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedThrowableWeapon.throwIndicator.indicator.size.h / 2) + throwIndicatorPositionOffset.y };
 
 					if (areaWithinCameraView({ params.equippedThrowableWeapon.throwIndicator.indicator.position.x, params.equippedThrowableWeapon.throwIndicator.indicator.position.y, params.equippedThrowableWeapon.throwIndicator.indicator.size.w, params.equippedThrowableWeapon.throwIndicator.indicator.size.h }) == true) {
@@ -4175,7 +4191,16 @@ void Character::renderEquippedWeapon() {
 						SDL_RenderCopy(renderer, spriteSheets[params.equippedThrowableWeapon.throwIndicator.indicator.sprite.spriteSheetIndex].texture, &sRect, &dRect);
 
 						//Update throwable throw indicator frame
+						if (SDL_GetTicks() - params.equippedThrowableWeapon.throwIndicator.frameSwapDelay.startTicks >= params.equippedThrowableWeapon.throwIndicator.frameSwapDelay.delay) {
+							params.equippedThrowableWeapon.throwIndicator.frameSwapDelay.startTicks = SDL_GetTicks();
 
+							if (params.equippedThrowableWeapon.throwIndicator.frame < (int)params.equippedThrowableWeapon.throwIndicator.indicator.sprite.areas[0].size() - 1) {
+								++params.equippedThrowableWeapon.throwIndicator.frame;
+							}
+							else {
+								params.equippedThrowableWeapon.throwIndicator.frame = 0;
+							}
+						}
 
 					}
 				}
