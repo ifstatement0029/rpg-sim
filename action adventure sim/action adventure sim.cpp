@@ -1955,6 +1955,14 @@ void initCharacters() {
 				currentCharacterParams.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.delay = 1;
 				currentCharacterParams.equippedThrowableWeapon.throwIndicator.frameSwapDelay.startTicks = SDL_GetTicks();
 				currentCharacterParams.equippedThrowableWeapon.throwIndicator.frameSwapDelay.delay = 100;
+				currentCharacterParams.equippedThrowableWeapon.throwArcIndicator.sprite.spriteSheetIndex = getSpriteSheetIndex("throwable throw indicator");
+				currentCharacterParams.equippedThrowableWeapon.throwArcIndicator.sprite.areas = {
+					{
+						{
+							{ 1, 21, 30, 7 }
+						}
+					}
+				};
 				break;
 			}
 		}
@@ -4173,14 +4181,18 @@ void Character::renderEquippedWeapon() {
 					}
 
 					//Get current throw distance
-					--;;
-					//printIntL({ rightJoystickAxisY, rightJoystickAxisX });
-					//joystickAxisMaxValue, deadZone
-					//rightJoystickAxisY: -joystickAxisMaxValue (left), joystickAxisMaxValue (right)
-					//rightJoystickAxisX: -joystickAxisMaxValue (up), joystickAxisMaxValue (down)
+					int rightJoystickTilt = -1;
+					if (abs(rightJoystickAxisY) > abs(rightJoystickAxisX)) {
+						rightJoystickTilt = abs(rightJoystickAxisY);
+					}
+					else {
+						rightJoystickTilt = abs(rightJoystickAxisX);
+					}
+					int tiltPercentage = (rightJoystickTilt * 100) / (joystickAxisMaxValue - deadZone);
+					params.equippedThrowableWeapon.throwDistance.current = (tiltPercentage * params.equippedThrowableWeapon.throwDistance.max) / 100;
 
 					//Update throwable throw indicator position
-					XYStruct throwIndicatorPositionOffset = convertAngleToCoordinates(params.equippedThrowableWeapon.aimIndicator.sprite.angle, params.size.w / 2);
+					XYStruct throwIndicatorPositionOffset = convertAngleToCoordinates(params.equippedThrowableWeapon.aimIndicator.sprite.angle, (params.size.w / 2) + params.equippedThrowableWeapon.throwDistance.current);
 					params.equippedThrowableWeapon.throwIndicator.indicator.position = { params.position.x + (params.size.w / 2) - (params.equippedThrowableWeapon.throwIndicator.indicator.size.w / 2) + throwIndicatorPositionOffset.x, params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedThrowableWeapon.throwIndicator.indicator.size.h / 2) + throwIndicatorPositionOffset.y };
 
 					if (areaWithinCameraView({ params.equippedThrowableWeapon.throwIndicator.indicator.position.x, params.equippedThrowableWeapon.throwIndicator.indicator.position.y, params.equippedThrowableWeapon.throwIndicator.indicator.size.w, params.equippedThrowableWeapon.throwIndicator.indicator.size.h }) == true) {
@@ -4203,6 +4215,10 @@ void Character::renderEquippedWeapon() {
 						}
 
 					}
+
+					//Update throw arc indicator position
+					--;;
+
 				}
 				break;
 			}

@@ -421,6 +421,8 @@ namespace game {
 
 				delayStruct sizeUpdateDelay, frameSwapDelay;
 			} throwIndicator;
+
+			indicatorStruct throwArcIndicator;
 		} equippedThrowableWeapon;
 
 		int resistance = -1, stuckTolerancePercentage = 10;
