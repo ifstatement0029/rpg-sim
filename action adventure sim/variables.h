@@ -22,8 +22,8 @@ namespace game {
 	SDL_Window* window = NULL;
 	//WHStruct windowResolution = { 3840, 2160 };
 	//WHStruct windowResolution = { 2560, 1440 };
-	//WHStruct windowResolution = { 1920, 1080 };
-	WHStruct windowResolution = { 1280, 720 };
+	WHStruct windowResolution = { 1920, 1080 };
+	//WHStruct windowResolution = { 1280, 720 };
 
 	int FPSCap = 60; // 0 for uncapped
 	bool vSyncOn = true;
@@ -426,9 +426,15 @@ namespace game {
 
 			struct throwableThrowStruct {
 				bool thrown = false;
+
+				XYStruct target = { -1, -1 };
+				
 				delayStruct delay;
+				
 				int pixelIncrement = 1;
 			} throwableThrow;
+
+			bool canExplode = false, exploding = false;
 		} equippedThrowableWeapon;
 
 		int resistance = -1, stuckTolerancePercentage = 10;

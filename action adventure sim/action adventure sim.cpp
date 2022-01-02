@@ -269,7 +269,7 @@ void initWindowAndRenderer() {
 
 	//Init window
 	if (fullscreen == false) {
-		window = SDL_CreateWindow("game", 1920 - windowResolution.w - 10, 50, windowResolution.w, windowResolution.h, SDL_WINDOW_SHOWN);
+		window = SDL_CreateWindow("game", 2560 - windowResolution.w - 10, 50, windowResolution.w, windowResolution.h, SDL_WINDOW_SHOWN);
 	}
 	else {
 		window = SDL_CreateWindow("game", 0, 0, windowResolution.w, windowResolution.h, SDL_WINDOW_FULLSCREEN);
@@ -4132,11 +4132,11 @@ void Character::renderEquippedWeapon() {
 					}
 
 					//Render throwable
-					if (areaWithinCameraView({ params.equippedThrowableWeapon.position.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h }) == true) {
+					/*if (areaWithinCameraView({ params.equippedThrowableWeapon.position.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h }) == true) {
 						SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.sprite.areas[0][0]);
 						SDL_Rect dRect = { params.equippedThrowableWeapon.position.x - camera.area.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight - camera.area.y, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h };
 						SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.sprite);
-					}
+					}*/
 
 					if (params.equippedThrowableWeapon.readied == true) {
 
@@ -4250,6 +4250,14 @@ void Character::renderEquippedWeapon() {
 
 					}
 				}
+
+				//Render throwable
+				if (areaWithinCameraView({ params.equippedThrowableWeapon.position.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h }) == true) {
+					SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.sprite.areas[0][0]);
+					SDL_Rect dRect = { params.equippedThrowableWeapon.position.x - camera.area.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight - camera.area.y, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h };
+					SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.sprite);
+				}
+
 				break;
 			}
 		}
@@ -4735,6 +4743,7 @@ void Character::useEquippedWeapon() {
 					
 					//Throw weapon
 					params.equippedThrowableWeapon.throwableThrow.thrown = true;
+					params.equippedThrowableWeapon.throwableThrow.target = params.equippedThrowableWeapon.aimIndicator.position; --;;
 					params.equippedThrowableWeapon.throwableThrow.delay.startTicks = SDL_GetTicks();
 					params.equippedThrowableWeapon.throwableThrow.delay.delay = 1;
 
@@ -5075,8 +5084,45 @@ void Character::readyEquippedThrowable() {
 }
 
 void Character::throwEquippedThrowable() {
-	if (params.equippedThrowableWeapon.throwableThrow.thrown == true) {
-		--;;
+	if (params.equippedThrowableWeapon.throwableThrow.thrown == true && SDL_GetTicks() - params.equippedThrowableWeapon.throwableThrow.delay.startTicks >= params.equippedThrowableWeapon.throwableThrow.delay.delay) {
+		params.equippedThrowableWeapon.throwableThrow.delay.startTicks = SDL_GetTicks();
+		
+		if (params.equippedThrowableWeapon.position.x != params.equippedThrowableWeapon.throwableThrow.target.x || params.equippedThrowableWeapon.position.y != params.equippedThrowableWeapon.throwableThrow.target.y) {
+			
+			if (params.equippedThrowableWeapon.position.x < params.equippedThrowableWeapon.throwableThrow.target.x) {
+				params.equippedThrowableWeapon.position.x += params.equippedThrowableWeapon.throwableThrow.pixelIncrement;
+				if (params.equippedThrowableWeapon.position.x > params.equippedThrowableWeapon.throwableThrow.target.x) {
+					params.equippedThrowableWeapon.position.x = params.equippedThrowableWeapon.throwableThrow.target.x;
+				}
+			}
+			else {
+				params.equippedThrowableWeapon.position.x -= params.equippedThrowableWeapon.throwableThrow.pixelIncrement;
+				if (params.equippedThrowableWeapon.position.x < params.equippedThrowableWeapon.throwableThrow.target.x) {
+					params.equippedThrowableWeapon.position.x = params.equippedThrowableWeapon.throwableThrow.target.x;
+				}
+			}
+			
+			if (params.equippedThrowableWeapon.position.y < params.equippedThrowableWeapon.throwableThrow.target.y) {
+				params.equippedThrowableWeapon.position.y += params.equippedThrowableWeapon.throwableThrow.pixelIncrement;
+				if (params.equippedThrowableWeapon.position.y > params.equippedThrowableWeapon.throwableThrow.target.y) {
+					params.equippedThrowableWeapon.position.y = params.equippedThrowableWeapon.throwableThrow.target.y;
+				}
+			}
+			else {
+				params.equippedThrowableWeapon.position.y -= params.equippedThrowableWeapon.throwableThrow.pixelIncrement;
+				if (params.equippedThrowableWeapon.position.y < params.equippedThrowableWeapon.throwableThrow.target.y) {
+					params.equippedThrowableWeapon.position.y = params.equippedThrowableWeapon.throwableThrow.target.y;
+				}
+			}
+
+		}
+		else {
+			params.equippedThrowableWeapon.throwableThrow.thrown = false;
+			if (params.equippedThrowableWeapon.canExplode == true && params.equippedThrowableWeapon.exploding == false) {
+				params.equippedThrowableWeapon.exploding = true;
+			}
+		}
+
 	}
 }
 
