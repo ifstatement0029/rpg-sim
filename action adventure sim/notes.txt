@@ -101,13 +101,12 @@ spider bot:
 
 RPG mechanics:
 
-character stats:
+character stats (what happens to character):
 life (if = 0 then game over)
 energy (abilities cost energy)
 attack
 defense
 speed
-
 
 abilities (used in combat only):
 each character has abilities - ;;
@@ -130,7 +129,7 @@ using skill has animation on character and object
 skill has a range and needs a target to activate
 
 active effects:
-can boost or lower stats and skills
+boost or lower stats and skills
 have a duration
 
 resistance:

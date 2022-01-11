@@ -4256,7 +4256,7 @@ void Character::renderEquippedWeapon() {
 					SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.sprite.areas[0][0]);
 					SDL_Rect dRect = { params.equippedThrowableWeapon.position.x - camera.area.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight - camera.area.y, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h };
 					SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.sprite);
-					printSDLRectL({ sRect, dRect }); --;;
+					//printSDLRectL({ sRect, dRect }); --;;
 					//printIntL({ params.position.x, params.position.y, params.size.w, params.size.h });
 				}
 
