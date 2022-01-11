@@ -170,6 +170,12 @@ controls:
 LT: swap between mapped types (skills, abilities, usable items)
 A: pause combat (during combat)
 A: activate/talk (outside of combat)
+B, X, Y, RB, RT: use mapped ability, skill, usable item
+LB: switch between mapped sets
+left stick: move character
+right stick: 
+	- press to lock on target or unlock (cannot tilt left/right if target is locked)
+	- tilt left/right to switch between targets (if target not locked) - if character has no target, the nearest enemy is targeted
 
 combat: 
 is arpg-like
@@ -180,7 +186,6 @@ party:
 characters in your party
 can control any character during combat and outside of it
 
-crafting:
+services:
 can craft cybernetics, gear and weapons
-
-
+can buy weapons, gear, usable items, 
