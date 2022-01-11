@@ -176,6 +176,9 @@ left stick: move character
 right stick: 
 	- press to lock on target or unlock (cannot tilt left/right if target is locked)
 	- tilt left/right to switch between targets (if target not locked) - if character has no target, the nearest enemy is targeted
+dpad left/right: switch between party members
+select: map
+start: pause
 
 combat: 
 is arpg-like

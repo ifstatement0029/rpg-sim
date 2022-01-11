@@ -310,385 +310,406 @@ namespace game {
 
 	//classes start
 
-	struct characterParams {
+	//struct characterParams {
+	//	int ID = -1;
+
+	//	XYStruct position = { -1, -1 }, groundPosition = { -1, -1 };
+	//	WHStruct size = { -1, -1 };
+	//	int layer = 0, shadowHeight = 0;
+	//	
+	//	bool displaySprites = true;
+	//	spriteStruct sprites;
+
+	//	directionEnum direction = directionEnum::down;
+	//	int frame = 0;
+
+	//	struct moveStruct {
+	//		int pixelIncrement = 2;
+	//		delayStruct speed = { SDL_GetTicks(), 1 }, frameSwap = { SDL_GetTicks(), 100 };
+	//	} move;
+
+	//	struct idleAnimationStruct {
+	//		delayStruct delayBeforeAnimation = { SDL_GetTicks(), 5000 }, frameDuration = { 0, 0 };
+	//		bool animationRunning = false;
+	//	} idleAnimation;
+
+	//	struct jumpStruct {
+	//		bool jumping = false, onObject = false, onTileObject = false;
+	//		int currentHeight = 0, maxHeight = -1, addedMaxHeight = 0, pixelIncrement = 2;
+	//		delayStruct move = { 0, 1 }, jumpButtonPress = { 0, 100 };
+	//		directionEnum direction = directionEnum::up;
+	//	} jump;
+
+	//	enum class equippedWeaponTypeEnum { none, ranged, melee, throwable } equippedWeaponType = characterParams::equippedWeaponTypeEnum::melee;
+
+	//	struct rangedWeaponStruct {
+	//		string name = "";
+
+	//		XYStruct position = { -1, -1 };
+	//		WHStruct size = { -1, -1 };
+
+	//		spriteStruct sprite;
+
+	//		enum class fireModeEnum { semiAuto, burst, fullAuto } fireMode = characterParams::rangedWeaponStruct::fireModeEnum::semiAuto;
+
+	//		struct burstStruct {
+	//			bool pause = false;
+	//			int bulletsFired = 0, maxBulletsBeforePause = -1;
+	//			delayStruct delay;
+	//		} burst;
+
+	//		struct magazineStruct {
+	//			string ammoName = "";
+	//			int capacity = -1, currentLoad = -1;
+	//		} magazine;
+
+	//		struct reloadStruct {
+	//			bool reloading = false;
+	//			delayStruct delay;
+	//			spriteStruct sprite;
+	//		} reload;
+	//	} equippedRangedWeapon;
+
+	//	struct meleeWeaponStruct {
+	//		string name = "";
+
+	//		XYStruct position = { -1, -1 };
+	//		WHStruct size = { -1, -1 };
+
+
+	//		areaStruct attackArea, previousAttackArea;
+
+	//		spriteStruct sprite;
+
+	//		struct swingStruct {
+	//			bool swinging = false, recoil = false, swingBack = false;
+	//			double originalAngle = -1;
+	//			int angle = 180, currentAngle = -1, startAngle = -1, endAngle = -1, pixelIncrement = 12;
+	//			delayStruct delay;
+	//		} swing;
+
+	//		int damage = -1, resistance = -1;
+	//	} equippedMeleeWeapon;
+
+	//	struct throwableWeaponStruct {
+	//		string name = "";
+
+	//		XYStruct position = { -1, -1 };
+	//		WHStruct size = { -1, -1 };
+
+	//		spriteStruct sprite;
+
+	//		bool readied = false;
+
+	//		struct indicatorStruct {
+	//			XYStruct position = { -1, -1 };
+	//			WHStruct size = { -1, -1 };
+	//			spriteStruct sprite;
+	//		};
+
+	//		indicatorStruct aimIndicator;
+
+	//		struct throwDistanceStruct {
+	//			int max = -1, current = 0;
+	//		} throwDistance;
+
+	//		struct throwIndicatorStruct {
+	//			WHStruct maxSize = { -1, -1 };
+	//			indicatorStruct indicator;
+	//			
+	//			int frame = 0, sizeIncrementMultiplier = -1, sizePixelIncrement = 1;
+
+	//			delayStruct sizeUpdateDelay, frameSwapDelay;
+	//		} throwIndicator;
+
+	//		indicatorStruct throwArcIndicator;
+
+	//		struct throwableThrowStruct {
+	//			bool thrown = false;
+
+	//			XYStruct target = { -1, -1 };
+	//			
+	//			delayStruct delay;
+	//			
+	//			int pixelIncrement = 1;
+	//		} throwableThrow;
+
+	//		bool canExplode = false, exploding = false;
+	//	} equippedThrowableWeapon;
+
+	//	int resistance = -1, stuckTolerancePercentage = 10;
+
+	//	bool destroy = false;
+
+	//	vector<int> bulletsFiredIDs;
+
+	//	bool renderEquippedMeleeWeaponAreaBool = false;
+
+	//	struct meleeRecoilSparkAnimationStruct {
+	//		bool active = false;
+
+	//		XYStruct position = { -1, -1 };
+	//		WHStruct size = { -1, -1 };
+
+	//		spriteStruct sprites;
+	//		
+	//		delayStruct frameDelay;
+	//		
+	//		int currentFrame = 0;
+	//	} meleeRecoilSparkAnimation;
+	//};
+
+	//class Character {
+	//public:
+	//	Character(characterParams newParams);
+	//	
+	//	int getLayer();
+	//	XYStruct getPosition();
+	//	WHStruct getSize();
+	//	int getCurrentHeight();
+	//	directionEnum getDirection();
+	//	int getFrame();
+	//	characterParams::rangedWeaponStruct::magazineStruct getMagazine();
+	//	string getEquippedWeaponName();
+	//	int getID();
+	//	int getResistance();
+	//	void setResistance(int newResistance);
+	//	int getStuckTolerancePercentage();
+	//	int getCharacterSpriteSheetIndex();
+	//	areaStruct getSpriteSheetArea(directionEnum direction, int frame);
+	//	bool getDisplaySprites();
+	//	void setDisplaySprites(bool newDisplaySprites);
+	//	void setDestroy(bool newDestroy);
+	//	vector<int> getBulletsFiredIDs();
+	//	
+	//	void render();
+	//	void updateEquippedWeaponAngle();
+	//	void renderEquippedWeapon();
+	//	void renderReloadAnimation();
+	//	void renderEquippedMeleeWeaponArea();
+	//	void renderMeleeRecoilSparkAnimation();
+	//	void move();
+	//	void idleAnimation();
+	//	void jump();
+	//	void jumpOnCollidableObject();
+	//	void jumpOnTile();
+	//	void useEquippedWeapon();
+	//	void markForDestruction();
+	//	void detectEquippedMeleeWeaponHit();
+	//	void animateMeleeRecoilSpark();
+	//	void readyEquippedThrowable();
+	//	void throwEquippedThrowable();
+
+	//private:
+	//	characterParams params;
+
+	//	void swapFrame();
+	//	void recoil();
+	//};
+
+	//vector<Character> characters;
+
+	//struct tableParamsStruct {
+	//	int ID = -1, layer = 0;
+
+	//	XYStruct position = { -1, -1 };
+	//	WHStruct size = { -1, -1 };
+	//	int height = -1;
+
+	//	/*int spriteSheetIndex = -1;
+	//	SDL_Rect spriteSRect = { -1, -1, -1, -1 };*/
+	//	spriteStruct sprite;
+	//	bool displaySprite = true;
+
+	//	int resistance = -1, stuckTolerancePercentage = 10;
+
+	//	bool destroy = false;
+	//};
+
+	//class Table {
+	//public:
+	//	Table(tableParamsStruct newParams);
+
+	//	int getLayer();
+	//	XYStruct getPosition();
+	//	WHStruct getSize();
+	//	int getID();
+	//	int getHeight();
+	//	int getResistance();
+	//	void setResistance(int newResistance);
+	//	int getStuckTolerancePercentage();
+	//	int getTableSpriteSheetIndex();
+	//	areaStruct getSpriteSheetArea();
+	//	bool getDisplaySprite();
+	//	void setDisplaySprite(bool newDisplaySprite);
+	//	void setDestroy(bool newDestroy);
+
+	//	void markForDestruction();
+
+	//	void render();
+	//
+	//private:
+	//	tableParamsStruct params;
+	//};
+
+	//vector<Table> tables;
+
+	//struct bulletParamsStruct {
+	//	int ID = -1, layer = -1, height = 0;
+
+	//	XYStruct position = { -1, -1 }, originalPosition = { -1, -1 }, previousPosition = { -1, -1 }, directionMods = { 1, 1 };
+	//	WHStruct size = { -1, -1 };
+
+	//	int shadowHeight = -1;
+
+	//	bool displaySprite = true;
+	//	spriteStruct sprite;
+
+	//	delayStruct speed;
+	//	int movePixelIncrement = 1;
+	//	
+	//	int distanceTravelled = 0, totalDistanceTravelled = 0;
+
+	//	int damage = -1, resistance = -1, stuckTolerancePercentage = 10;
+
+	//	bool stuck = false, destroy = false;
+
+	//	int characterID = -1;
+
+	//	delayStruct fadeOut;
+	//};
+
+	//class Bullet {
+	//public:
+	//	Bullet(bulletParamsStruct newParams);
+
+	//	int getID();
+	//	int getLayer();
+	//	XYStruct getPosition();
+	//	WHStruct getSize();
+	//	int getResistance();
+	//	void setResistance(int newResistance);
+	//	int getStuckTolerancePercentage();
+	//	int getBulletSpriteSheetIndex();
+	//	areaStruct getSpriteSheetArea();
+	//	bool getDisplaySprite();
+	//	void setDisplaySprite(bool newDisplaySprite);
+	//	void setDestroy(bool newDestroy);
+	//	int getCharacterID();
+	//	delayStruct getFadeOut();
+	//	void setFadeOut(delayStruct newFadeOut);
+	//	bool getStuck();
+
+	//	void render();
+	//	void move();
+	//	void markForDestruction();
+	//	void ricochet(collisionDataStruct& collisionData);
+	//	void ricochetPenetrateOrStayStuck();
+	//	void explode();
+
+	//private:
+	//	bulletParamsStruct params;
+	//};
+
+	//vector<Bullet> bullets;
+
+	//struct explosionParamsStruct {
+	//	int ID = -1, overworldGridLayer = -1;
+
+	//	spriteStruct sprite;
+
+	//	collisionDataStruct collisionData;
+
+	//	int force = -1;
+
+	//	rangeStruct shadowHeightRandRange;
+
+	//	bool fragmentIsEntireSprite = false, randomizeFragmentAngle = false;
+	//	XYStruct totalFragments = { -1, -1 };
+	//	struct fragmentStruct {
+	//		XYStruct position = { -1, -1 }, originalPosition = { -1, -1 };
+	//		WHStruct size = { -1, -1 };
+
+	//		int shadowHeight = -1;
+
+	//		int distanceTravelled = 0, maxDistance = -1;
+
+	//		spriteStruct sprite;
+	//		
+	//		delayStruct speed;
+	//		int pixelIncrement = -1;
+	//	};
+	//	vector<fragmentStruct> fragments;
+
+	//	delayStruct fadeOut;
+
+	//	bool enableShadows = true;
+	//};
+
+	//class Explosion {
+	//public:
+	//	Explosion(explosionParamsStruct newParams);
+
+	//	int getID();
+	//	int getOverworldGridLayer();
+	//	XYStruct getFragmentPosition(int fragmentIndex);
+	//	int getTotalFragments();
+	//	vector<explosionParamsStruct::fragmentStruct> getFragments();
+	//	delayStruct getFadeOut();
+	//	void setFadeOut(delayStruct newFadeOut);
+
+	//	void createFragments();
+	//	void render();
+	//	void explode();
+	//	void markForDestruction();
+
+	//private:
+	//	explosionParamsStruct params;
+	//};
+
+	//vector<Explosion> explosions;
+
+	//struct areaParamsStruct {
+	//	int ID = -1;
+
+	//	XYStruct position = { -1, -1 };
+	//	WHStruct size = { -1, -1 };
+	//};
+
+	//class Area {
+	//public:
+	//	Area(areaParamsStruct newParams);
+
+	//	int getID();
+
+	//	void render();
+
+	//private:
+	//	areaParamsStruct params;
+	//};
+
+	//vector<Area> areas;
+
+	struct characterParamsStruct {
 		int ID = -1;
-
-		XYStruct position = { -1, -1 }, groundPosition = { -1, -1 };
-		WHStruct size = { -1, -1 };
-		int layer = 0, shadowHeight = 0;
 		
-		bool displaySprites = true;
+		XYStruct position = { -1, -1 };
+		WHStruct size = { -1, -1 };
+
 		spriteStruct sprites;
-
-		directionEnum direction = directionEnum::down;
-		int frame = 0;
-
-		struct moveStruct {
-			int pixelIncrement = 2;
-			delayStruct speed = { SDL_GetTicks(), 1 }, frameSwap = { SDL_GetTicks(), 100 };
-		} move;
-
-		struct idleAnimationStruct {
-			delayStruct delayBeforeAnimation = { SDL_GetTicks(), 5000 }, frameDuration = { 0, 0 };
-			bool animationRunning = false;
-		} idleAnimation;
-
-		struct jumpStruct {
-			bool jumping = false, onObject = false, onTileObject = false;
-			int currentHeight = 0, maxHeight = -1, addedMaxHeight = 0, pixelIncrement = 2;
-			delayStruct move = { 0, 1 }, jumpButtonPress = { 0, 100 };
-			directionEnum direction = directionEnum::up;
-		} jump;
-
-		enum class equippedWeaponTypeEnum { none, ranged, melee, throwable } equippedWeaponType = characterParams::equippedWeaponTypeEnum::melee;
-
-		struct rangedWeaponStruct {
-			string name = "";
-
-			XYStruct position = { -1, -1 };
-			WHStruct size = { -1, -1 };
-
-			spriteStruct sprite;
-
-			enum class fireModeEnum { semiAuto, burst, fullAuto } fireMode = characterParams::rangedWeaponStruct::fireModeEnum::semiAuto;
-
-			struct burstStruct {
-				bool pause = false;
-				int bulletsFired = 0, maxBulletsBeforePause = -1;
-				delayStruct delay;
-			} burst;
-
-			struct magazineStruct {
-				string ammoName = "";
-				int capacity = -1, currentLoad = -1;
-			} magazine;
-
-			struct reloadStruct {
-				bool reloading = false;
-				delayStruct delay;
-				spriteStruct sprite;
-			} reload;
-		} equippedRangedWeapon;
-
-		struct meleeWeaponStruct {
-			string name = "";
-
-			XYStruct position = { -1, -1 };
-			WHStruct size = { -1, -1 };
-
-
-			areaStruct attackArea, previousAttackArea;
-
-			spriteStruct sprite;
-
-			struct swingStruct {
-				bool swinging = false, recoil = false, swingBack = false;
-				double originalAngle = -1;
-				int angle = 180, currentAngle = -1, startAngle = -1, endAngle = -1, pixelIncrement = 12;
-				delayStruct delay;
-			} swing;
-
-			int damage = -1, resistance = -1;
-		} equippedMeleeWeapon;
-
-		struct throwableWeaponStruct {
-			string name = "";
-
-			XYStruct position = { -1, -1 };
-			WHStruct size = { -1, -1 };
-
-			spriteStruct sprite;
-
-			bool readied = false;
-
-			struct indicatorStruct {
-				XYStruct position = { -1, -1 };
-				WHStruct size = { -1, -1 };
-				spriteStruct sprite;
-			};
-
-			indicatorStruct aimIndicator;
-
-			struct throwDistanceStruct {
-				int max = -1, current = 0;
-			} throwDistance;
-
-			struct throwIndicatorStruct {
-				WHStruct maxSize = { -1, -1 };
-				indicatorStruct indicator;
-				
-				int frame = 0, sizeIncrementMultiplier = -1, sizePixelIncrement = 1;
-
-				delayStruct sizeUpdateDelay, frameSwapDelay;
-			} throwIndicator;
-
-			indicatorStruct throwArcIndicator;
-
-			struct throwableThrowStruct {
-				bool thrown = false;
-
-				XYStruct target = { -1, -1 };
-				
-				delayStruct delay;
-				
-				int pixelIncrement = 1;
-			} throwableThrow;
-
-			bool canExplode = false, exploding = false;
-		} equippedThrowableWeapon;
-
-		int resistance = -1, stuckTolerancePercentage = 10;
-
-		bool destroy = false;
-
-		vector<int> bulletsFiredIDs;
-
-		bool renderEquippedMeleeWeaponAreaBool = false;
-
-		struct meleeRecoilSparkAnimationStruct {
-			bool active = false;
-
-			XYStruct position = { -1, -1 };
-			WHStruct size = { -1, -1 };
-
-			spriteStruct sprites;
-			
-			delayStruct frameDelay;
-			
-			int currentFrame = 0;
-		} meleeRecoilSparkAnimation;
 	};
 
 	class Character {
 	public:
-		Character(characterParams newParams);
-		
-		int getLayer();
-		XYStruct getPosition();
-		WHStruct getSize();
-		int getCurrentHeight();
-		directionEnum getDirection();
-		int getFrame();
-		characterParams::rangedWeaponStruct::magazineStruct getMagazine();
-		string getEquippedWeaponName();
+		Character(characterParamsStruct newParams);
+
 		int getID();
-		int getResistance();
-		void setResistance(int newResistance);
-		int getStuckTolerancePercentage();
-		int getCharacterSpriteSheetIndex();
-		areaStruct getSpriteSheetArea(directionEnum direction, int frame);
-		bool getDisplaySprites();
-		void setDisplaySprites(bool newDisplaySprites);
-		void setDestroy(bool newDestroy);
-		vector<int> getBulletsFiredIDs();
-		
-		void render();
-		void updateEquippedWeaponAngle();
-		void renderEquippedWeapon();
-		void renderReloadAnimation();
-		void renderEquippedMeleeWeaponArea();
-		void renderMeleeRecoilSparkAnimation();
-		void move();
-		void idleAnimation();
-		void jump();
-		void jumpOnCollidableObject();
-		void jumpOnTile();
-		void useEquippedWeapon();
-		void markForDestruction();
-		void detectEquippedMeleeWeaponHit();
-		void animateMeleeRecoilSpark();
-		void readyEquippedThrowable();
-		void throwEquippedThrowable();
 
 	private:
-		characterParams params;
-
-		void swapFrame();
-		void recoil();
+		characterParamsStruct params;
 	};
 
 	vector<Character> characters;
-
-	struct tableParamsStruct {
-		int ID = -1, layer = 0;
-
-		XYStruct position = { -1, -1 };
-		WHStruct size = { -1, -1 };
-		int height = -1;
-
-		/*int spriteSheetIndex = -1;
-		SDL_Rect spriteSRect = { -1, -1, -1, -1 };*/
-		spriteStruct sprite;
-		bool displaySprite = true;
-
-		int resistance = -1, stuckTolerancePercentage = 10;
-
-		bool destroy = false;
-	};
-
-	class Table {
-	public:
-		Table(tableParamsStruct newParams);
-
-		int getLayer();
-		XYStruct getPosition();
-		WHStruct getSize();
-		int getID();
-		int getHeight();
-		int getResistance();
-		void setResistance(int newResistance);
-		int getStuckTolerancePercentage();
-		int getTableSpriteSheetIndex();
-		areaStruct getSpriteSheetArea();
-		bool getDisplaySprite();
-		void setDisplaySprite(bool newDisplaySprite);
-		void setDestroy(bool newDestroy);
-
-		void markForDestruction();
-
-		void render();
-	
-	private:
-		tableParamsStruct params;
-	};
-
-	vector<Table> tables;
-
-	struct bulletParamsStruct {
-		int ID = -1, layer = -1, height = 0;
-
-		XYStruct position = { -1, -1 }, originalPosition = { -1, -1 }, previousPosition = { -1, -1 }, directionMods = { 1, 1 };
-		WHStruct size = { -1, -1 };
-
-		int shadowHeight = -1;
-
-		bool displaySprite = true;
-		spriteStruct sprite;
-
-		delayStruct speed;
-		int movePixelIncrement = 1;
-		
-		int distanceTravelled = 0, totalDistanceTravelled = 0;
-
-		int damage = -1, resistance = -1, stuckTolerancePercentage = 10;
-
-		bool stuck = false, destroy = false;
-
-		int characterID = -1;
-
-		delayStruct fadeOut;
-	};
-
-	class Bullet {
-	public:
-		Bullet(bulletParamsStruct newParams);
-
-		int getID();
-		int getLayer();
-		XYStruct getPosition();
-		WHStruct getSize();
-		int getResistance();
-		void setResistance(int newResistance);
-		int getStuckTolerancePercentage();
-		int getBulletSpriteSheetIndex();
-		areaStruct getSpriteSheetArea();
-		bool getDisplaySprite();
-		void setDisplaySprite(bool newDisplaySprite);
-		void setDestroy(bool newDestroy);
-		int getCharacterID();
-		delayStruct getFadeOut();
-		void setFadeOut(delayStruct newFadeOut);
-		bool getStuck();
-
-		void render();
-		void move();
-		void markForDestruction();
-		void ricochet(collisionDataStruct& collisionData);
-		void ricochetPenetrateOrStayStuck();
-		void explode();
-
-	private:
-		bulletParamsStruct params;
-	};
-
-	vector<Bullet> bullets;
-
-	struct explosionParamsStruct {
-		int ID = -1, overworldGridLayer = -1;
-
-		spriteStruct sprite;
-
-		collisionDataStruct collisionData;
-
-		int force = -1;
-
-		rangeStruct shadowHeightRandRange;
-
-		bool fragmentIsEntireSprite = false, randomizeFragmentAngle = false;
-		XYStruct totalFragments = { -1, -1 };
-		struct fragmentStruct {
-			XYStruct position = { -1, -1 }, originalPosition = { -1, -1 };
-			WHStruct size = { -1, -1 };
-
-			int shadowHeight = -1;
-
-			int distanceTravelled = 0, maxDistance = -1;
-
-			spriteStruct sprite;
-			
-			delayStruct speed;
-			int pixelIncrement = -1;
-		};
-		vector<fragmentStruct> fragments;
-
-		delayStruct fadeOut;
-
-		bool enableShadows = true;
-	};
-
-	class Explosion {
-	public:
-		Explosion(explosionParamsStruct newParams);
-
-		int getID();
-		int getOverworldGridLayer();
-		XYStruct getFragmentPosition(int fragmentIndex);
-		int getTotalFragments();
-		vector<explosionParamsStruct::fragmentStruct> getFragments();
-		delayStruct getFadeOut();
-		void setFadeOut(delayStruct newFadeOut);
-
-		void createFragments();
-		void render();
-		void explode();
-		void markForDestruction();
-
-	private:
-		explosionParamsStruct params;
-	};
-
-	vector<Explosion> explosions;
-
-	struct areaParamsStruct {
-		int ID = -1;
-
-		XYStruct position = { -1, -1 };
-		WHStruct size = { -1, -1 };
-	};
-
-	class Area {
-	public:
-		Area(areaParamsStruct newParams);
-
-		int getID();
-
-		void render();
-
-	private:
-		areaParamsStruct params;
-	};
-
-	vector<Area> areas;
 
 	//classes end
 

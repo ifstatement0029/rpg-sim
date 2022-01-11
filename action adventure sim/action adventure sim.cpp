@@ -900,107 +900,107 @@ bool checkCollisionWithCollidableObjectFactoringHeight(areaStruct gridArea, int 
 }
 
 //Need to factor height in areas
-collisionDataStruct checkCollisionWithCharacter(areaStruct sourcePixelArea, areaStruct previousPixelArea, int characterToIgnoreID) {
-	collisionDataStruct collisionData;
-
-	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
-		XYStruct characterPosition = characters[charactersCnt].getPosition();
-		WHStruct characterSize = characters[charactersCnt].getSize();
-		
-		int characterID = characters[charactersCnt].getID();
-
-		if (areaWithinArea(sourcePixelArea, { characterPosition.x, characterPosition.y, characterSize.w, characterSize.h }) == true) {
-			if ((characterToIgnoreID > -1 && characterToIgnoreID != characterID) || characterToIgnoreID == -1) {
-				collisionData.collision = true;
-				collisionData.collidePosition = characterPosition;
-				collisionData.instanceID = characterID;
-
-				//Get side of character hit
-				if (previousPixelArea.x > -1 && previousPixelArea.y > -1 && previousPixelArea.w > -1 && previousPixelArea.h > -1) {
-					if (previousPixelArea.x + previousPixelArea.w - 1 < sourcePixelArea.x) {
-						collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::left;
-					}
-					else if (previousPixelArea.x > sourcePixelArea.x + sourcePixelArea.w - 1) {
-						collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::right;
-					}
-					else if (previousPixelArea.y + previousPixelArea.h - 1 < sourcePixelArea.y) {
-						collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::up;
-					}
-					else if (previousPixelArea.y > sourcePixelArea.y + sourcePixelArea.h - 1) {
-						collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::down;
-					}
-				}
-
-				return collisionData;
-			}
-		}
-	}
-	return collisionData;
-}
-
-collisionDataStruct checkCollisionWithTable(areaStruct sourcePixelArea, areaStruct previousPixelArea) {
-	collisionDataStruct collisionData;
-	for (int tablesCnt = 0; tablesCnt < (int)tables.size(); ++tablesCnt) {
-		XYStruct tablePosition = tables[tablesCnt].getPosition();
-		WHStruct tableSize = tables[tablesCnt].getSize();
-		if (areaWithinArea(sourcePixelArea, { tablePosition.x, tablePosition.y, tableSize.w, tableSize.h }) == true) {
-			collisionData.collision = true;
-			collisionData.collidePosition = tablePosition;
-			collisionData.instanceID = tables[tablesCnt].getID();
-
-			//Get side of table hit
-			if (previousPixelArea.x > -1 && previousPixelArea.y > -1 && previousPixelArea.w > -1 && previousPixelArea.h > -1) {
-				if (previousPixelArea.x + previousPixelArea.w - 1 < sourcePixelArea.x) {
-					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::left;
-				}
-				else if (previousPixelArea.x > sourcePixelArea.x + sourcePixelArea.w - 1) {
-					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::right;
-				}
-				else if (previousPixelArea.y + previousPixelArea.h - 1 < sourcePixelArea.y) {
-					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::up;
-				}
-				else if (previousPixelArea.y > sourcePixelArea.y + sourcePixelArea.h - 1) {
-					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::down;
-				}
-			}
-
-			return collisionData;
-		}
-	}
-	return collisionData;
-}
-
-collisionDataStruct checkCollisionWithBullet(areaStruct sourcePixelArea, areaStruct previousPixelArea) {
-	collisionDataStruct collisionData;
-	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
-		XYStruct bulletPosition = bullets[bulletsCnt].getPosition();
-		WHStruct bulletSize = bullets[bulletsCnt].getSize();
-		if (areaWithinArea(sourcePixelArea, { bulletPosition.x, bulletPosition.y, bulletSize.w, bulletSize.h }) == true) {
-			collisionData.collision = true;
-			collisionData.collidePosition = bulletPosition;
-			collisionData.instanceID = bullets[bulletsCnt].getID();
-
-			//Get side of bullet hit
-			if (previousPixelArea.x > -1 && previousPixelArea.y > -1 && previousPixelArea.w > -1 && previousPixelArea.h > -1) {
-				if (previousPixelArea.x + previousPixelArea.w - 1 < sourcePixelArea.x) {
-					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::left;
-				}
-				else if (previousPixelArea.x > sourcePixelArea.x + sourcePixelArea.w - 1) {
-					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::right;
-				}
-				else if (previousPixelArea.y + previousPixelArea.h - 1 < sourcePixelArea.y) {
-					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::up;
-				}
-				else if (previousPixelArea.y > sourcePixelArea.y + sourcePixelArea.h - 1) {
-					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::down;
-				}
-			}
-
-			return collisionData;
-		}
-	}
-	return collisionData;
-}
+//collisionDataStruct checkCollisionWithCharacter(areaStruct sourcePixelArea, areaStruct previousPixelArea, int characterToIgnoreID) {
+//	collisionDataStruct collisionData;
+//
+//	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
+//		XYStruct characterPosition = characters[charactersCnt].getPosition();
+//		WHStruct characterSize = characters[charactersCnt].getSize();
+//		
+//		int characterID = characters[charactersCnt].getID();
+//
+//		if (areaWithinArea(sourcePixelArea, { characterPosition.x, characterPosition.y, characterSize.w, characterSize.h }) == true) {
+//			if ((characterToIgnoreID > -1 && characterToIgnoreID != characterID) || characterToIgnoreID == -1) {
+//				collisionData.collision = true;
+//				collisionData.collidePosition = characterPosition;
+//				collisionData.instanceID = characterID;
+//
+//				//Get side of character hit
+//				if (previousPixelArea.x > -1 && previousPixelArea.y > -1 && previousPixelArea.w > -1 && previousPixelArea.h > -1) {
+//					if (previousPixelArea.x + previousPixelArea.w - 1 < sourcePixelArea.x) {
+//						collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::left;
+//					}
+//					else if (previousPixelArea.x > sourcePixelArea.x + sourcePixelArea.w - 1) {
+//						collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::right;
+//					}
+//					else if (previousPixelArea.y + previousPixelArea.h - 1 < sourcePixelArea.y) {
+//						collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::up;
+//					}
+//					else if (previousPixelArea.y > sourcePixelArea.y + sourcePixelArea.h - 1) {
+//						collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::down;
+//					}
+//				}
+//
+//				return collisionData;
+//			}
+//		}
+//	}
+//	return collisionData;
+//}
+//
+//collisionDataStruct checkCollisionWithTable(areaStruct sourcePixelArea, areaStruct previousPixelArea) {
+//	collisionDataStruct collisionData;
+//	for (int tablesCnt = 0; tablesCnt < (int)tables.size(); ++tablesCnt) {
+//		XYStruct tablePosition = tables[tablesCnt].getPosition();
+//		WHStruct tableSize = tables[tablesCnt].getSize();
+//		if (areaWithinArea(sourcePixelArea, { tablePosition.x, tablePosition.y, tableSize.w, tableSize.h }) == true) {
+//			collisionData.collision = true;
+//			collisionData.collidePosition = tablePosition;
+//			collisionData.instanceID = tables[tablesCnt].getID();
+//
+//			//Get side of table hit
+//			if (previousPixelArea.x > -1 && previousPixelArea.y > -1 && previousPixelArea.w > -1 && previousPixelArea.h > -1) {
+//				if (previousPixelArea.x + previousPixelArea.w - 1 < sourcePixelArea.x) {
+//					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::left;
+//				}
+//				else if (previousPixelArea.x > sourcePixelArea.x + sourcePixelArea.w - 1) {
+//					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::right;
+//				}
+//				else if (previousPixelArea.y + previousPixelArea.h - 1 < sourcePixelArea.y) {
+//					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::up;
+//				}
+//				else if (previousPixelArea.y > sourcePixelArea.y + sourcePixelArea.h - 1) {
+//					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::down;
+//				}
+//			}
+//
+//			return collisionData;
+//		}
+//	}
+//	return collisionData;
+//}
+//
+//collisionDataStruct checkCollisionWithBullet(areaStruct sourcePixelArea, areaStruct previousPixelArea) {
+//	collisionDataStruct collisionData;
+//	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
+//		XYStruct bulletPosition = bullets[bulletsCnt].getPosition();
+//		WHStruct bulletSize = bullets[bulletsCnt].getSize();
+//		if (areaWithinArea(sourcePixelArea, { bulletPosition.x, bulletPosition.y, bulletSize.w, bulletSize.h }) == true) {
+//			collisionData.collision = true;
+//			collisionData.collidePosition = bulletPosition;
+//			collisionData.instanceID = bullets[bulletsCnt].getID();
+//
+//			//Get side of bullet hit
+//			if (previousPixelArea.x > -1 && previousPixelArea.y > -1 && previousPixelArea.w > -1 && previousPixelArea.h > -1) {
+//				if (previousPixelArea.x + previousPixelArea.w - 1 < sourcePixelArea.x) {
+//					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::left;
+//				}
+//				else if (previousPixelArea.x > sourcePixelArea.x + sourcePixelArea.w - 1) {
+//					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::right;
+//				}
+//				else if (previousPixelArea.y + previousPixelArea.h - 1 < sourcePixelArea.y) {
+//					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::up;
+//				}
+//				else if (previousPixelArea.y > sourcePixelArea.y + sourcePixelArea.h - 1) {
+//					collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::down;
+//				}
+//			}
+//
+//			return collisionData;
+//		}
+//	}
+//	return collisionData;
+//}
 
 void displayLoadingMessage() {
 	setSDLRenderTarget(NULL);
@@ -1595,7 +1595,7 @@ void getEvent() {
 				cKeyPressed = true;
 
 				//Show controlled character pixel and tile coordinates
-				printXYStruct(characters[controlledCharacterIndex].getPosition());
+				//printXYStruct(characters[controlledCharacterIndex].getPosition());
 
 				break;
 			}
@@ -1721,36 +1721,36 @@ void initBoolGrid(vector<vector<bool>>& grid, WHStruct gridSize, bool boolValue)
 	}
 }
 
-void initTables(int layer) {
-	for (int tablesCnt = 0; tablesCnt < randInt(2, 4); ++tablesCnt) {
-		
-		//Init table
-		tableParamsStruct newTableParams;
-		newTableParams.ID = tablesCnt;
-		newTableParams.layer = layer;
-		areaStruct gridArea = alignPixelAreaToGrid({ randInt(0, camera.area.w), randInt(0, camera.area.h), tileSize.w * 3, tileSize.h * 2 });
-		newTableParams.position = { gridArea.x, gridArea.y };
-		newTableParams.size = { gridArea.w, gridArea.h };
-		newTableParams.height = newTableParams.size.h / 2;
-		newTableParams.sprite.spriteSheetIndex = getSpriteSheetIndex("table");
-		newTableParams.sprite.areas = {
-			{
-				{ 0, 0, 24, 16 }
-			}
-		};
-		newTableParams.resistance = 1;
-		Table newTable(newTableParams);
-		tables.push_back(newTable);
-
-		//Init collidable object
-		collidableObjectStruct currentCollidableObject;
-		currentCollidableObject.area = { newTableParams.position.x, newTableParams.position.y, newTableParams.size.w, newTableParams.size.h };
-		currentCollidableObject.height = newTableParams.height;
-		areaStruct currentJumpableObjectGridArea = getGridAreaFromPixelArea(currentCollidableObject.area);
-		collidableObjects.push_back(currentCollidableObject);
-
-	}
-}
+//void initTables(int layer) {
+//	for (int tablesCnt = 0; tablesCnt < randInt(2, 4); ++tablesCnt) {
+//		
+//		//Init table
+//		tableParamsStruct newTableParams;
+//		newTableParams.ID = tablesCnt;
+//		newTableParams.layer = layer;
+//		areaStruct gridArea = alignPixelAreaToGrid({ randInt(0, camera.area.w), randInt(0, camera.area.h), tileSize.w * 3, tileSize.h * 2 });
+//		newTableParams.position = { gridArea.x, gridArea.y };
+//		newTableParams.size = { gridArea.w, gridArea.h };
+//		newTableParams.height = newTableParams.size.h / 2;
+//		newTableParams.sprite.spriteSheetIndex = getSpriteSheetIndex("table");
+//		newTableParams.sprite.areas = {
+//			{
+//				{ 0, 0, 24, 16 }
+//			}
+//		};
+//		newTableParams.resistance = 1;
+//		Table newTable(newTableParams);
+//		tables.push_back(newTable);
+//
+//		//Init collidable object
+//		collidableObjectStruct currentCollidableObject;
+//		currentCollidableObject.area = { newTableParams.position.x, newTableParams.position.y, newTableParams.size.w, newTableParams.size.h };
+//		currentCollidableObject.height = newTableParams.height;
+//		areaStruct currentJumpableObjectGridArea = getGridAreaFromPixelArea(currentCollidableObject.area);
+//		collidableObjects.push_back(currentCollidableObject);
+//
+//	}
+//}
 
 void initLevel() {
 	displayLoadingMessage();
@@ -1827,155 +1827,155 @@ void initLevel() {
 	//	insertTilesInOverworldGrid(position, tilesMatrix, 1, tableSpriteSize.h / 2, true, true);
 	//}
 
-	initTables(1);
+	//initTables(1);
 }
 
-void initCharacters() {
-	controlledCharacterIndex = 0;
-	int characterID = 0;
-	XYStruct characterPosition = { 191, 193 };
-	for (int charactersCnt = 0; charactersCnt < 20; ++charactersCnt) {
-		characterParams currentCharacterParams;
-
-		currentCharacterParams.ID = characterID;
-		++characterID;
-
-		currentCharacterParams.position = characterPosition;
-		currentCharacterParams.groundPosition = currentCharacterParams.position;
-		currentCharacterParams.size = { tileSize.w * 4, tileSize.h * 4 };
-
-		currentCharacterParams.sprites.spriteSheetIndex = getSpriteSheetIndex("main character");
-		//currentCharacterParams.sprites.areas = getSpriteAreas({ 2, 10 }, { 32, 32 }, 8, 4, { 8, 18 });
-		currentCharacterParams.sprites.areas = {
-			{
-				{ 526, 7, 29, 35 }, { 559, 7, 29, 35 }, { 590, 7, 29, 35 }, { 621, 7, 29, 35 } //up
-			},
-			{
-				{ 5, 7, 29, 35 }, { 45, 7, 29, 35 }, { 78, 7, 29, 35 }, { 117, 7, 29, 35 } //down
-			},
-			{
-				{ 147, 159, 29, 35 }, { 174, 159, 29, 35 }, { 199, 159, 29, 35 }, { 228, 159, 29, 35 } //left
-			},
-			{
-				{ 278, 7, 29, 35 }, { 301, 7, 29, 35 }, { 332, 7, 29, 35 }, { 356, 7, 29, 35 } //right
-			},
-			{
-				{ 388, 7, 29, 35 }, { 422, 7, 29, 35 }, { 461, 7, 29, 35 }, { 492, 7, 29, 35 } //up-right
-			},
-			{
-				{ 151, 7, 29, 35 }, { 181, 7, 29, 35 }, { 214, 7, 29, 35 }, { 246, 7, 29, 35 } //down-right
-			},
-			{
-				{ 255, 159, 29, 35 }, { 291, 159, 29, 35 }, { 321, 159, 29, 35 }, { 354, 159, 29, 35 } //down-left
-			},
-			{
-				{ 9, 159, 29, 35 }, { 40, 159, 29, 35 }, { 76, 159, 29, 35 }, { 114, 159, 29, 35 } //up-left
-			}
-		};
-
-		currentCharacterParams.layer = 1;
-
-		//Init equipped weapon
-		currentCharacterParams.equippedWeaponType = characterParams::equippedWeaponTypeEnum::throwable;
-		switch (currentCharacterParams.equippedWeaponType) {
-			case characterParams::equippedWeaponTypeEnum::ranged: {
-				currentCharacterParams.equippedRangedWeapon.name = "Gun";
-				currentCharacterParams.equippedRangedWeapon.size = { tileSize.w * 4, tileSize.h * 2 };
-				currentCharacterParams.equippedRangedWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
-				vector<areaStruct> areas;
-				areas.push_back({ 2, 21, 21, 8 });
-				currentCharacterParams.equippedRangedWeapon.sprite.areas.push_back(areas);
-				currentCharacterParams.equippedRangedWeapon.sprite.center = { 0, currentCharacterParams.equippedRangedWeapon.sprite.areas[0][0].h / 2 };
-				currentCharacterParams.equippedRangedWeapon.fireMode = characterParams::rangedWeaponStruct::fireModeEnum::semiAuto;
-				currentCharacterParams.equippedRangedWeapon.burst.maxBulletsBeforePause = 3;
-				currentCharacterParams.equippedRangedWeapon.burst.delay.delay = 200;
-				currentCharacterParams.equippedRangedWeapon.magazine.ammoName = "Blank";
-				currentCharacterParams.equippedRangedWeapon.magazine.capacity = 100;
-				currentCharacterParams.equippedRangedWeapon.magazine.currentLoad = 90;
-				currentCharacterParams.equippedRangedWeapon.reload.delay.delay = 1000;
-				currentCharacterParams.equippedRangedWeapon.reload.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
-				currentCharacterParams.equippedRangedWeapon.reload.sprite.areas = {
-					{
-						{ 41, 168, 8, 8 },
-						{ 52, 168, 8, 8 }
-					}
-				};
-				break;
-			}
-			case characterParams::equippedWeaponTypeEnum::melee: {
-				currentCharacterParams.equippedMeleeWeapon.name = "Katana";
-				currentCharacterParams.equippedMeleeWeapon.position = currentCharacterParams.position;
-				currentCharacterParams.equippedMeleeWeapon.size = { tileSize.w * 4, tileSize.h * 2 };
-				currentCharacterParams.equippedMeleeWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
-				currentCharacterParams.equippedMeleeWeapon.sprite.areas = {
-					{
-						{ 522, 9, 29, 6 }
-					}
-				};
-				currentCharacterParams.equippedMeleeWeapon.sprite.center = { 0, currentCharacterParams.equippedMeleeWeapon.sprite.areas[0][0].h / 2 };
-				currentCharacterParams.equippedMeleeWeapon.swing.delay.delay = 1;
-				currentCharacterParams.equippedMeleeWeapon.damage = 100;
-				currentCharacterParams.equippedMeleeWeapon.resistance = 100;
-				break;
-			}
-			case characterParams::equippedWeaponTypeEnum::throwable: {
-				currentCharacterParams.equippedThrowableWeapon.name = "Grenade";
-				currentCharacterParams.equippedThrowableWeapon.size = tileSize;
-				currentCharacterParams.equippedThrowableWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("grenades");
-				currentCharacterParams.equippedThrowableWeapon.sprite.areas = {
-					{
-						{
-							{ 143, 67, 98, 117 }
-						}
-					}
-				};
-				currentCharacterParams.equippedThrowableWeapon.sprite.center = { 0, currentCharacterParams.equippedThrowableWeapon.sprite.areas[0][0].h / 2 };
-				currentCharacterParams.equippedThrowableWeapon.aimIndicator.size = { currentCharacterParams.size.w + tileSize.w, currentCharacterParams.size.h + tileSize.h };
-				currentCharacterParams.equippedThrowableWeapon.aimIndicator.sprite.spriteSheetIndex = getSpriteSheetIndex("throwable aim indicator");
-				currentCharacterParams.equippedThrowableWeapon.aimIndicator.sprite.areas = {
-					{
-						{
-							{ 778, 94, 56, 61 }
-						}
-					}
-				};
-				currentCharacterParams.equippedThrowableWeapon.throwDistance.max = currentCharacterParams.size.w * randInt(2, 4);
-				currentCharacterParams.equippedThrowableWeapon.throwIndicator.maxSize = { tileSize.w * 2, tileSize.h * 2 };
-				currentCharacterParams.equippedThrowableWeapon.throwIndicator.indicator.size = currentCharacterParams.equippedThrowableWeapon.throwIndicator.maxSize;
-				currentCharacterParams.equippedThrowableWeapon.throwIndicator.indicator.sprite.spriteSheetIndex = getSpriteSheetIndex("throwable throw indicator");
-				currentCharacterParams.equippedThrowableWeapon.throwIndicator.indicator.sprite.areas = {
-					{
-						{
-							{ 3, 2, 13, 12 },
-							{ 18, 2, 13, 12 }
-						}
-					}
-				};
-				currentCharacterParams.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.startTicks = SDL_GetTicks();
-				currentCharacterParams.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.delay = 1;
-				currentCharacterParams.equippedThrowableWeapon.throwIndicator.frameSwapDelay.startTicks = SDL_GetTicks();
-				currentCharacterParams.equippedThrowableWeapon.throwIndicator.frameSwapDelay.delay = 100;
-				currentCharacterParams.equippedThrowableWeapon.throwArcIndicator.sprite.spriteSheetIndex = getSpriteSheetIndex("throwable throw indicator");
-				currentCharacterParams.equippedThrowableWeapon.throwArcIndicator.sprite.areas = {
-					{
-						{
-							{ 1, 21, 30, 7 }
-						}
-					}
-				};
-				currentCharacterParams.equippedThrowableWeapon.throwArcIndicator.sprite.center = { 0, currentCharacterParams.equippedThrowableWeapon.throwArcIndicator.sprite.areas[0][0].h };
-				break;
-			}
-		}
-
-		currentCharacterParams.resistance = 50;
-
-		Character currentCharacter(currentCharacterParams);
-		characters.push_back(currentCharacter);
-
-		characterPosition.x += currentCharacterParams.size.w;
-	}
-}
+//void initCharacters() {
+//	controlledCharacterIndex = 0;
+//	int characterID = 0;
+//	XYStruct characterPosition = { 191, 193 };
+//	for (int charactersCnt = 0; charactersCnt < 20; ++charactersCnt) {
+//		characterParams currentCharacterParams;
+//
+//		currentCharacterParams.ID = characterID;
+//		++characterID;
+//
+//		currentCharacterParams.position = characterPosition;
+//		currentCharacterParams.groundPosition = currentCharacterParams.position;
+//		currentCharacterParams.size = { tileSize.w * 4, tileSize.h * 4 };
+//
+//		currentCharacterParams.sprites.spriteSheetIndex = getSpriteSheetIndex("main character");
+//		//currentCharacterParams.sprites.areas = getSpriteAreas({ 2, 10 }, { 32, 32 }, 8, 4, { 8, 18 });
+//		currentCharacterParams.sprites.areas = {
+//			{
+//				{ 526, 7, 29, 35 }, { 559, 7, 29, 35 }, { 590, 7, 29, 35 }, { 621, 7, 29, 35 } //up
+//			},
+//			{
+//				{ 5, 7, 29, 35 }, { 45, 7, 29, 35 }, { 78, 7, 29, 35 }, { 117, 7, 29, 35 } //down
+//			},
+//			{
+//				{ 147, 159, 29, 35 }, { 174, 159, 29, 35 }, { 199, 159, 29, 35 }, { 228, 159, 29, 35 } //left
+//			},
+//			{
+//				{ 278, 7, 29, 35 }, { 301, 7, 29, 35 }, { 332, 7, 29, 35 }, { 356, 7, 29, 35 } //right
+//			},
+//			{
+//				{ 388, 7, 29, 35 }, { 422, 7, 29, 35 }, { 461, 7, 29, 35 }, { 492, 7, 29, 35 } //up-right
+//			},
+//			{
+//				{ 151, 7, 29, 35 }, { 181, 7, 29, 35 }, { 214, 7, 29, 35 }, { 246, 7, 29, 35 } //down-right
+//			},
+//			{
+//				{ 255, 159, 29, 35 }, { 291, 159, 29, 35 }, { 321, 159, 29, 35 }, { 354, 159, 29, 35 } //down-left
+//			},
+//			{
+//				{ 9, 159, 29, 35 }, { 40, 159, 29, 35 }, { 76, 159, 29, 35 }, { 114, 159, 29, 35 } //up-left
+//			}
+//		};
+//
+//		currentCharacterParams.layer = 1;
+//
+//		//Init equipped weapon
+//		currentCharacterParams.equippedWeaponType = characterParams::equippedWeaponTypeEnum::throwable;
+//		switch (currentCharacterParams.equippedWeaponType) {
+//			case characterParams::equippedWeaponTypeEnum::ranged: {
+//				currentCharacterParams.equippedRangedWeapon.name = "Gun";
+//				currentCharacterParams.equippedRangedWeapon.size = { tileSize.w * 4, tileSize.h * 2 };
+//				currentCharacterParams.equippedRangedWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
+//				vector<areaStruct> areas;
+//				areas.push_back({ 2, 21, 21, 8 });
+//				currentCharacterParams.equippedRangedWeapon.sprite.areas.push_back(areas);
+//				currentCharacterParams.equippedRangedWeapon.sprite.center = { 0, currentCharacterParams.equippedRangedWeapon.sprite.areas[0][0].h / 2 };
+//				currentCharacterParams.equippedRangedWeapon.fireMode = characterParams::rangedWeaponStruct::fireModeEnum::semiAuto;
+//				currentCharacterParams.equippedRangedWeapon.burst.maxBulletsBeforePause = 3;
+//				currentCharacterParams.equippedRangedWeapon.burst.delay.delay = 200;
+//				currentCharacterParams.equippedRangedWeapon.magazine.ammoName = "Blank";
+//				currentCharacterParams.equippedRangedWeapon.magazine.capacity = 100;
+//				currentCharacterParams.equippedRangedWeapon.magazine.currentLoad = 90;
+//				currentCharacterParams.equippedRangedWeapon.reload.delay.delay = 1000;
+//				currentCharacterParams.equippedRangedWeapon.reload.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
+//				currentCharacterParams.equippedRangedWeapon.reload.sprite.areas = {
+//					{
+//						{ 41, 168, 8, 8 },
+//						{ 52, 168, 8, 8 }
+//					}
+//				};
+//				break;
+//			}
+//			case characterParams::equippedWeaponTypeEnum::melee: {
+//				currentCharacterParams.equippedMeleeWeapon.name = "Katana";
+//				currentCharacterParams.equippedMeleeWeapon.position = currentCharacterParams.position;
+//				currentCharacterParams.equippedMeleeWeapon.size = { tileSize.w * 4, tileSize.h * 2 };
+//				currentCharacterParams.equippedMeleeWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("weapons");
+//				currentCharacterParams.equippedMeleeWeapon.sprite.areas = {
+//					{
+//						{ 522, 9, 29, 6 }
+//					}
+//				};
+//				currentCharacterParams.equippedMeleeWeapon.sprite.center = { 0, currentCharacterParams.equippedMeleeWeapon.sprite.areas[0][0].h / 2 };
+//				currentCharacterParams.equippedMeleeWeapon.swing.delay.delay = 1;
+//				currentCharacterParams.equippedMeleeWeapon.damage = 100;
+//				currentCharacterParams.equippedMeleeWeapon.resistance = 100;
+//				break;
+//			}
+//			case characterParams::equippedWeaponTypeEnum::throwable: {
+//				currentCharacterParams.equippedThrowableWeapon.name = "Grenade";
+//				currentCharacterParams.equippedThrowableWeapon.size = tileSize;
+//				currentCharacterParams.equippedThrowableWeapon.sprite.spriteSheetIndex = getSpriteSheetIndex("grenades");
+//				currentCharacterParams.equippedThrowableWeapon.sprite.areas = {
+//					{
+//						{
+//							{ 143, 67, 98, 117 }
+//						}
+//					}
+//				};
+//				currentCharacterParams.equippedThrowableWeapon.sprite.center = { 0, currentCharacterParams.equippedThrowableWeapon.sprite.areas[0][0].h / 2 };
+//				currentCharacterParams.equippedThrowableWeapon.aimIndicator.size = { currentCharacterParams.size.w + tileSize.w, currentCharacterParams.size.h + tileSize.h };
+//				currentCharacterParams.equippedThrowableWeapon.aimIndicator.sprite.spriteSheetIndex = getSpriteSheetIndex("throwable aim indicator");
+//				currentCharacterParams.equippedThrowableWeapon.aimIndicator.sprite.areas = {
+//					{
+//						{
+//							{ 778, 94, 56, 61 }
+//						}
+//					}
+//				};
+//				currentCharacterParams.equippedThrowableWeapon.throwDistance.max = currentCharacterParams.size.w * randInt(2, 4);
+//				currentCharacterParams.equippedThrowableWeapon.throwIndicator.maxSize = { tileSize.w * 2, tileSize.h * 2 };
+//				currentCharacterParams.equippedThrowableWeapon.throwIndicator.indicator.size = currentCharacterParams.equippedThrowableWeapon.throwIndicator.maxSize;
+//				currentCharacterParams.equippedThrowableWeapon.throwIndicator.indicator.sprite.spriteSheetIndex = getSpriteSheetIndex("throwable throw indicator");
+//				currentCharacterParams.equippedThrowableWeapon.throwIndicator.indicator.sprite.areas = {
+//					{
+//						{
+//							{ 3, 2, 13, 12 },
+//							{ 18, 2, 13, 12 }
+//						}
+//					}
+//				};
+//				currentCharacterParams.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.startTicks = SDL_GetTicks();
+//				currentCharacterParams.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.delay = 1;
+//				currentCharacterParams.equippedThrowableWeapon.throwIndicator.frameSwapDelay.startTicks = SDL_GetTicks();
+//				currentCharacterParams.equippedThrowableWeapon.throwIndicator.frameSwapDelay.delay = 100;
+//				currentCharacterParams.equippedThrowableWeapon.throwArcIndicator.sprite.spriteSheetIndex = getSpriteSheetIndex("throwable throw indicator");
+//				currentCharacterParams.equippedThrowableWeapon.throwArcIndicator.sprite.areas = {
+//					{
+//						{
+//							{ 1, 21, 30, 7 }
+//						}
+//					}
+//				};
+//				currentCharacterParams.equippedThrowableWeapon.throwArcIndicator.sprite.center = { 0, currentCharacterParams.equippedThrowableWeapon.throwArcIndicator.sprite.areas[0][0].h };
+//				break;
+//			}
+//		}
+//
+//		currentCharacterParams.resistance = 50;
+//
+//		Character currentCharacter(currentCharacterParams);
+//		characters.push_back(currentCharacter);
+//
+//		characterPosition.x += currentCharacterParams.size.w;
+//	}
+//}
 
 //Maybe not a good idea to use this function if elements need to be decoupled for performance. E.g.: running SDL_RenderCopy in a loop and running SDL_SetRenderTarget and SDL_RenderSetLogicalSize outside of that loop
 void renderTexture(/*targetTypeEnum targetType, */WHStruct logicalSize, SDL_Texture* sTexture, SDL_Texture* dTexture, areaStruct sRect, areaStruct dRect, int transparencyPercentage) { //s: source, d: destination
@@ -2832,56 +2832,56 @@ void renderBackgroundCharactersAndObjects() {
 
 	vector<renderOrderStruct> renderOrder;
 
-	//Insert characters in renderOrder vector
-	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
-		renderOrderStruct currentRenderOrderStruct;
-		
-		currentRenderOrderStruct.type = renderOrderStruct::typeEnum::character;
-		currentRenderOrderStruct.layerIndex = characters[charactersCnt].getLayer();
-		currentRenderOrderStruct.index = charactersCnt;
-		XYStruct characterPosition = characters[charactersCnt].getPosition();
-		currentRenderOrderStruct.position = { characterPosition.x, characterPosition.y + characters[charactersCnt].getSize().h / 2 };
-		//currentRenderOrderStruct.height = characters[charactersCnt].getCurrentHeight();
+	////Insert characters in renderOrder vector
+	//for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
+	//	renderOrderStruct currentRenderOrderStruct;
+	//	
+	//	currentRenderOrderStruct.type = renderOrderStruct::typeEnum::character;
+	//	currentRenderOrderStruct.layerIndex = characters[charactersCnt].getLayer();
+	//	currentRenderOrderStruct.index = charactersCnt;
+	//	XYStruct characterPosition = characters[charactersCnt].getPosition();
+	//	currentRenderOrderStruct.position = { characterPosition.x, characterPosition.y + characters[charactersCnt].getSize().h / 2 };
+	//	//currentRenderOrderStruct.height = characters[charactersCnt].getCurrentHeight();
 
-		renderOrder.push_back(currentRenderOrderStruct);
-	}
+	//	renderOrder.push_back(currentRenderOrderStruct);
+	//}
 
-	//Insert tables in renderOrder vector
-	for (int tablesCnt = 0; tablesCnt < (int)tables.size(); ++tablesCnt) {
-		renderOrderStruct currentRenderOrderStruct;
+	////Insert tables in renderOrder vector
+	//for (int tablesCnt = 0; tablesCnt < (int)tables.size(); ++tablesCnt) {
+	//	renderOrderStruct currentRenderOrderStruct;
 
-		currentRenderOrderStruct.type = renderOrderStruct::typeEnum::table;
-		currentRenderOrderStruct.layerIndex = tables[tablesCnt].getLayer();
-		currentRenderOrderStruct.index = tablesCnt;
-		currentRenderOrderStruct.position = tables[tablesCnt].getPosition();
-		//currentRenderOrderStruct.height = tables[tablesCnt].getHeight(); //height of non-character needs to be 0 so character can appear on top of them if jumped on them
+	//	currentRenderOrderStruct.type = renderOrderStruct::typeEnum::table;
+	//	currentRenderOrderStruct.layerIndex = tables[tablesCnt].getLayer();
+	//	currentRenderOrderStruct.index = tablesCnt;
+	//	currentRenderOrderStruct.position = tables[tablesCnt].getPosition();
+	//	//currentRenderOrderStruct.height = tables[tablesCnt].getHeight(); //height of non-character needs to be 0 so character can appear on top of them if jumped on them
 
-		renderOrder.push_back(currentRenderOrderStruct);
-	}
+	//	renderOrder.push_back(currentRenderOrderStruct);
+	//}
 
-	//Insert bullets in renderOrder vector
-	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
-		renderOrderStruct newRenderOrderElement;
-		
-		newRenderOrderElement.type = renderOrderStruct::typeEnum::bullet;
-		newRenderOrderElement.layerIndex = bullets[bulletsCnt].getLayer();
-		newRenderOrderElement.index = bulletsCnt;
-		newRenderOrderElement.position = bullets[bulletsCnt].getPosition();
-		
-		renderOrder.push_back(newRenderOrderElement);
-	}
+	////Insert bullets in renderOrder vector
+	//for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
+	//	renderOrderStruct newRenderOrderElement;
+	//	
+	//	newRenderOrderElement.type = renderOrderStruct::typeEnum::bullet;
+	//	newRenderOrderElement.layerIndex = bullets[bulletsCnt].getLayer();
+	//	newRenderOrderElement.index = bulletsCnt;
+	//	newRenderOrderElement.position = bullets[bulletsCnt].getPosition();
+	//	
+	//	renderOrder.push_back(newRenderOrderElement);
+	//}
 
-	//Insert explosion in renderOrder vector
-	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
-		renderOrderStruct newRenderOrderElement;
+	////Insert explosion in renderOrder vector
+	//for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
+	//	renderOrderStruct newRenderOrderElement;
 
-		newRenderOrderElement.type = renderOrderStruct::typeEnum::explosion;
-		newRenderOrderElement.layerIndex = explosions[explosionsCnt].getOverworldGridLayer();
-		newRenderOrderElement.index = explosionsCnt;
-		newRenderOrderElement.position = explosions[explosionsCnt].getFragmentPosition(0);;
+	//	newRenderOrderElement.type = renderOrderStruct::typeEnum::explosion;
+	//	newRenderOrderElement.layerIndex = explosions[explosionsCnt].getOverworldGridLayer();
+	//	newRenderOrderElement.index = explosionsCnt;
+	//	newRenderOrderElement.position = explosions[explosionsCnt].getFragmentPosition(0);;
 
-		renderOrder.push_back(newRenderOrderElement);
-	}
+	//	renderOrder.push_back(newRenderOrderElement);
+	//}
 
 	//Sort renderOrder by x then by y, then by layerNum
 	if ((int)renderOrder.size() > 0) {
@@ -2936,7 +2936,7 @@ void renderBackgroundCharactersAndObjects() {
 		if ((int)renderOrder.size() > 0) {
 
 			//First render (to guarantee graphics that need to are rendered below second render)
-			for (int renderOrderCnt = 0; renderOrderCnt < (int)renderOrder.size(); ++renderOrderCnt) {
+			/*for (int renderOrderCnt = 0; renderOrderCnt < (int)renderOrder.size(); ++renderOrderCnt) {
 				if (renderOrder[renderOrderCnt].layerIndex == layersCnt) {
 					switch (renderOrder[renderOrderCnt].type) {
 						case renderOrderStruct::typeEnum::explosion: {
@@ -2945,7 +2945,7 @@ void renderBackgroundCharactersAndObjects() {
 						}
 					}
 				}
-			}
+			}*/
 
 			//Second render
 			for (int renderOrderCnt = 0; renderOrderCnt < (int)renderOrder.size(); ++renderOrderCnt) {
@@ -2954,29 +2954,29 @@ void renderBackgroundCharactersAndObjects() {
 						case renderOrderStruct::typeEnum::character: {
 
 							//If character is facing up then render weapon before character
-							directionEnum characterDirection = characters[renderOrder[renderOrderCnt].index].getDirection();
-							if (characterDirection == directionEnum::up || characterDirection == directionEnum::upLeft || characterDirection == directionEnum::downLeft || characterDirection == directionEnum::left) {
-								characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
-							}
-							
-							characters[renderOrder[renderOrderCnt].index].render();
-							characters[renderOrder[renderOrderCnt].index].renderReloadAnimation();
-							
-							//If character if facing down then render weapon after character
-							if (characterDirection == directionEnum::down || characterDirection == directionEnum::downRight || characterDirection == directionEnum::right || characterDirection == directionEnum::upRight) {
-								characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
-							}
+							//directionEnum characterDirection = characters[renderOrder[renderOrderCnt].index].getDirection();
+							//if (characterDirection == directionEnum::up || characterDirection == directionEnum::upLeft || characterDirection == directionEnum::downLeft || characterDirection == directionEnum::left) {
+							//	characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
+							//}
+							//
+							//characters[renderOrder[renderOrderCnt].index].render();
+							//characters[renderOrder[renderOrderCnt].index].renderReloadAnimation();
+							//
+							////If character if facing down then render weapon after character
+							//if (characterDirection == directionEnum::down || characterDirection == directionEnum::downRight || characterDirection == directionEnum::right || characterDirection == directionEnum::upRight) {
+							//	characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
+							//}
 
-							characters[renderOrder[renderOrderCnt].index].renderEquippedMeleeWeaponArea();
-							characters[renderOrder[renderOrderCnt].index].renderMeleeRecoilSparkAnimation();
+							//characters[renderOrder[renderOrderCnt].index].renderEquippedMeleeWeaponArea();
+							//characters[renderOrder[renderOrderCnt].index].renderMeleeRecoilSparkAnimation();
 							break;
 						}
 						case renderOrderStruct::typeEnum::table: {
-							tables[renderOrder[renderOrderCnt].index].render();
+							//tables[renderOrder[renderOrderCnt].index].render();
 							break;
 						}
 						case renderOrderStruct::typeEnum::bullet: {
-							bullets[renderOrder[renderOrderCnt].index].render();
+							//bullets[renderOrder[renderOrderCnt].index].render();
 							break;
 						}
 					}
@@ -2988,9 +2988,9 @@ void renderBackgroundCharactersAndObjects() {
 	}
 
 	//Render areas
-	for (int areasCnt = 0; areasCnt < (int)areas.size(); ++areasCnt) {
+	/*for (int areasCnt = 0; areasCnt < (int)areas.size(); ++areasCnt) {
 		areas[areasCnt].render();
-	}
+	}*/
 
 	//Render pre-render texture to screen
 	setSDLRenderTarget(NULL);
@@ -3009,10 +3009,10 @@ void renderUI() {
 	WHStruct textSize = getTextSize("Z", defaultFont);
 
 	//Render equipped weapon magazine ammo
-	characterParams::rangedWeaponStruct::magazineStruct magazine = characters[controlledCharacterIndex].getMagazine();
+	/*characterParams::rangedWeaponStruct::magazineStruct magazine = characters[controlledCharacterIndex].getMagazine();
 	renderText(characters[controlledCharacterIndex].getEquippedWeaponName(), defaultFont, defaultColour, { 0, textLogicalSize.h - (textSize.h * 6) });
 	renderText(magazine.ammoName, defaultFont, defaultColour, {0, textLogicalSize.h - (textSize.h * 4)});
-	renderText(formatStr("{}/{}", { str(magazine.currentLoad), str(magazine.capacity) }), defaultFont, defaultColour, { 0, textLogicalSize.h - (textSize.h * 2) });
+	renderText(formatStr("{}/{}", { str(magazine.currentLoad), str(magazine.capacity) }), defaultFont, defaultColour, { 0, textLogicalSize.h - (textSize.h * 2) });*/
 
 }
 
@@ -3590,90 +3590,90 @@ void createMazeAndGetAStarPath(areaStruct startPixelArea, areaStruct endPixelAre
 
 }
 
-void characterActions() {
-	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
-		if (controlledCharacterIndex == charactersCnt) {
-			characters[charactersCnt].move();
-			characters[charactersCnt].jump();
-			characters[charactersCnt].jumpOnCollidableObject();
-			characters[charactersCnt].jumpOnTile();
-			characters[charactersCnt].updateEquippedWeaponAngle();
-			characters[charactersCnt].useEquippedWeapon();
-			characters[charactersCnt].detectEquippedMeleeWeaponHit();
-			characters[charactersCnt].animateMeleeRecoilSpark();
-			characters[charactersCnt].readyEquippedThrowable();
-			characters[charactersCnt].throwEquippedThrowable();
-		}
-		else {
-			characters[charactersCnt].idleAnimation();
-		}
-	}
-}
-
-void tableActions() {
-	for (int tablesCnt = 0; tablesCnt < (int)tables.size(); ++tablesCnt) {
-		tables[tablesCnt].markForDestruction();
-	}
-}
-
-void bulletActions() {
-	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
-		bullets[bulletsCnt].move();
-		bullets[bulletsCnt].markForDestruction();
-		bullets[bulletsCnt].ricochetPenetrateOrStayStuck();
-		bullets[bulletsCnt].explode();
-	}
-}
-
-void explosionActions() {
-	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
-		explosions[explosionsCnt].createFragments();
-		explosions[explosionsCnt].explode();
-		explosions[explosionsCnt].markForDestruction();
-	}
-}
-
-int getBulletIndexByID(int ID) {
-	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
-		if (bullets[bulletsCnt].getID() == ID) {
-			return bulletsCnt;
-		}
-	}
-
-	return -1;
-}
-
-void destroyBullets() {
-	for (int bulletsToDestroyIDsCnt = 0; bulletsToDestroyIDsCnt < (int)bulletsToDestroyIDs.size(); ++bulletsToDestroyIDsCnt) {
-		int bulletIndex = getBulletIndexByID(bulletsToDestroyIDs[bulletsToDestroyIDsCnt]);
-		if (bulletIndex > -1) {
-			bullets.erase(bullets.begin() + bulletIndex);
-		}
-	}
-
-	bulletsToDestroyIDs.clear();
-}
-
-int getExplosionIndexByID(int ID) {
-	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
-		if (explosions[explosionsCnt].getID() == ID) {
-			return explosionsCnt;
-		}
-	}
-
-	return -1;
-}
-
-void destroyExplosions() {
-	for (int explosionsToDestroyIDsCnt = 0 ; explosionsToDestroyIDsCnt < (int)explosionsToDestroyIDs.size(); ++explosionsToDestroyIDsCnt) {
-		int explosionIndex = getExplosionIndexByID(explosionsToDestroyIDs[explosionsToDestroyIDsCnt]);
-		if (explosionIndex > -1) {
-			explosions.erase(explosions.begin() + explosionIndex);
-		}
-	}
-
-	explosionsToDestroyIDs.clear();
-}
+//void characterActions() {
+//	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
+//		if (controlledCharacterIndex == charactersCnt) {
+//			characters[charactersCnt].move();
+//			characters[charactersCnt].jump();
+//			characters[charactersCnt].jumpOnCollidableObject();
+//			characters[charactersCnt].jumpOnTile();
+//			characters[charactersCnt].updateEquippedWeaponAngle();
+//			characters[charactersCnt].useEquippedWeapon();
+//			characters[charactersCnt].detectEquippedMeleeWeaponHit();
+//			characters[charactersCnt].animateMeleeRecoilSpark();
+//			characters[charactersCnt].readyEquippedThrowable();
+//			characters[charactersCnt].throwEquippedThrowable();
+//		}
+//		else {
+//			characters[charactersCnt].idleAnimation();
+//		}
+//	}
+//}
+//
+//void tableActions() {
+//	for (int tablesCnt = 0; tablesCnt < (int)tables.size(); ++tablesCnt) {
+//		tables[tablesCnt].markForDestruction();
+//	}
+//}
+//
+//void bulletActions() {
+//	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
+//		bullets[bulletsCnt].move();
+//		bullets[bulletsCnt].markForDestruction();
+//		bullets[bulletsCnt].ricochetPenetrateOrStayStuck();
+//		bullets[bulletsCnt].explode();
+//	}
+//}
+//
+//void explosionActions() {
+//	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
+//		explosions[explosionsCnt].createFragments();
+//		explosions[explosionsCnt].explode();
+//		explosions[explosionsCnt].markForDestruction();
+//	}
+//}
+//
+//int getBulletIndexByID(int ID) {
+//	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
+//		if (bullets[bulletsCnt].getID() == ID) {
+//			return bulletsCnt;
+//		}
+//	}
+//
+//	return -1;
+//}
+//
+//void destroyBullets() {
+//	for (int bulletsToDestroyIDsCnt = 0; bulletsToDestroyIDsCnt < (int)bulletsToDestroyIDs.size(); ++bulletsToDestroyIDsCnt) {
+//		int bulletIndex = getBulletIndexByID(bulletsToDestroyIDs[bulletsToDestroyIDsCnt]);
+//		if (bulletIndex > -1) {
+//			bullets.erase(bullets.begin() + bulletIndex);
+//		}
+//	}
+//
+//	bulletsToDestroyIDs.clear();
+//}
+//
+//int getExplosionIndexByID(int ID) {
+//	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
+//		if (explosions[explosionsCnt].getID() == ID) {
+//			return explosionsCnt;
+//		}
+//	}
+//
+//	return -1;
+//}
+//
+//void destroyExplosions() {
+//	for (int explosionsToDestroyIDsCnt = 0 ; explosionsToDestroyIDsCnt < (int)explosionsToDestroyIDs.size(); ++explosionsToDestroyIDsCnt) {
+//		int explosionIndex = getExplosionIndexByID(explosionsToDestroyIDs[explosionsToDestroyIDsCnt]);
+//		if (explosionIndex > -1) {
+//			explosions.erase(explosions.begin() + explosionIndex);
+//		}
+//	}
+//
+//	explosionsToDestroyIDs.clear();
+//}
 
 void renderShadow(SDL_Rect dRect, int transparencyPercentage) {
 
@@ -3700,138 +3700,138 @@ XYStruct convertAngleToCoordinates(double angleInDegrees, int radius) {
 	return coordinates;
 }
 
-vector<int> getBulletIDs() {
-	vector<int> bulletIDs;
-
-	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
-		bulletIDs.push_back(bullets[bulletsCnt].getID());
-	}
-
-	return bulletIDs;
-}
-
-void initBullet(bulletParamsStruct newParams) {
-	Bullet newBullet(newParams);
-	bullets.push_back(newBullet);
-}
-
-void setStuckBulletsFadeOut() {
-	if ((int)bullets.size() > maxStuckBullets) {
-
-		//If earliest bullet is not fading out then set bullet fade out
-		if (bullets[0].getFadeOut().delay == 0) {
-			delayStruct newFadeOut;
-			newFadeOut.startTicks = SDL_GetTicks();
-			newFadeOut.delay = 2000;
-			bullets[0].setFadeOut(newFadeOut);
-		}
-
-	}
-}
-
-void setExplosionsFadeOut() {
-	if ((int)explosions.size() > maxExplosions) {
-
-		//If earliest explosion is not fading out then set fade out
-		if (explosions[0].getFadeOut().delay == 0) {
-			delayStruct newFadeOut;
-			newFadeOut.startTicks = SDL_GetTicks();
-			newFadeOut.delay = 2000;
-			explosions[0].setFadeOut(newFadeOut);
-		}
-
-	}
-}
-
-void initExplosion(explosionParamsStruct newParams) {
-	Explosion newExplosion(newParams);
-	explosions.push_back(newExplosion);
-}
-
-vector<int> getExplosionIDs() {
-	vector<int> explosionIDs;
-
-	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
-		explosionIDs.push_back(explosions[explosionsCnt].getID());
-	}
-
-	return explosionIDs;
-}
-
-void initSplatter(explosionParamsStruct explosionParams, spriteStruct splatterSprite, areaStruct impactArea) {
-	explosionParamsStruct newSplatter;
-
-	newSplatter = explosionParams;
-	newSplatter.ID = getFreeID(getExplosionIDs());
-	newSplatter.sprite = splatterSprite;
-	newSplatter.sprite.angle = explosionParams.sprite.angle;
-
-	if (impactArea.x > -1 && impactArea.y > -1) {
-		newSplatter.collisionData.collidePosition = { impactArea.x, impactArea.y };
-	}
-
-	newSplatter.fragmentIsEntireSprite = true;
-	newSplatter.totalFragments = { impactArea.w / 2, impactArea.h / 2 };
-
-	newSplatter.enableShadows = false;
-
-	initExplosion(newSplatter);
-}
-
-int getCharacterIndexByID(int ID) {
-	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
-		if (characters[charactersCnt].getID() == ID) {
-			return charactersCnt;
-		}
-	}
-
-	return -1;
-}
-
-void destroyCharacters() {
-	for (int charactersToDestroyIDsCnt = 0; charactersToDestroyIDsCnt < (int)charactersToDestroyIDs.size(); ++charactersToDestroyIDsCnt) {
-		int characterIndex = getCharacterIndexByID(charactersToDestroyIDs[charactersToDestroyIDsCnt]);
-		if (characterIndex > -1) {
-			characters.erase(characters.begin() + characterIndex);
-		}
-	}
-
-	charactersToDestroyIDs.clear();
-}
-
-int getTableIndexByID(int ID) {
-	for (int tablesCnt = 0; tablesCnt < (int)tables.size(); ++tablesCnt) {
-		if (tables[tablesCnt].getID() == ID) {
-			return tablesCnt;
-		}
-	}
-
-	return -1;
-}
-
-void destroyTables() {
-	for (int tablesToDestroyIDsCnt = 0; tablesToDestroyIDsCnt < (int)tablesToDestroyIDs.size(); ++tablesToDestroyIDsCnt) {
-		int tableIndex = getTableIndexByID(tablesToDestroyIDs[tablesToDestroyIDsCnt]);
-		if (tableIndex > -1) {
-			tables.erase(tables.begin() + tableIndex);
-		}
-	}
-}
-
-void initArea(areaParamsStruct newParams) {
-	Area newArea(newParams);
-	areas.push_back(newArea);
-}
-
-vector<int> getAreaIDs() {
-	vector<int> areaIDs;
-
-	for (int areasCnt = 0; areasCnt < (int)areas.size(); ++areasCnt) {
-		areaIDs.push_back(areas[areasCnt].getID());
-	}
-
-	return areaIDs;
-}
+//vector<int> getBulletIDs() {
+//	vector<int> bulletIDs;
+//
+//	for (int bulletsCnt = 0; bulletsCnt < (int)bullets.size(); ++bulletsCnt) {
+//		bulletIDs.push_back(bullets[bulletsCnt].getID());
+//	}
+//
+//	return bulletIDs;
+//}
+//
+//void initBullet(bulletParamsStruct newParams) {
+//	Bullet newBullet(newParams);
+//	bullets.push_back(newBullet);
+//}
+//
+//void setStuckBulletsFadeOut() {
+//	if ((int)bullets.size() > maxStuckBullets) {
+//
+//		//If earliest bullet is not fading out then set bullet fade out
+//		if (bullets[0].getFadeOut().delay == 0) {
+//			delayStruct newFadeOut;
+//			newFadeOut.startTicks = SDL_GetTicks();
+//			newFadeOut.delay = 2000;
+//			bullets[0].setFadeOut(newFadeOut);
+//		}
+//
+//	}
+//}
+//
+//void setExplosionsFadeOut() {
+//	if ((int)explosions.size() > maxExplosions) {
+//
+//		//If earliest explosion is not fading out then set fade out
+//		if (explosions[0].getFadeOut().delay == 0) {
+//			delayStruct newFadeOut;
+//			newFadeOut.startTicks = SDL_GetTicks();
+//			newFadeOut.delay = 2000;
+//			explosions[0].setFadeOut(newFadeOut);
+//		}
+//
+//	}
+//}
+//
+//void initExplosion(explosionParamsStruct newParams) {
+//	Explosion newExplosion(newParams);
+//	explosions.push_back(newExplosion);
+//}
+//
+//vector<int> getExplosionIDs() {
+//	vector<int> explosionIDs;
+//
+//	for (int explosionsCnt = 0; explosionsCnt < (int)explosions.size(); ++explosionsCnt) {
+//		explosionIDs.push_back(explosions[explosionsCnt].getID());
+//	}
+//
+//	return explosionIDs;
+//}
+//
+//void initSplatter(explosionParamsStruct explosionParams, spriteStruct splatterSprite, areaStruct impactArea) {
+//	explosionParamsStruct newSplatter;
+//
+//	newSplatter = explosionParams;
+//	newSplatter.ID = getFreeID(getExplosionIDs());
+//	newSplatter.sprite = splatterSprite;
+//	newSplatter.sprite.angle = explosionParams.sprite.angle;
+//
+//	if (impactArea.x > -1 && impactArea.y > -1) {
+//		newSplatter.collisionData.collidePosition = { impactArea.x, impactArea.y };
+//	}
+//
+//	newSplatter.fragmentIsEntireSprite = true;
+//	newSplatter.totalFragments = { impactArea.w / 2, impactArea.h / 2 };
+//
+//	newSplatter.enableShadows = false;
+//
+//	initExplosion(newSplatter);
+//}
+//
+//int getCharacterIndexByID(int ID) {
+//	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
+//		if (characters[charactersCnt].getID() == ID) {
+//			return charactersCnt;
+//		}
+//	}
+//
+//	return -1;
+//}
+//
+//void destroyCharacters() {
+//	for (int charactersToDestroyIDsCnt = 0; charactersToDestroyIDsCnt < (int)charactersToDestroyIDs.size(); ++charactersToDestroyIDsCnt) {
+//		int characterIndex = getCharacterIndexByID(charactersToDestroyIDs[charactersToDestroyIDsCnt]);
+//		if (characterIndex > -1) {
+//			characters.erase(characters.begin() + characterIndex);
+//		}
+//	}
+//
+//	charactersToDestroyIDs.clear();
+//}
+//
+//int getTableIndexByID(int ID) {
+//	for (int tablesCnt = 0; tablesCnt < (int)tables.size(); ++tablesCnt) {
+//		if (tables[tablesCnt].getID() == ID) {
+//			return tablesCnt;
+//		}
+//	}
+//
+//	return -1;
+//}
+//
+//void destroyTables() {
+//	for (int tablesToDestroyIDsCnt = 0; tablesToDestroyIDsCnt < (int)tablesToDestroyIDs.size(); ++tablesToDestroyIDsCnt) {
+//		int tableIndex = getTableIndexByID(tablesToDestroyIDs[tablesToDestroyIDsCnt]);
+//		if (tableIndex > -1) {
+//			tables.erase(tables.begin() + tableIndex);
+//		}
+//	}
+//}
+//
+//void initArea(areaParamsStruct newParams) {
+//	Area newArea(newParams);
+//	areas.push_back(newArea);
+//}
+//
+//vector<int> getAreaIDs() {
+//	vector<int> areaIDs;
+//
+//	for (int areasCnt = 0; areasCnt < (int)areas.size(); ++areasCnt) {
+//		areaIDs.push_back(areas[areasCnt].getID());
+//	}
+//
+//	return areaIDs;
+//}
 
 SDL_RendererFlip randFlip(flipPercentagesStruct flipPercentages) {
 	SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE;
@@ -3851,2013 +3851,2044 @@ SDL_RendererFlip randFlip(flipPercentagesStruct flipPercentages) {
 	return flip;
 }
 
+vector<int> getCharacterIDs() {
+	vector<int> characterIDs;
+
+	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
+		characterIDs.push_back(characters[charactersCnt].getID());
+	}
+
+	return characterIDs;
+}
+
+void initCharacters() {
+	for (int charactersCnt = 0; charactersCnt < 1; ++charactersCnt) {
+		characterParamsStruct newCharacterParams;
+
+		newCharacterParams.ID = getFreeID(getCharacterIDs());
+		
+		newCharacterParams.position = { --;; };
+
+		Character newCharacter(newCharacterParams);
+		characters.push_back(newCharacter);
+	}
+}
+
 //functions end
 
 //class functions start
 
-Character::Character(characterParams newParams) {
+//Character::Character(characterParams newParams) {
+//	params = newParams;
+//};
+//
+//int Character::getLayer() {
+//	return params.layer;
+//}
+//
+//XYStruct Character::getPosition() {
+//	return params.position;
+//}
+//
+//WHStruct Character::getSize() {
+//	return params.size;
+//}
+//
+//int Character::getCurrentHeight() {
+//	return params.jump.currentHeight;
+//}
+//
+//directionEnum Character::getDirection() {
+//	return params.direction;
+//}
+//
+//int Character::getFrame() {
+//	return params.frame;
+//}
+//
+//characterParams::rangedWeaponStruct::magazineStruct Character::getMagazine() {
+//	return params.equippedRangedWeapon.magazine;
+//}
+//
+//string Character::getEquippedWeaponName() {
+//	return params.equippedRangedWeapon.name;
+//}
+//
+//int Character::getID() {
+//	return params.ID;
+//}
+//
+//int Character::getResistance() {
+//	return params.resistance;
+//}
+//
+//void Character::setResistance(int newResistance) {
+//	params.resistance = newResistance;
+//}
+//
+//int Character::getStuckTolerancePercentage() {
+//	return params.stuckTolerancePercentage;
+//}
+//
+//int Character::getCharacterSpriteSheetIndex() {
+//	return params.sprites.spriteSheetIndex;
+//}
+//
+//areaStruct Character::getSpriteSheetArea(directionEnum direction, int frame) {
+//	return params.sprites.areas[(int)direction][frame];
+//}
+//
+//bool Character::getDisplaySprites() {
+//	return params.displaySprites;
+//}
+//
+//void Character::setDisplaySprites(bool newDisplaySprites) {
+//	params.displaySprites = newDisplaySprites;
+//}
+//
+//void Character::setDestroy(bool newDestroy) {
+//	params.destroy = newDestroy;
+//}
+//
+//vector<int> Character::getBulletsFiredIDs() {
+//	return params.bulletsFiredIDs;
+//}
+//
+//void Character::render() {
+//	if (params.displaySprites == true) {
+//
+//		//Render shadow
+//		WHStruct shadowSize = { params.size.w, params.size.h / 5 };
+//		XYStruct shadowPosition = { params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h - params.shadowHeight };
+//		if (areaWithinCameraView({ shadowPosition.x + camera.area.x, shadowPosition.y + camera.area.y, shadowSize.w, shadowSize.h }) == true) {
+//			renderShadow({ shadowPosition.x, shadowPosition.y, shadowSize.w, shadowSize.h }, 50);
+//		}
+//
+//		//Render character
+//		if (areaWithinCameraView({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }) == true) {
+//			SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
+//			SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h };
+//			SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
+//		}
+//
+//	}
+//}
+//
+//void Character::updateEquippedWeaponAngle() {
+//	switch (params.equippedWeaponType) {
+//		case characterParams::equippedWeaponTypeEnum::ranged: {
+//			if (rightStickXDir != 0 || rightStickYDir != 0) {
+//				params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+//			}
+//			else if (xDir != 0 || yDir != 0) {
+//				params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+//			}
+//			break;
+//		}
+//		case characterParams::equippedWeaponTypeEnum::melee: {
+//			if (params.equippedMeleeWeapon.swing.swinging == false) {
+//				if (rightStickXDir != 0 || rightStickYDir != 0) {
+//					params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+//				}
+//				else if (xDir != 0 || yDir != 0) {
+//					params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+//				}
+//			}
+//			break;
+//		}
+//		case characterParams::equippedWeaponTypeEnum::throwable: {
+//			if (rightStickXDir != 0 || rightStickYDir != 0) {
+//				params.equippedThrowableWeapon.aimIndicator.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+//			}
+//			else if (xDir != 0 || yDir != 0) {
+//				params.equippedThrowableWeapon.aimIndicator.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
+//			}
+//			break;
+//		}
+//	}
+//}
+//
+//void Character::renderEquippedWeapon() {
+//	if (params.displaySprites == true) {
+//		switch (params.equippedWeaponType) {
+//			case characterParams::equippedWeaponTypeEnum::ranged: {
+//
+//				//Update position
+//				params.equippedRangedWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedRangedWeapon.sprite.areas[0][0].h / 2) };
+//
+//				//Flip weapon and adjust position
+//				if (params.equippedRangedWeapon.sprite.angle >= -90 && params.equippedRangedWeapon.sprite.angle <= 90) {
+//
+//					//Weapon is facing right
+//					params.equippedRangedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+//
+//				}
+//				else {
+//
+//					//Weapon is facing left
+//					params.equippedRangedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
+//
+//				}
+//
+//				//Render
+//				SDL_Rect sRect = convertAreaToSDLRect(params.equippedRangedWeapon.sprite.areas[0][0]);
+//				SDL_Rect dRect = { params.equippedRangedWeapon.position.x - camera.area.x, params.equippedRangedWeapon.position.y - camera.area.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h };
+//				if (areaWithinCameraView({ params.equippedRangedWeapon.position.x, params.equippedRangedWeapon.position.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h }) == true) {
+//					SDLRenderCopyEx(sRect, dRect, params.equippedRangedWeapon.sprite);
+//				}
+//
+//				break;
+//			}
+//			case characterParams::equippedWeaponTypeEnum::melee: {
+//
+//				//Update position
+//				params.equippedMeleeWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedMeleeWeapon.sprite.areas[0][0].h / 2) };
+//
+//				//Flip weapon and adjust position
+//				if (params.equippedMeleeWeapon.sprite.angle >= -90 && params.equippedMeleeWeapon.sprite.angle <= 90) {
+//
+//					//Weapon is facing right
+//					params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+//
+//				}
+//				else {
+//
+//					//Weapon is facing left
+//					params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
+//
+//				}
+//
+//				//Render
+//				SDL_Rect sRect = convertAreaToSDLRect(params.equippedMeleeWeapon.sprite.areas[0][0]);
+//				SDL_Rect dRect = { params.equippedMeleeWeapon.position.x - camera.area.x, params.equippedMeleeWeapon.position.y - camera.area.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h };
+//				if (areaWithinCameraView({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }) == true) {
+//
+//					//Update weapon angle
+//					if (params.equippedMeleeWeapon.swing.swinging == true) {
+//						params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.currentAngle;
+//					}
+//
+//					SDLRenderCopyEx(sRect, dRect, params.equippedMeleeWeapon.sprite);
+//				}
+//
+//				break;
+//			}
+//			case characterParams::equippedWeaponTypeEnum::throwable: {
+//				if (params.equippedThrowableWeapon.throwableThrow.thrown == false) {
+//					if (params.equippedThrowableWeapon.readied == false) {
+//
+//						//Update position for when throwable is not readied
+//						switch (params.direction) {
+//						case directionEnum::down: {
+//							params.equippedThrowableWeapon.position = { params.position.x, params.position.y + (params.size.h / 2) };
+//							break;
+//						}
+//						case directionEnum::up: {
+//							params.equippedThrowableWeapon.position = { params.position.x + params.size.w, params.position.y + (params.size.h / 2) };
+//							break;
+//						}
+//						case directionEnum::left: {
+//							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+//							break;
+//						}
+//						case directionEnum::right: {
+//							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+//							break;
+//						}
+//						case directionEnum::upRight: {
+//							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+//							break;
+//						}
+//						case directionEnum::upLeft: {
+//							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+//							break;
+//						}
+//						case directionEnum::downRight: {
+//							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+//							break;
+//						}
+//						case directionEnum::downLeft: {
+//							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
+//							break;
+//						}
+//						}
+//
+//					}
+//					else {
+//
+//						//Update position for when throwable is readied
+//						switch (params.direction) {
+//						case directionEnum::down: {
+//							params.equippedThrowableWeapon.position = { params.position.x, params.position.y };
+//							break;
+//						}
+//						case directionEnum::up: {
+//							params.equippedThrowableWeapon.position = { params.position.x + params.size.w, params.position.y };
+//							break;
+//						}
+//						case directionEnum::left: {
+//							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
+//							break;
+//						}
+//						case directionEnum::right: {
+//							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
+//							break;
+//						}
+//						case directionEnum::upRight: {
+//							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
+//							break;
+//						}
+//						case directionEnum::upLeft: {
+//							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
+//							break;
+//						}
+//						case directionEnum::downRight: {
+//							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
+//							break;
+//						}
+//						case directionEnum::downLeft: {
+//							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
+//							break;
+//						}
+//						}
+//
+//					}
+//
+//					//Render throwable
+//					/*if (areaWithinCameraView({ params.equippedThrowableWeapon.position.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h }) == true) {
+//						SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.sprite.areas[0][0]);
+//						SDL_Rect dRect = { params.equippedThrowableWeapon.position.x - camera.area.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight - camera.area.y, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h };
+//						SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.sprite);
+//					}*/
+//
+//					if (params.equippedThrowableWeapon.readied == true) {
+//
+//						//Update throwable aim indicator position
+//						params.equippedThrowableWeapon.aimIndicator.position = { params.position.x + (params.size.w / 2) - (params.equippedThrowableWeapon.aimIndicator.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedThrowableWeapon.aimIndicator.size.h / 2) };
+//
+//						//Flip throwable aim indicator and adjust position
+//						if (params.equippedThrowableWeapon.aimIndicator.sprite.angle >= -90 && params.equippedThrowableWeapon.aimIndicator.sprite.angle <= 90) {
+//
+//							//Throwable aim indicator is facing right
+//							params.equippedThrowableWeapon.aimIndicator.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+//
+//						}
+//						else {
+//
+//							//Throwable aim indicator is facing left
+//							params.equippedThrowableWeapon.aimIndicator.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
+//
+//						}
+//
+//						//Render throwable aim indicator
+//						if (areaWithinCameraView({ params.equippedThrowableWeapon.aimIndicator.position.x, params.equippedThrowableWeapon.aimIndicator.position.y, params.equippedThrowableWeapon.aimIndicator.size.w, params.equippedThrowableWeapon.aimIndicator.size.h }) == true) {
+//							SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.aimIndicator.sprite.areas[0][0]);
+//							SDL_Rect dRect = { params.equippedThrowableWeapon.aimIndicator.position.x - camera.area.x, params.equippedThrowableWeapon.aimIndicator.position.y - camera.area.y, params.equippedThrowableWeapon.aimIndicator.size.w, params.equippedThrowableWeapon.aimIndicator.size.h };
+//							SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.aimIndicator.sprite);
+//						}
+//
+//						//Update throwable throw indicator size
+//						if (SDL_GetTicks() - params.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.startTicks >= params.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.delay) {
+//							params.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.startTicks = SDL_GetTicks();
+//
+//							if ((params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier == -1 && params.equippedThrowableWeapon.throwIndicator.indicator.size.w > params.equippedThrowableWeapon.throwIndicator.maxSize.w / 2)
+//								|| (params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier == 1 && params.equippedThrowableWeapon.throwIndicator.indicator.size.w < params.equippedThrowableWeapon.throwIndicator.maxSize.w)) {
+//								params.equippedThrowableWeapon.throwIndicator.indicator.size.w += params.equippedThrowableWeapon.throwIndicator.sizePixelIncrement * params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier;
+//								params.equippedThrowableWeapon.throwIndicator.indicator.size.h += params.equippedThrowableWeapon.throwIndicator.sizePixelIncrement * params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier;
+//							}
+//							else {
+//								if (params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier == -1) {
+//									params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier = 1;
+//								}
+//								else {
+//									params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier = -1;
+//								}
+//							}
+//						}
+//
+//						//Get current throw distance
+//						int rightJoystickTilt = -1;
+//						if (abs(rightJoystickAxisY) > abs(rightJoystickAxisX)) {
+//							rightJoystickTilt = abs(rightJoystickAxisY);
+//						}
+//						else {
+//							rightJoystickTilt = abs(rightJoystickAxisX);
+//						}
+//						int tiltPercentage = (rightJoystickTilt * 100) / (joystickAxisMaxValue - deadZone);
+//						params.equippedThrowableWeapon.throwDistance.current = (tiltPercentage * params.equippedThrowableWeapon.throwDistance.max) / 100;
+//
+//						//Update throwable throw indicator position
+//						XYStruct throwIndicatorPositionOffset = convertAngleToCoordinates(params.equippedThrowableWeapon.aimIndicator.sprite.angle, (params.size.w / 2) + params.equippedThrowableWeapon.throwDistance.current);
+//						params.equippedThrowableWeapon.throwIndicator.indicator.position = { params.position.x + (params.size.w / 2) - (params.equippedThrowableWeapon.throwIndicator.indicator.size.w / 2) + throwIndicatorPositionOffset.x, params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedThrowableWeapon.throwIndicator.indicator.size.h / 2) + throwIndicatorPositionOffset.y };
+//
+//						if (areaWithinCameraView({ params.equippedThrowableWeapon.throwIndicator.indicator.position.x, params.equippedThrowableWeapon.throwIndicator.indicator.position.y, params.equippedThrowableWeapon.throwIndicator.indicator.size.w, params.equippedThrowableWeapon.throwIndicator.indicator.size.h }) == true) {
+//
+//							//Render throwable throw indicator
+//							SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.throwIndicator.indicator.sprite.areas[0][params.equippedThrowableWeapon.throwIndicator.frame]);
+//							SDL_Rect dRect = { params.equippedThrowableWeapon.throwIndicator.indicator.position.x - camera.area.x, params.equippedThrowableWeapon.throwIndicator.indicator.position.y - camera.area.y, params.equippedThrowableWeapon.throwIndicator.indicator.size.w, params.equippedThrowableWeapon.throwIndicator.indicator.size.h };
+//							SDL_RenderCopy(renderer, spriteSheets[params.equippedThrowableWeapon.throwIndicator.indicator.sprite.spriteSheetIndex].texture, &sRect, &dRect);
+//
+//							//Update throwable throw indicator frame
+//							if (SDL_GetTicks() - params.equippedThrowableWeapon.throwIndicator.frameSwapDelay.startTicks >= params.equippedThrowableWeapon.throwIndicator.frameSwapDelay.delay) {
+//								params.equippedThrowableWeapon.throwIndicator.frameSwapDelay.startTicks = SDL_GetTicks();
+//
+//								if (params.equippedThrowableWeapon.throwIndicator.frame < (int)params.equippedThrowableWeapon.throwIndicator.indicator.sprite.areas[0].size() - 1) {
+//									++params.equippedThrowableWeapon.throwIndicator.frame;
+//								}
+//								else {
+//									params.equippedThrowableWeapon.throwIndicator.frame = 0;
+//								}
+//							}
+//
+//						}
+//
+//						//Update throw arc indicator angle and flip
+//						params.equippedThrowableWeapon.throwArcIndicator.sprite.angle = params.equippedThrowableWeapon.aimIndicator.sprite.angle;
+//						params.equippedThrowableWeapon.throwArcIndicator.sprite.flip = params.equippedThrowableWeapon.aimIndicator.sprite.flip;
+//
+//						//Update throw arc indicator position and size
+//						params.equippedThrowableWeapon.throwArcIndicator.position = params.equippedThrowableWeapon.position;
+//						//params.equippedThrowableWeapon.throwArcIndicator.size = { abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.x - params.equippedThrowableWeapon.throwArcIndicator.position.x), tileSize.h };
+//						/*if ((params.equippedThrowableWeapon.throwArcIndicator.sprite.angle >= (double)-45 && params.equippedThrowableWeapon.throwArcIndicator.sprite.angle <= (double)45)
+//							|| (params.equippedThrowableWeapon.throwArcIndicator.sprite.angle >= (double)-180 && params.equippedThrowableWeapon.throwArcIndicator.sprite.angle <= (double)-180 + 45)
+//							|| (params.equippedThrowableWeapon.throwArcIndicator.sprite.angle >= (double)180 - 45 && params.equippedThrowableWeapon.throwArcIndicator.sprite.angle <= (double)180)) {
+//							params.equippedThrowableWeapon.throwArcIndicator.size = { abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.x - params.equippedThrowableWeapon.throwArcIndicator.position.x), tileSize.h };
+//						}
+//						else {
+//							params.equippedThrowableWeapon.throwArcIndicator.size = { abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.y - params.equippedThrowableWeapon.throwArcIndicator.position.y), tileSize.h };
+//						}*/
+//						if (abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.x - params.equippedThrowableWeapon.throwArcIndicator.position.x) > abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.y - params.equippedThrowableWeapon.throwArcIndicator.position.y)) {
+//							params.equippedThrowableWeapon.throwArcIndicator.size = { abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.x - params.equippedThrowableWeapon.throwArcIndicator.position.x), tileSize.h };
+//						}
+//						else {
+//							params.equippedThrowableWeapon.throwArcIndicator.size = { abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.y - params.equippedThrowableWeapon.throwArcIndicator.position.y), tileSize.h };
+//						}
+//
+//						//Render throw arc indicator
+//						if (areaWithinCameraView({ params.equippedThrowableWeapon.throwArcIndicator.position.x, params.equippedThrowableWeapon.throwArcIndicator.position.y - params.jump.currentHeight, params.equippedThrowableWeapon.throwArcIndicator.size.w, params.equippedThrowableWeapon.throwArcIndicator.size.h }) == true) {
+//							SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.throwArcIndicator.sprite.areas[0][0]);
+//							SDL_Rect dRect = { params.equippedThrowableWeapon.throwArcIndicator.position.x - camera.area.x, params.equippedThrowableWeapon.throwArcIndicator.position.y - params.jump.currentHeight - camera.area.y, params.equippedThrowableWeapon.throwArcIndicator.size.w, params.equippedThrowableWeapon.throwArcIndicator.size.h };
+//							SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.throwArcIndicator.sprite);
+//						}
+//
+//					}
+//				}
+//
+//				//Render throwable
+//				if (areaWithinCameraView({ params.equippedThrowableWeapon.position.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h }) == true) {
+//					SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.sprite.areas[0][0]);
+//					SDL_Rect dRect = { params.equippedThrowableWeapon.position.x - camera.area.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight - camera.area.y, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h };
+//					SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.sprite);
+//					//printSDLRectL({ sRect, dRect }); --;;
+//					//printIntL({ params.position.x, params.position.y, params.size.w, params.size.h });
+//				}
+//
+//				break;
+//			}
+//		}
+//	}
+//}
+//
+//void Character::renderReloadAnimation() {
+//	if (params.equippedRangedWeapon.reload.reloading == true) {
+//
+//		//Position animation on top of character
+//		areaStruct reloadAnimationArea = { params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h / 6 };
+//		if (areaWithinCameraView(reloadAnimationArea) == true) {
+//
+//			//Render background bar
+//			SDL_Rect backgroundSRect = { convertAreaToSDLRect(params.equippedRangedWeapon.reload.sprite.areas[0][0]) };
+//			SDL_Rect backgroundDRect = { reloadAnimationArea.x - camera.area.x, reloadAnimationArea.y - camera.area.y, reloadAnimationArea.w, 3 };
+//			//SDL_RenderCopy(renderer, spriteSheets[params.equippedRangedWeapon.reload.sprite.spriteSheetIndex].texture, &backgroundSRect, &backgroundDRect);
+//			colourStruct newColour = { 255, 255, 255, 255 };
+//			setSDLDrawColour(newColour);
+//			SDL_RenderDrawLine(renderer, backgroundDRect.x, backgroundDRect.y - 1, backgroundDRect.x, backgroundDRect.y + 1); //left vertical bar
+//			SDL_RenderDrawLine(renderer, backgroundDRect.x, backgroundDRect.y, backgroundDRect.x + backgroundDRect.w - 1, backgroundDRect.y); //horizontal bar
+//			SDL_RenderDrawLine(renderer, backgroundDRect.x + backgroundDRect.w, backgroundDRect.y - 1, backgroundDRect.x + backgroundDRect.w, backgroundDRect.y + 1); //right vertical bar
+//
+//			//Render foreground bar
+//			SDL_Rect foregroundSRect = { convertAreaToSDLRect(params.equippedRangedWeapon.reload.sprite.areas[0][1]) };
+//			int delayPercentage = (int)(((SDL_GetTicks() - params.equippedRangedWeapon.reload.delay.startTicks) * 100) / params.equippedRangedWeapon.reload.delay.delay);
+//			SDL_Rect foregroundDRect = { reloadAnimationArea.x - camera.area.x, reloadAnimationArea.y + 1 - camera.area.y, (reloadAnimationArea.w * delayPercentage) / 100, 1 };
+//			//SDL_RenderCopy(renderer, spriteSheets[params.equippedRangedWeapon.reload.sprite.spriteSheetIndex].texture, &foregroundSRect, &foregroundDRect);
+//			SDL_RenderDrawLine(renderer, foregroundDRect.x + foregroundDRect.w - 1, foregroundDRect.y - 3, foregroundDRect.x + foregroundDRect.w - 1, foregroundDRect.y + 1);
+//
+//		}
+//
+//	}
+//}
+//
+//void Character::renderEquippedMeleeWeaponArea() {
+//	if (params.renderEquippedMeleeWeaponAreaBool == true && areaWithinCameraView({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }) == true) {
+//		SDL_Rect sRect = convertAreaToSDLRect(areaSprite.spriteSheetArea);
+//
+//		SDL_Rect dRect = { params.equippedMeleeWeapon.attackArea.x - camera.area.x, params.equippedMeleeWeapon.attackArea.y - camera.area.y, params.equippedMeleeWeapon.attackArea.w, params.equippedMeleeWeapon.attackArea.h };
+//
+//		SDL_RenderCopy(renderer, spriteSheets[areaSprite.spriteSheetIndex].texture, &sRect, &dRect);
+//	}
+//}
+//
+//void Character::renderMeleeRecoilSparkAnimation() {
+//	if (params.meleeRecoilSparkAnimation.active == true && areaWithinCameraView(params.equippedMeleeWeapon.attackArea) == true) {
+//		SDL_Rect sRect = convertAreaToSDLRect(params.meleeRecoilSparkAnimation.sprites.areas[0][params.meleeRecoilSparkAnimation.currentFrame]);
+//		SDL_Rect dRect = { params.meleeRecoilSparkAnimation.position.x - camera.area.x, params.meleeRecoilSparkAnimation.position.y - camera.area.y, params.meleeRecoilSparkAnimation.size.w, params.meleeRecoilSparkAnimation.size.h };
+//
+//		SDL_RenderCopy(renderer, spriteSheets[params.meleeRecoilSparkAnimation.sprites.spriteSheetIndex].texture, &sRect, &dRect);
+//	}
+//}
+//
+//void Character::swapFrame() {
+//	if (SDL_GetTicks() - params.move.frameSwap.startTicks >= params.move.frameSwap.delay / FPSTimerMod) {
+//		params.move.frameSwap.startTicks = SDL_GetTicks();
+//		if (params.frame < (int)params.sprites.areas[(int)params.direction].size() - 1) {
+//			++params.frame;
+//		}
+//		else {
+//			params.frame = 0;
+//		}
+//	}
+//}
+//
+//void Character::recoil() {
+//	params.equippedMeleeWeapon.swing.recoil = true;
+//	params.equippedMeleeWeapon.swing.swingBack = false;
+//	params.equippedMeleeWeapon.swing.endAngle = params.equippedMeleeWeapon.swing.startAngle + abs(params.equippedMeleeWeapon.swing.endAngle - params.equippedMeleeWeapon.swing.startAngle) / 2;
+//
+//	//Init melee recoil spark
+//	params.meleeRecoilSparkAnimation.active = true;
+//	params.meleeRecoilSparkAnimation.size = { tileSize.w * 2, tileSize.h * 2 };
+//	params.meleeRecoilSparkAnimation.position = { params.equippedMeleeWeapon.attackArea.x + (params.equippedMeleeWeapon.size.w / 2) - (params.meleeRecoilSparkAnimation.size.w / 2), params.equippedMeleeWeapon.attackArea.y + (params.equippedMeleeWeapon.size.h / 2) - (params.meleeRecoilSparkAnimation.size.h / 2) };
+//
+//	params.meleeRecoilSparkAnimation.sprites.spriteSheetIndex = getSpriteSheetIndex("spark");
+//	params.meleeRecoilSparkAnimation.sprites.areas = {
+//		{
+//			{ 47, 40, 112, 112 },
+//			{ 205, 40, 112, 112 },
+//			{ 363, 40, 112, 112 },
+//			{ 522, 40, 112, 112 }
+//		}
+//	};
+//	params.meleeRecoilSparkAnimation.frameDelay.delay = 100;
+//	params.meleeRecoilSparkAnimation.currentFrame = 0;
+//}
+//
+//void Character::move() {
+//	if (SDL_GetTicks() - params.move.speed.startTicks >= params.move.speed.delay / FPSTimerMod) {
+//		params.move.speed.startTicks = SDL_GetTicks();
+//
+//		//Define move pixel increment based on how far left stick is tilted
+//		if (abs(joystickAxisX) > ((joystickAxisMaxValue - deadZone) / 6) * 5 || abs(joystickAxisY) > ((joystickAxisMaxValue - deadZone) / 6) * 5) {
+//			params.move.pixelIncrement = 2;
+//		}
+//		else {
+//			params.move.pixelIncrement = 1;
+//		}
+//
+//		bool positionUpdated = false;
+//
+//		//Left
+//		if (xDir == -1) {
+//			params.direction = directionEnum::left;
+//			params.position.x -= params.move.pixelIncrement;
+//
+//			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), { -1, -1, -1 -1 }, params.layer, params.jump.currentHeight);
+//			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
+//				params.position.x += params.move.pixelIncrement;
+//			}
+//
+//			positionUpdated = true;
+//		}
+//
+//		//Right
+//		if (xDir == 1) {
+//			params.direction = directionEnum::right;
+//			params.position.x += params.move.pixelIncrement;
+//
+//			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), { -1, -1, -1 - 1 }, params.layer, params.jump.currentHeight);
+//			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
+//				params.position.x -= params.move.pixelIncrement;
+//			}
+//
+//			positionUpdated = true;
+//		}
+//
+//		//Up
+//		if (yDir == -1) {
+//			params.direction = directionEnum::up;
+//			params.position.y -= params.move.pixelIncrement;
+//			
+//			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), { -1, -1, -1 - 1 }, params.layer, params.jump.currentHeight);
+//			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
+//				params.position.y += params.move.pixelIncrement;
+//			}
+//
+//			positionUpdated = true;
+//		}
+//
+//		//Down
+//		if (yDir == 1) {
+//			params.direction = directionEnum::down;
+//			params.position.y += params.move.pixelIncrement;
+//			
+//			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), { -1, -1, -1 - 1 }, params.layer, params.jump.currentHeight);
+//			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
+//				params.position.y -= params.move.pixelIncrement;
+//			}
+//
+//			positionUpdated = true;
+//		}
+//
+//		//Up-right
+//		if (yDir == -1 && xDir == 1) {
+//			params.direction = directionEnum::upRight;
+//		}
+//
+//		//Down-right
+//		if (yDir == 1 && xDir == 1) {
+//			params.direction = directionEnum::downRight;
+//		}
+//
+//		//Down-left
+//		if (yDir == 1 && xDir == -1) {
+//			params.direction = directionEnum::downLeft;
+//		}
+//
+//		//Up-left
+//		if (yDir == -1 && xDir == -1) {
+//			params.direction = directionEnum::upLeft;
+//		}
+//
+//		//Face where weapon is aimed if aiming weapon
+//		if (params.equippedMeleeWeapon.swing.swinging == false) {
+//			if (rightStickYDir != 0 || rightStickXDir != 0) {
+//				int angle = 0;
+//				switch (params.equippedWeaponType) {
+//					case characterParams::equippedWeaponTypeEnum::none: {
+//						angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
+//						break;
+//					}
+//					case characterParams::equippedWeaponTypeEnum::ranged: {
+//						angle = (int)params.equippedRangedWeapon.sprite.angle;
+//						break;
+//					}
+//					case characterParams::equippedWeaponTypeEnum::melee: {
+//						angle = (int)params.equippedMeleeWeapon.sprite.angle;
+//						break;
+//					}
+//					case characterParams::equippedWeaponTypeEnum::throwable: {
+//						angle = params.equippedThrowableWeapon.aimIndicator.sprite.angle;
+//						break;
+//					}
+//				}
+//				int selectionAngle = 45, halfSelectionAngle = selectionAngle / 2;
+//				if (angle >= -90 - halfSelectionAngle && angle <= -90 + halfSelectionAngle) {
+//					params.direction = directionEnum::up;
+//				}
+//				else if (angle >= 90 - halfSelectionAngle && angle <= 90 + halfSelectionAngle) {
+//					params.direction = directionEnum::down;
+//				}
+//				else if ((angle >= -180 && angle <= -180 + halfSelectionAngle) || (angle >= 180 - halfSelectionAngle && angle <= 180)) {
+//					params.direction = directionEnum::left;
+//				}
+//				else if (angle >= -halfSelectionAngle && angle <= halfSelectionAngle) {
+//					params.direction = directionEnum::right;
+//				}
+//				else if (angle >= -90 - halfSelectionAngle - selectionAngle && angle <= -90 - halfSelectionAngle) {
+//					params.direction = directionEnum::upLeft;
+//				}
+//				else if (angle >= -90 + halfSelectionAngle && angle <= -90 + halfSelectionAngle + selectionAngle) {
+//					params.direction = directionEnum::upRight;
+//				}
+//				else if (angle >= 90 + halfSelectionAngle && angle <= 90 + halfSelectionAngle + selectionAngle) {
+//					params.direction = directionEnum::downLeft;
+//				}
+//				else if (angle >= 90 - halfSelectionAngle - selectionAngle && angle <= 90 - halfSelectionAngle) {
+//					params.direction = directionEnum::downRight;
+//				}
+//			}
+//		}
+//
+//		//Swap frame and centre camera
+//		if (positionUpdated == true) {
+//			if (params.jump.jumping == false) {
+//				swapFrame();
+//			}
+//			//centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
+//		}
+//
+//		//Reset 
+//		if (xDir != 0 || yDir != 0) {
+//			params.idleAnimation.animationRunning = false;
+//			params.idleAnimation.delayBeforeAnimation.startTicks = SDL_GetTicks();
+//		}
+//
+//	}
+//}
+//
+//void Character::idleAnimation() {
+//	
+//	//Check if need to run idle animation
+//	if (xDir == 0 && yDir == 0 && params.idleAnimation.animationRunning == false && SDL_GetTicks() - params.idleAnimation.delayBeforeAnimation.startTicks >= params.idleAnimation.delayBeforeAnimation.delay / FPSTimerMod) {
+//		params.idleAnimation.animationRunning = true;
+//		params.idleAnimation.frameDuration.startTicks = SDL_GetTicks();
+//		params.idleAnimation.frameDuration.delay = randInt(1, 2) * 1000;
+//
+//		//Get random direction
+//		params.direction = (directionEnum)randInt(0, 7);
+//
+//	}
+//
+//	//Run idle animation
+//	if (params.idleAnimation.animationRunning == true && SDL_GetTicks() - params.idleAnimation.frameDuration.startTicks >= params.idleAnimation.frameDuration.delay / FPSTimerMod) {
+//		params.idleAnimation.frameDuration.startTicks = SDL_GetTicks();
+//		params.idleAnimation.frameDuration.delay = randInt(1, 2) * 1000;
+//
+//		//Get random direction
+//		params.direction = (directionEnum)randInt(0, 7);
+//
+//	}
+//
+//}
+//
+//void Character::jump() {
+//	if (controllerButtons.A == true && params.jump.jumping == false) {
+//		params.jump.jumping = true;
+//		params.jump.move.startTicks = SDL_GetTicks();
+//		params.jump.direction = directionEnum::up;
+//		params.jump.jumpButtonPress.startTicks = SDL_GetTicks();
+//		params.jump.maxHeight = (params.size.h / 2) + params.jump.currentHeight;
+//	}
+//
+//	//If A is pressed for longer the character jumps higher
+//	if (controllerButtons.A == true && SDL_GetTicks() - params.jump.jumpButtonPress.startTicks > params.jump.jumpButtonPress.delay / FPSTimerMod) {
+//		params.jump.jumpButtonPress.startTicks = SDL_GetTicks();
+//		params.jump.addedMaxHeight = params.size.h / 2;
+//	}
+//
+//	//Reset added max height
+//	if (controllerButtons.A == false && params.jump.addedMaxHeight > 0) {
+//		params.jump.addedMaxHeight = 0;
+//	}
+//
+//	if (params.jump.jumping == true && SDL_GetTicks() - params.jump.move.startTicks > params.jump.move.delay / FPSTimerMod) {
+//		params.jump.move.startTicks = SDL_GetTicks();
+//		
+//		switch (params.jump.direction) {
+//			case directionEnum::up: {
+//				if (params.jump.currentHeight < params.jump.maxHeight + params.jump.addedMaxHeight) {
+//					params.jump.currentHeight += params.jump.pixelIncrement;
+//					if (params.jump.currentHeight > params.jump.maxHeight + params.jump.addedMaxHeight) {
+//						params.jump.currentHeight = params.jump.maxHeight + params.jump.addedMaxHeight;
+//					}
+//				}
+//				else {
+//					params.jump.direction = directionEnum::down;
+//				}
+//				break;
+//			}
+//			case directionEnum::down: {
+//				if (params.jump.currentHeight > 0) {
+//					params.jump.currentHeight -= params.jump.pixelIncrement;
+//					if (params.jump.currentHeight < 0) {
+//						params.jump.currentHeight = 0;
+//					}
+//				}
+//				else {
+//					params.jump.jumping = false;
+//					controllerButtons.A = false;
+//				}
+//				break;
+//			}
+//		}
+//	}
+//}
+//
+//void Character::jumpOnCollidableObject() {
+//	if (params.jump.onTileObject == false) {
+//
+//		//Check if character in collision with jumpable object
+//		params.jump.onObject = false;
+//		bool collidedWithObject = false;
+//		for (int collidableObjectsCnt = 0; collidableObjectsCnt < (int)collidableObjects.size(); ++collidableObjectsCnt) {
+//
+//			//If character is on top of object
+//			if (checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer) == true) {
+//				if (params.jump.direction == directionEnum::down && params.jump.currentHeight > 0 && params.jump.currentHeight <= collidableObjects[collidableObjectsCnt].height) {
+//
+//					//Stop jumping
+//					params.jump.jumping = false;
+//
+//					params.jump.currentHeight = collidableObjects[collidableObjectsCnt].height;
+//					params.jump.onObject = true;
+//					params.shadowHeight = params.jump.currentHeight;
+//					break;
+//				}
+//				else {
+//					collidedWithObject = true;
+//				}
+//			}
+//
+//			//Set shadow height to 0 if no collision with tile object underneath character
+//			if (checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2) + params.jump.currentHeight, params.size.w, params.size.h / 2 }), params.layer) == false && params.shadowHeight > 0) {
+//				params.shadowHeight = 0;
+//			}
+//
+//		}
+//
+//		//Fall
+//		if (params.jump.onObject == false && params.jump.jumping == false && params.jump.currentHeight > 0 && collidedWithObject == false) {
+//			params.jump.jumping = true;
+//			params.shadowHeight = 0;
+//		}
+//
+//	}
+//}
+//
+//void Character::jumpOnTile() {
+//	if (params.jump.onObject == false) {
+//
+//		//If character in collision with tile object and on top of object
+//		params.jump.onTileObject = false;
+//		bool collidedWithObject = false;
+//		collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer);
+//		if (collisionData.collision == true) {
+//			if (params.jump.direction == directionEnum::down && params.jump.currentHeight > 0 && params.jump.currentHeight <= overworldGrid.gridTile[params.layer][collisionData.collidePosition.x][collisionData.collidePosition.y].height) {
+//
+//				//Stop jumping
+//				params.jump.jumping = false;
+//
+//				params.jump.currentHeight = overworldGrid.gridTile[params.layer][collisionData.collidePosition.x][collisionData.collidePosition.y].height;
+//				params.jump.onTileObject = true;
+//				params.shadowHeight = params.jump.currentHeight;
+//			}
+//			else {
+//				collidedWithObject = true;
+//			}
+//		}
+//
+//		//Fall
+//		if (params.jump.onTileObject == false && params.jump.jumping == false && params.jump.currentHeight > 0 && collidedWithObject == false) {
+//			params.jump.jumping = true;
+//			params.shadowHeight = 0;
+//		}
+//
+//		//Set shadow height to 0 if no collision with tile object underneath character
+//		collisionDataStruct underCharacterCollisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2) + params.jump.currentHeight, params.size.w, params.size.h / 2 }), params.layer);
+//		if (underCharacterCollisionData.collision == false && params.shadowHeight > 0) {
+//			params.shadowHeight = 0;
+//		}
+//
+//	}
+//}
+//
+//void Character::useEquippedWeapon() {
+//
+//	//Use equipped weapon
+//	if (controllerButtons.RB == true) {
+//		if (params.equippedRangedWeapon.fireMode == characterParams::rangedWeaponStruct::fireModeEnum::semiAuto) {
+//			controllerButtons.RB = false;
+//		}
+//
+//		switch (params.equippedWeaponType) {
+//			case characterParams::equippedWeaponTypeEnum::ranged: {
+//				if (params.equippedRangedWeapon.magazine.currentLoad > 0 && params.equippedRangedWeapon.reload.reloading == false) {
+//
+//					if (params.equippedRangedWeapon.fireMode != characterParams::rangedWeaponStruct::fireModeEnum::burst || (params.equippedRangedWeapon.fireMode == characterParams::rangedWeaponStruct::fireModeEnum::burst && params.equippedRangedWeapon.burst.pause == false)) {
+//						
+//						//Fire bullet
+//						bulletParamsStruct bulletParams;
+//						bulletParams.ID = getFreeID(getBulletIDs());
+//						bulletParams.layer = params.layer;
+//						bulletParams.height = params.jump.currentHeight;
+//						bulletParams.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) - params.jump.currentHeight };
+//						bulletParams.originalPosition = bulletParams.position;
+//						int characterIndex = getCharacterIndexByID(params.ID);
+//						XYStruct characterPosition = characters[characterIndex].getPosition();
+//						WHStruct characterSize = characters[characterIndex].getSize();
+//						bulletParams.shadowHeight = (characterPosition.y + characterSize.h) - bulletParams.position.y;
+//						//bulletParams.size = { tileSize.w / 2, tileSize.h / 2 };
+//						bulletParams.size = tileSize;
+//						bulletParams.sprite.spriteSheetIndex = getSpriteSheetIndex("bullets");
+//						bulletParams.sprite.areas = {
+//							{
+//								{ 11, 360, 16, 16 }
+//							}
+//						};
+//						bulletParams.sprite.angle = params.equippedRangedWeapon.sprite.angle;
+//						bulletParams.speed.startTicks = SDL_GetTicks();
+//						bulletParams.speed.delay = 1;
+//						bulletParams.movePixelIncrement = 6;
+//						bulletParams.damage = 90;
+//						bulletParams.resistance = 100;
+//						bulletParams.characterID = params.ID;
+//						initBullet(bulletParams);
+//
+//						params.bulletsFiredIDs.push_back(bulletParams.ID);
+//
+//						//Update magazin current load
+//						if (params.equippedRangedWeapon.magazine.currentLoad > 0) {
+//							--params.equippedRangedWeapon.magazine.currentLoad;
+//						}
+//
+//					}
+//
+//					//Make weapon fire in bursts
+//					if (params.equippedRangedWeapon.fireMode == characterParams::rangedWeaponStruct::fireModeEnum::burst) {
+//						if (params.equippedRangedWeapon.burst.pause == false) {
+//							if (params.equippedRangedWeapon.burst.bulletsFired < params.equippedRangedWeapon.burst.maxBulletsBeforePause) {
+//								++params.equippedRangedWeapon.burst.bulletsFired;
+//							}
+//							else {
+//								params.equippedRangedWeapon.burst.pause = true;
+//								params.equippedRangedWeapon.burst.delay.startTicks = SDL_GetTicks();
+//							}
+//						}
+//						else if (SDL_GetTicks() - params.equippedRangedWeapon.burst.delay.startTicks >= params.equippedRangedWeapon.burst.delay.delay / FPSTimerMod) {
+//							params.equippedRangedWeapon.burst.pause = false;
+//							params.equippedRangedWeapon.burst.bulletsFired = 0;
+//						}
+//					}
+//
+//				}
+//				break;
+//			}
+//			case characterParams::equippedWeaponTypeEnum::melee: {
+//				if (params.equippedMeleeWeapon.swing.swinging == false) {
+//					params.equippedMeleeWeapon.swing.swinging = true;
+//					params.equippedMeleeWeapon.swing.originalAngle = params.equippedMeleeWeapon.sprite.angle;
+//					params.equippedMeleeWeapon.swing.startAngle = (int)params.equippedMeleeWeapon.sprite.angle - (params.equippedMeleeWeapon.swing.angle / 2);
+//					params.equippedMeleeWeapon.swing.endAngle = params.equippedMeleeWeapon.swing.startAngle + params.equippedMeleeWeapon.swing.angle;
+//					params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.startAngle;
+//					params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
+//				}
+//				break;
+//			}
+//			case characterParams::equippedWeaponTypeEnum::throwable: {
+//				if (params.equippedThrowableWeapon.readied == true && params.equippedThrowableWeapon.throwableThrow.thrown == false) {
+//					
+//					//Throw weapon
+//					params.equippedThrowableWeapon.throwableThrow.thrown = true;
+//					params.equippedThrowableWeapon.throwableThrow.target = params.equippedThrowableWeapon.throwIndicator.indicator.position;
+//					params.equippedThrowableWeapon.throwableThrow.delay.startTicks = SDL_GetTicks();
+//					params.equippedThrowableWeapon.throwableThrow.delay.delay = 1;
+//
+//					//Unequip weapon
+//					params.equippedWeaponType = characterParams::equippedWeaponTypeEnum::none;
+//
+//				}
+//				break;
+//			}
+//		}
+//	}
+//
+//	//Reload equipped ranged weapon
+//	if (controllerButtons.X == true && params.equippedRangedWeapon.reload.reloading == false && params.equippedRangedWeapon.magazine.currentLoad < params.equippedRangedWeapon.magazine.capacity) {
+//		controllerButtons.X = false;
+//		params.equippedRangedWeapon.reload.reloading = true;
+//		params.equippedRangedWeapon.reload.delay.startTicks = SDL_GetTicks();
+//	}
+//	if (params.equippedRangedWeapon.reload.reloading == true && SDL_GetTicks() - params.equippedRangedWeapon.reload.delay.startTicks >= params.equippedRangedWeapon.reload.delay.delay / FPSTimerMod) {
+//		params.equippedRangedWeapon.reload.reloading = false;
+//		params.equippedRangedWeapon.magazine.currentLoad = params.equippedRangedWeapon.magazine.capacity;
+//	}
+//
+//	//Swing equipped melee weapon
+//	if (params.equippedMeleeWeapon.swing.swinging == true && SDL_GetTicks() - params.equippedMeleeWeapon.swing.delay.startTicks >= params.equippedMeleeWeapon.swing.delay.delay / FPSTimerMod) {
+//		params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
+//		
+//		if (params.equippedMeleeWeapon.swing.swingBack == false) {
+//			if (params.equippedMeleeWeapon.swing.currentAngle < params.equippedMeleeWeapon.swing.endAngle) {
+//				params.equippedMeleeWeapon.swing.currentAngle += params.equippedMeleeWeapon.swing.pixelIncrement;
+//
+//				if (params.equippedMeleeWeapon.swing.currentAngle > params.equippedMeleeWeapon.swing.endAngle) {
+//					params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.endAngle;
+//				}
+//			}
+//			else {
+//				if (params.equippedMeleeWeapon.swing.recoil == false) {
+//					params.equippedMeleeWeapon.swing.swinging = false;
+//					params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.originalAngle;
+//				}
+//				else {
+//					params.equippedMeleeWeapon.swing.swingBack = true;
+//				}
+//			}
+//		}
+//		else {
+//
+//			//Swing back
+//			if (params.equippedMeleeWeapon.swing.currentAngle > params.equippedMeleeWeapon.swing.startAngle) {
+//				params.equippedMeleeWeapon.swing.currentAngle -= params.equippedMeleeWeapon.swing.pixelIncrement;
+//
+//				if (params.equippedMeleeWeapon.swing.currentAngle <= params.equippedMeleeWeapon.swing.startAngle) {
+//					params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.startAngle;
+//					params.equippedMeleeWeapon.swing.swingBack = false;
+//					params.equippedMeleeWeapon.swing.swinging = false;
+//					params.equippedMeleeWeapon.swing.recoil = false;
+//					params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.originalAngle;
+//				}
+//			}
+//
+//		}
+//	}
+//
+//}
+//
+//void Character::markForDestruction() {
+//	if (params.destroy == true) {
+//		charactersToDestroyIDs.push_back(params.ID);
+//	}
+//}
+//
+//void Character::detectEquippedMeleeWeaponHit() {
+//	if (params.equippedMeleeWeapon.swing.swinging == true && params.equippedMeleeWeapon.swing.recoil == false) {
+//
+//		//Update previous attack area
+//		if (params.equippedMeleeWeapon.attackArea.x != -1) {
+//			params.equippedMeleeWeapon.previousAttackArea = params.equippedMeleeWeapon.attackArea;
+//		}
+//
+//		//Set source pixel area and melee recoil spark position based on character direction
+//		switch (params.direction) {
+//			case directionEnum::up: {
+//				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
+//				break;
+//			}
+//			case directionEnum::down: {
+//				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
+//				break;
+//			}
+//			case directionEnum::left: {
+//				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
+//				break;
+//			}
+//			case directionEnum::right: {
+//				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
+//				break;
+//			}
+//			case directionEnum::upRight: {
+//				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
+//				break;
+//			}
+//			case directionEnum::downRight: {
+//				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
+//				break;
+//			}
+//			case directionEnum::downLeft: { 
+//				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
+//				break;
+//			}
+//			case directionEnum::upLeft: {
+//				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
+//				break;
+//			}
+//		}
+//
+//		//Set previous attack area
+//		if (params.equippedMeleeWeapon.previousAttackArea.x == -1) {
+//			params.equippedMeleeWeapon.previousAttackArea = params.equippedMeleeWeapon.attackArea;
+//		}
+//
+//		//Check collision with characters
+//		collisionDataStruct characterCollisionData = checkCollisionWithCharacter(params.equippedMeleeWeapon.attackArea, params.equippedMeleeWeapon.previousAttackArea, params.ID);
+//		
+//		int characterIndex = getCharacterIndexByID(characterCollisionData.instanceID);
+//
+//		if (characterCollisionData.collision == true && characters[characterIndex].getDisplaySprites() == true && characterCollisionData.instanceID != params.ID) {
+//
+//			//Update equipped melee weapon resistance
+//			--params.equippedMeleeWeapon.resistance;
+//
+//			//Update target character resistance
+//			int characterResistance = characters[characterIndex].getResistance() - params.equippedMeleeWeapon.damage;
+//			characters[characterIndex].setResistance(characterResistance);
+//
+//			//If equipped melee weapon damage < character resistance then melee weapon recoils
+//			if (params.equippedMeleeWeapon.damage < characterResistance) {
+//				recoil();
+//			}
+//			else {
+//
+//				//Character explodes
+//				explosionParamsStruct characterExplosion;
+//				characterExplosion.ID = getFreeID(getExplosionIDs());
+//				characterExplosion.overworldGridLayer = characters[characterIndex].getLayer();
+//				characterExplosion.sprite.spriteSheetIndex = characters[characterIndex].getCharacterSpriteSheetIndex();
+//				characterExplosion.sprite.areas = {
+//					{
+//						{
+//							characters[characterIndex].getSpriteSheetArea(characters[characterIndex].getDirection(), characters[characterIndex].getFrame())
+//						}
+//					}
+//				};
+//				characterExplosion.sprite.angle = params.equippedMeleeWeapon.sprite.angle;
+//				characterExplosion.sprite.center = { randInt(0, characterExplosion.sprite.areas[0][0].w), randInt(0, characterExplosion.sprite.areas[0][0].h) };
+//
+//				characterExplosion.sprite.flip = randFlip({ { 0, 33 }, { 34, 66 }, { 67, 100 } });
+//				characterExplosion.collisionData = characterCollisionData;
+//				characterExplosion.force = params.equippedMeleeWeapon.damage;
+//				int characterHeight = characters[characterIndex].getSize().h;
+//				characterExplosion.shadowHeightRandRange = { characterHeight / 2, characterHeight };
+//				//characterExplosion.totalFragments = { randInt(1, characterExplosion.sprite.areas[0][0].w), randInt(1, characterExplosion.sprite.areas[0][0].h) };
+//				characterExplosion.totalFragments = { characterExplosion.sprite.areas[0][0].w / 4, characterExplosion.sprite.areas[0][0].h / 4 };
+//				initExplosion(characterExplosion);
+//
+//				characters[characterIndex].setDisplaySprites(false);
+//			}
+//
+//		}
+//
+//		//Check collision with wall
+//		collisionDataStruct wallCollisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea(params.equippedMeleeWeapon.attackArea), getGridAreaFromPixelArea(params.equippedMeleeWeapon.previousAttackArea), params.layer, params.jump.currentHeight);
+//
+//		if (wallCollisionData.collision == true) {
+//
+//			//Update equipped melee weapon resistance
+//			--params.equippedMeleeWeapon.resistance;
+//
+//			//Update wall resistance
+//			overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].resistance -= params.equippedMeleeWeapon.damage;
+//
+//			//If wall resistance > 0 then recoil
+//			if (overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].resistance > 0) {
+//				recoil();
+//			}
+//			else {
+//
+//				//Wall explodes
+//				explosionParamsStruct wallExplosion;
+//				wallExplosion.ID = getFreeID(getExplosionIDs());
+//				wallExplosion.overworldGridLayer = params.layer;
+//				wallExplosion.sprite.spriteSheetIndex = tiles[overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].tileIndex].spriteSheetIndex;
+//				wallExplosion.sprite.areas = {
+//					{
+//						{
+//							tiles[overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].tileIndex].spriteSheetArea
+//						}
+//					}
+//				};
+//				wallExplosion.sprite.angle = params.equippedMeleeWeapon.sprite.angle;
+//				wallExplosion.sprite.center = { randInt(0, wallExplosion.sprite.areas[0][0].w), randInt(0, wallExplosion.sprite.areas[0][0].h) };
+//				wallExplosion.sprite.flip = randFlip({ { 0, 33 }, { 34, 66 }, { 67, 100 } });
+//				wallExplosion.collisionData = wallCollisionData;
+//				wallExplosion.collisionData.collidePosition = getPixelPosition(wallCollisionData.collidePosition);
+//				//wallExplosion.force = params.equippedMeleeWeapon.damage;
+//				wallExplosion.force = 10;
+//				wallExplosion.shadowHeightRandRange = { tileSize.h / 2, tileSize.h };
+//				wallExplosion.totalFragments = { wallExplosion.sprite.areas[0][0].w / 4, wallExplosion.sprite.areas[0][0].h / 4 };
+//				initExplosion(wallExplosion);
+//
+//				//Remove wall from overworld grid
+//				gridTileStruct blankTile;
+//				overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y] = blankTile;
+//
+//			}
+//
+//		}
+//
+//		//Check collision with object
+//		collisionDataStruct tableCollisionData = checkCollisionWithTable(params.equippedMeleeWeapon.attackArea, params.equippedMeleeWeapon.previousAttackArea);
+//
+//		if (tableCollisionData.collision == true) {
+//
+//			//If table has not already exploded
+//			int tableIndex = getTableIndexByID(tableCollisionData.instanceID);
+//			if (tables[tableIndex].getDisplaySprite() == true) {
+//
+//				//Update equipped melee weapon resistance
+//				--params.equippedMeleeWeapon.resistance;
+//
+//				//Update table resistance
+//				int newTableResistance = tables[tableIndex].getResistance() - params.equippedMeleeWeapon.damage;
+//				tables[tableIndex].setResistance(newTableResistance);
+//
+//				//If table resistance > 0 then recoil
+//				if (newTableResistance > 0) {
+//					recoil();
+//				}
+//				else {
+//
+//					//Table explodes
+//					explosionParamsStruct tableExplosion;
+//					tableExplosion.ID = getFreeID(getExplosionIDs());
+//					tableExplosion.overworldGridLayer = tables[tableIndex].getLayer();
+//					tableExplosion.sprite.spriteSheetIndex = tables[tableIndex].getTableSpriteSheetIndex();
+//					tableExplosion.sprite.areas = {
+//						{
+//							{
+//								tables[tableIndex].getSpriteSheetArea()
+//							}
+//						}
+//					};
+//					tableExplosion.sprite.angle = params.equippedMeleeWeapon.sprite.angle;
+//					tableExplosion.sprite.center = { randInt(0, tableExplosion.sprite.areas[0][0].w), randInt(0, tableExplosion.sprite.areas[0][0].h) };
+//					tableExplosion.sprite.flip = randFlip({ { 0, 33 }, { 34, 66 }, { 67, 100 } });
+//					tableExplosion.collisionData = tableCollisionData;
+//					tableExplosion.force = 10;
+//					int tableHeight = tables[tableIndex].getHeight();
+//					tableExplosion.shadowHeightRandRange = { tableHeight / 2, tableHeight };
+//					tableExplosion.totalFragments = { tableExplosion.sprite.areas[0][0].w / 4, tableExplosion.sprite.areas[0][0].h / 4 };
+//					initExplosion(tableExplosion);
+//
+//					tables[tableIndex].setDisplaySprite(false);
+//				}
+//
+//			}
+//
+//		}
+//
+//		//Check collision with bullet
+//		collisionDataStruct bulletCollision = checkCollisionWithBullet(params.equippedMeleeWeapon.attackArea, params.equippedMeleeWeapon.previousAttackArea);
+//
+//		if (bulletCollision.collision == true) {
+//
+//			//If bullet has not already exploded
+//			int bulletIndex = getBulletIndexByID(bulletCollision.instanceID);
+//			if (bullets[bulletIndex].getDisplaySprite() == true) {
+//
+//				//Update equipped melee weapon resistance
+//				--params.equippedMeleeWeapon.resistance;
+//
+//				//Update bullet resistance
+//				int newBulletResistance = bullets[bulletIndex].getResistance() - params.equippedMeleeWeapon.damage;
+//				bullets[bulletIndex].setResistance(newBulletResistance);
+//
+//				//If bullet resistance > 0 then recoil
+//				if (newBulletResistance > 0) {
+//					recoil();
+//				}
+//				else {
+//
+//					//Bullet explodes
+//					explosionParamsStruct bulletExplosion;
+//					bulletExplosion.ID = getFreeID(getExplosionIDs());
+//					bulletExplosion.overworldGridLayer = params.layer;
+//					bulletExplosion.sprite.spriteSheetIndex = bullets[bulletIndex].getBulletSpriteSheetIndex();
+//					bulletExplosion.sprite.areas = {
+//						{
+//							{
+//								bullets[bulletIndex].getSpriteSheetArea()
+//							}
+//						}
+//					};
+//					bulletExplosion.sprite.angle = params.equippedMeleeWeapon.sprite.angle;
+//					bulletExplosion.collisionData = tableCollisionData;
+//					bulletExplosion.force = 10;
+//					int otherBulletHeight = bullets[bulletIndex].getSize().h;
+//					bulletExplosion.shadowHeightRandRange = { otherBulletHeight / 2, otherBulletHeight };
+//					bulletExplosion.totalFragments = { bulletExplosion.sprite.areas[0][0].w / 4, bulletExplosion.sprite.areas[0][0].h / 4 };
+//					initExplosion(bulletExplosion);
+//
+//					//Disable other bullet sprite display
+//					bullets[bulletIndex].setDisplaySprite(false);
+//
+//				}
+//			}
+//
+//		}
+//	}
+//}
+//
+//void Character::animateMeleeRecoilSpark() {
+//	if (params.meleeRecoilSparkAnimation.active == true && SDL_GetTicks() - params.meleeRecoilSparkAnimation.frameDelay.startTicks >= params.meleeRecoilSparkAnimation.frameDelay.delay / FPSTimerMod) {
+//		params.meleeRecoilSparkAnimation.frameDelay.startTicks = SDL_GetTicks();
+//
+//		if (params.meleeRecoilSparkAnimation.currentFrame < (int)params.meleeRecoilSparkAnimation.sprites.areas[0].size() - 1) {
+//			++params.meleeRecoilSparkAnimation.currentFrame;
+//		}
+//		else {
+//			params.meleeRecoilSparkAnimation.active = false;
+//		}
+//	}
+//}
+//
+//void Character::readyEquippedThrowable() {
+//	if (params.equippedWeaponType == characterParams::equippedWeaponTypeEnum::throwable) {
+//		params.equippedThrowableWeapon.readied = controllerButtons.LB;
+//	}
+//}
+//
+//void Character::throwEquippedThrowable() {
+//	if (params.equippedThrowableWeapon.throwableThrow.thrown == true && SDL_GetTicks() - params.equippedThrowableWeapon.throwableThrow.delay.startTicks >= params.equippedThrowableWeapon.throwableThrow.delay.delay) {
+//		params.equippedThrowableWeapon.throwableThrow.delay.startTicks = SDL_GetTicks();
+//		
+//		if (params.equippedThrowableWeapon.position.x != params.equippedThrowableWeapon.throwableThrow.target.x || params.equippedThrowableWeapon.position.y != params.equippedThrowableWeapon.throwableThrow.target.y) {
+//			
+//			if (params.equippedThrowableWeapon.position.x < params.equippedThrowableWeapon.throwableThrow.target.x) {
+//				params.equippedThrowableWeapon.position.x += params.equippedThrowableWeapon.throwableThrow.pixelIncrement;
+//				if (params.equippedThrowableWeapon.position.x > params.equippedThrowableWeapon.throwableThrow.target.x) {
+//					params.equippedThrowableWeapon.position.x = params.equippedThrowableWeapon.throwableThrow.target.x;
+//				}
+//			}
+//			else {
+//				params.equippedThrowableWeapon.position.x -= params.equippedThrowableWeapon.throwableThrow.pixelIncrement;
+//				if (params.equippedThrowableWeapon.position.x < params.equippedThrowableWeapon.throwableThrow.target.x) {
+//					params.equippedThrowableWeapon.position.x = params.equippedThrowableWeapon.throwableThrow.target.x;
+//				}
+//			}
+//			
+//			if (params.equippedThrowableWeapon.position.y < params.equippedThrowableWeapon.throwableThrow.target.y) {
+//				params.equippedThrowableWeapon.position.y += params.equippedThrowableWeapon.throwableThrow.pixelIncrement;
+//				if (params.equippedThrowableWeapon.position.y > params.equippedThrowableWeapon.throwableThrow.target.y) {
+//					params.equippedThrowableWeapon.position.y = params.equippedThrowableWeapon.throwableThrow.target.y;
+//				}
+//			}
+//			else {
+//				params.equippedThrowableWeapon.position.y -= params.equippedThrowableWeapon.throwableThrow.pixelIncrement;
+//				if (params.equippedThrowableWeapon.position.y < params.equippedThrowableWeapon.throwableThrow.target.y) {
+//					params.equippedThrowableWeapon.position.y = params.equippedThrowableWeapon.throwableThrow.target.y;
+//				}
+//			}
+//
+//		}
+//		else {
+//			params.equippedThrowableWeapon.throwableThrow.thrown = false;
+//			if (params.equippedThrowableWeapon.canExplode == true && params.equippedThrowableWeapon.exploding == false) {
+//				params.equippedThrowableWeapon.exploding = true;
+//			}
+//		}
+//
+//	}
+//}
+//
+//Table::Table(tableParamsStruct newParams) {
+//	params = newParams;
+//}
+//
+//void Table::render() {
+//	if (params.displaySprite == true) {
+//		SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
+//		SDL_Rect dRect = convertAreaToSDLRect({ params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h });
+//
+//		if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h }) == true) {
+//			SDL_RenderCopy(renderer, spriteSheets[params.sprite.spriteSheetIndex].texture, &sRect, &dRect);
+//		}
+//	}
+//}
+//
+//int Table::getLayer() {
+//	return params.layer;
+//}
+//
+//XYStruct Table::getPosition() {
+//	return params.position;
+//}
+//
+//WHStruct Table::getSize() {
+//	return params.size;
+//}
+//
+//int Table::getID() {
+//	return params.ID;
+//}
+//
+//int Table::getHeight() {
+//	return params.height;
+//}
+//
+//int Table::getResistance() {
+//	return params.resistance;
+//}
+//
+//void Table::setResistance(int newResistance) {
+//	params.resistance = newResistance;
+//}
+//
+//int Table::getStuckTolerancePercentage() {
+//	return params.stuckTolerancePercentage;
+//}
+//
+//int Table::getTableSpriteSheetIndex() {
+//	return params.sprite.spriteSheetIndex;
+//}
+//
+//areaStruct Table::getSpriteSheetArea() {
+//	return params.sprite.areas[0][0];
+//}
+//
+//bool Table::getDisplaySprite() {
+//	return params.displaySprite;
+//}
+//
+//void Table::setDisplaySprite(bool newDisplaySprite) {
+//	params.displaySprite = newDisplaySprite;
+//}
+//
+//void Table::setDestroy(bool newDestroy) {
+//	params.destroy = newDestroy;
+//}
+//
+//void Table::markForDestruction() {
+//	if (params.destroy == true) {
+//		tablesToDestroyIDs.push_back(params.ID);
+//	}
+//}
+//
+//Bullet::Bullet(bulletParamsStruct newParams) {
+//	params = newParams;
+//}
+//
+//int Bullet::getID() {
+//	return params.ID;
+//}
+//
+//int Bullet::getLayer() {
+//	return params.layer;
+//}
+//
+//XYStruct Bullet::getPosition() {
+//	return params.position;
+//}
+//
+//WHStruct Bullet::getSize() {
+//	return params.size;
+//}
+//
+//int Bullet::getResistance() {
+//	return params.resistance;
+//}
+//
+//void Bullet::setResistance(int newResistance) {
+//	params.resistance = newResistance;
+//}
+//
+//int Bullet::getStuckTolerancePercentage() {
+//	return params.stuckTolerancePercentage;
+//}
+//
+//int Bullet::getBulletSpriteSheetIndex() {
+//	return params.sprite.spriteSheetIndex;
+//}
+//
+//areaStruct Bullet::getSpriteSheetArea() {
+//	return params.sprite.areas[0][0];
+//}
+//
+//bool Bullet::getDisplaySprite() {
+//	return params.displaySprite;
+//}
+//
+//void Bullet::setDisplaySprite(bool newDisplaySprite) {
+//	params.displaySprite = newDisplaySprite;
+//}
+//
+//void Bullet::setDestroy(bool newDestroy) {
+//	params.destroy = newDestroy;
+//}
+//
+//int Bullet::getCharacterID() {
+//	return params.characterID;
+//}
+//
+//delayStruct Bullet::getFadeOut() {
+//	return params.fadeOut;
+//}
+//
+//void Bullet::setFadeOut(delayStruct newFadeOut) {
+//	params.fadeOut = newFadeOut;
+//}
+//
+//bool Bullet::getStuck() {
+//	return params.stuck;
+//}
+//
+//void Bullet::render() {
+//	if (params.displaySprite == true) {
+//		SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
+//		SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.height, params.size.w, params.size.h };
+//
+//		if (areaWithinCameraView({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }) == true && params.displaySprite == true) {
+//			
+//			//Set transparency
+//			int percentageTimePassed = 0;
+//			if (params.fadeOut.delay > 0) {
+//				percentageTimePassed = ((SDL_GetTicks() - params.fadeOut.startTicks) * 100) / params.fadeOut.delay;
+//				setSDLTextureTransparency(spriteSheets[params.sprite.spriteSheetIndex].texture, 100 - percentageTimePassed);
+//			}
+//
+//			//Render shadow
+//			renderShadow({ dRect.x, dRect.y + params.shadowHeight, dRect.w, dRect.h / 5 }, 50 - (percentageTimePassed / 2));
+//
+//			SDLRenderCopyEx(sRect, dRect, params.sprite);
+//
+//			//Remove transparency
+//			if (params.fadeOut.delay > 0) {
+//				setSDLTextureTransparency(spriteSheets[params.sprite.spriteSheetIndex].texture, 100);
+//			}
+//
+//		}
+//	}
+//}
+//
+//void Bullet::move() {
+//	if (params.stuck == false && SDL_GetTicks() - params.speed.startTicks >= params.speed.delay / FPSTimerMod) {
+//		params.speed.startTicks = SDL_GetTicks();
+//		params.distanceTravelled += params.movePixelIncrement;
+//		params.totalDistanceTravelled += params.movePixelIncrement;
+//		params.previousPosition = params.position;
+//		params.position = { lround((double)params.originalPosition.x + ((params.distanceTravelled * cos(((params.sprite.angle) * M_PI) / 180)) * params.directionMods.x)), lround((double)params.originalPosition.y + ((params.distanceTravelled * sin(((params.sprite.angle) * M_PI) / 180)) * params.directionMods.y )) };
+//	}
+//}
+//
+//void Bullet::markForDestruction() {
+//
+//	//If bullet goes outside of overworld grid or destroy = true then destroy it
+//	/*if (areaWithinArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { 0, 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false || params.destroy == true) {
+//		bulletsToDestroyIDs.push_back(params.ID);
+//	}*/
+//
+//	if (params.fadeOut.delay > 0 && SDL_GetTicks() - params.fadeOut.startTicks >= params.fadeOut.delay) {
+//		bulletsToDestroyIDs.push_back(params.ID);
+//	}
+//
+//}
+//
+//void Bullet::ricochet(collisionDataStruct& collisionData) {
+//	params.originalPosition = params.position;
+//	params.distanceTravelled = 0;
+//	if (collisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::left || collisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::right) {
+//		params.directionMods.x = -1;
+//	}
+//	else {
+//		params.directionMods.y = -1;
+//	}
+//}
+//
+//void Bullet::ricochetPenetrateOrStayStuck() {
+//	if (params.stuck == false) {
+//
+//		//Calculate bullet force (the farther the bullet travels, the less damage it does
+//		int force = params.damage - params.totalDistanceTravelled;
+//		if (force < 0) {
+//			force = 0;
+//		}
+//
+//		//Check for collision with wall
+//		collisionDataStruct overworldGridCollisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }), { -1, -1, -1 - 1 }, params.layer, params.height);
+//
+//		//Check for collision with characters
+//		collisionDataStruct characterCollisionData = checkCollisionWithCharacter({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h }, params.characterID);
+//
+//		//Check for collision with tables
+//		collisionDataStruct tableCollisionData = checkCollisionWithTable({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h });
+//
+//		//Check for collision with other bullets
+//		collisionDataStruct otherBulletCollisionData = checkCollisionWithBullet({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h });
+//
+//		//Overworld grid collision
+//		if (overworldGridCollisionData.collision == true) {
+//
+//			//Decrease wall resistance by the amount of force that hits it
+//			overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance -= force;
+//
+//			//Decrease bullet resistance
+//			params.resistance -= force;
+//
+//			int resistanceTolerance = (overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance * overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].stuckTolerancePercentage) / 100;
+//
+//			//If bullet force is lower than wall resistance - resitance tolerance then bullet ricochet
+//			if (force < overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance - resistanceTolerance) {
+//
+//				//Bullet ricochets
+//				/*params.originalPosition = params.position;
+//				params.distanceTravelled = 0;
+//				if (overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::left || overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::right) {
+//					params.directionMods.x = -1;
+//				}
+//				else {
+//					params.directionMods.y = -1;
+//				}*/
+//				ricochet(overworldGridCollisionData);
+//
+//			}
+//			else if (force >= overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance - resistanceTolerance && force <= overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance + resistanceTolerance) {
+//
+//				//If bullet force is within range of stuck tolerance percentage of wall resistance then bullet stays stuck
+//				params.stuck = true;
+//
+//			}
+//			//else if (force > overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance + resistanceTolerance) {
+//			//	
+//			//	//If bullet force is greater than wall resistance + resistance tolerance then bullet penetrates
+//			//	
+//			//}
+//
+//			//If resistance of wall <= 0 then explode
+//			if (overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance <= 0) {
+//				explosionParamsStruct newExplosionParams;
+//				newExplosionParams.ID = getFreeID(getExplosionIDs());
+//				newExplosionParams.overworldGridLayer = params.layer;
+//				newExplosionParams.sprite.spriteSheetIndex = tiles[overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].tileIndex].spriteSheetIndex;
+//				newExplosionParams.sprite.areas = {
+//					{
+//						{
+//							tiles[overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].tileIndex].spriteSheetArea
+//						}
+//					}
+//				};
+//				newExplosionParams.sprite.angle = params.sprite.angle;
+//				newExplosionParams.collisionData = overworldGridCollisionData;
+//				newExplosionParams.collisionData.collidePosition = getPixelPosition(newExplosionParams.collisionData.collidePosition);
+//				newExplosionParams.force = force;
+//				newExplosionParams.shadowHeightRandRange = { tileSize.h / 2, tileSize.h };
+//				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
+//				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
+//				initExplosion(newExplosionParams);
+//
+//				//Remove tile from overworld grid
+//				gridTileStruct blankTile;
+//				overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y] = blankTile;
+//
+//			}
+//
+//		}
+//
+//		//Character collision
+//		if (characterCollisionData.collision == true /*&& characterCollisionData.instanceID != params.characterID*/ && characters[getCharacterIndexByID(characterCollisionData.instanceID)].getDisplaySprites() == true) {
+//
+//			//Decrease character resistance by the amount of force that hits
+//			int characterIndex = getCharacterIndexByID(characterCollisionData.instanceID);
+//			int characterNewResistance = characters[characterIndex].getResistance() - force;
+//			characters[characterIndex].setResistance(characterNewResistance);
+//
+//			//Decrease bullet resistance
+//			params.resistance -= force;
+//
+//			int resistanceTolerance = (characterNewResistance * characters[characterIndex].getStuckTolerancePercentage()) / 100;
+//
+//			//If bullet force is lower than character resistance - resitance tolerance then bullet ricochet
+//			if (force < characterNewResistance - resistanceTolerance) {
+//
+//				//Bullet ricochets
+//				/*params.originalPosition = params.position;
+//				params.distanceTravelled = 0;
+//				if (overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::left || overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::right) {
+//					params.directionMods.x = -1;
+//				}
+//				else {
+//					params.directionMods.y = -1;
+//				}*/
+//				ricochet(characterCollisionData);
+//
+//			}
+//			else if (force >= characterNewResistance - resistanceTolerance && force <= characterNewResistance + resistanceTolerance) {
+//
+//				//If bullet force is within range of stuck tolerance percentage of character resistance then bullet stays stuck
+//				params.stuck = true;
+//
+//			}
+//			//else if (force > characterNewResistance + resistanceTolerance) {
+//			//	
+//			//	//If bullet force is greater than character resistance + resistance tolerance then bullet penetrates
+//			//	
+//			//}
+//
+//			//If resistance of character <= 0 then explode
+//			if (characterNewResistance <= 0) {
+//				explosionParamsStruct newExplosionParams;
+//				newExplosionParams.ID = getFreeID(getExplosionIDs());
+//				newExplosionParams.overworldGridLayer = params.layer;
+//				newExplosionParams.sprite.spriteSheetIndex = characters[characterIndex].getCharacterSpriteSheetIndex();
+//				newExplosionParams.sprite.areas = {
+//					{
+//						{
+//							characters[characterIndex].getSpriteSheetArea(characters[characterIndex].getDirection(), characters[characterIndex].getFrame())
+//						}
+//					}
+//				};
+//				newExplosionParams.sprite.angle = params.sprite.angle;
+//				newExplosionParams.collisionData = characterCollisionData;
+//				newExplosionParams.force = force;
+//				int characterHeight = characters[characterIndex].getSize().h;
+//				newExplosionParams.shadowHeightRandRange = { characterHeight / 2, characterHeight };
+//				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
+//				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
+//				initExplosion(newExplosionParams);
+//				initSplatter(newExplosionParams, bloodSplatterSprite, { params.position.x, params.position.y, params.size.w, params.size.h });
+//
+//				//Disable character sprite display
+//				characters[characterIndex].setDisplaySprites(false);
+//				characters[characterIndex].setDestroy(true);
+//
+//			}
+//
+//		}
+//
+//		//Table collision
+//		if (tableCollisionData.collision == true) {
+//
+//			//Decrease table resistance by the amount of force that hits
+//			int tableIndex = getTableIndexByID(tableCollisionData.instanceID);
+//			int newTableResistance = tables[tableIndex].getResistance() - force;
+//			tables[tableIndex].setResistance(newTableResistance);
+//
+//			//Decrease bullet resistance
+//			params.resistance -= force;
+//
+//			int resistanceTolerance = (newTableResistance * tables[tableIndex].getStuckTolerancePercentage()) / 100;
+//
+//			//If bullet force is lower than table resistance - resitance tolerance then bullet ricochet
+//			if (force < newTableResistance - resistanceTolerance) {
+//
+//				//Bullet ricochets
+//				ricochet(tableCollisionData);
+//
+//			}
+//			else if (force >= newTableResistance - resistanceTolerance && force <= newTableResistance + resistanceTolerance) {
+//
+//				//If bullet force is within range of stuck tolerance percentage of table resistance then bullet stays stuck
+//				params.stuck = true;
+//
+//			}
+//			//else if (force > newTableResistance + resistanceTolerance) {
+//			//	
+//			//	//If bullet force is greater than table resistance + resistance tolerance then bullet penetrates
+//			//	
+//			//}
+//
+//			//If resistance of table <= 0 then explode
+//			if (newTableResistance <= 0) {
+//				explosionParamsStruct newExplosionParams;
+//				newExplosionParams.ID = getFreeID(getExplosionIDs());
+//				newExplosionParams.overworldGridLayer = params.layer;
+//				newExplosionParams.sprite.spriteSheetIndex = tables[tableIndex].getTableSpriteSheetIndex();
+//				newExplosionParams.sprite.areas = {
+//					{
+//						{
+//							tables[tableIndex].getSpriteSheetArea()
+//						}
+//					}
+//				};
+//				newExplosionParams.sprite.angle = params.sprite.angle;
+//				newExplosionParams.collisionData = tableCollisionData;
+//				newExplosionParams.force = force;
+//				int tableHeight = tables[tableIndex].getSize().h;
+//				newExplosionParams.shadowHeightRandRange = { tableHeight / 2, tableHeight };
+//				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
+//				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
+//				initExplosion(newExplosionParams);
+//
+//				//Disable table sprite display
+//				tables[tableIndex].setDisplaySprite(false);
+//				tables[tableIndex].setDestroy(true);
+//
+//				//Remove table collision from overworld grid
+//				XYStruct tablePosition = tables[tableIndex].getPosition();
+//				WHStruct tableSize = tables[tableIndex].getSize();
+//				setOverworldGridCollision(overworldGrid.gridTile, params.layer, getGridAreaFromPixelArea({ tablePosition.x, tablePosition.y, tableSize.w, tableSize.h }), false);
+//
+//			}
+//
+//		}
+//
+//		//Other bullet collision
+//		if (otherBulletCollisionData.collision == true) {
+//			int otherBulletIndex = getBulletIndexByID(otherBulletCollisionData.instanceID);
+//			
+//			//Check if other bullet was fired by same character who fired current bullet
+//			vector<int> bulletsFiredIDs = characters[bullets[otherBulletIndex].getCharacterID()].getBulletsFiredIDs();
+//			bool bulletFiredBySameCharacter = false;
+//			for (int bulletsFiredIDsCnt = 0; bulletsFiredIDsCnt < (int)bulletsFiredIDs.size(); ++bulletsFiredIDsCnt) {
+//				if (bullets[otherBulletIndex].getID() == bulletsFiredIDs[bulletsFiredIDsCnt]) {
+//					bulletFiredBySameCharacter = true;
+//					break;
+//				}
+//			}
+//
+//			//If bullet is not the same as current bullet and is not a bullet that has been fired by same character who fired current bullet
+//			if (otherBulletIndex > -1 && otherBulletIndex != params.ID && bulletFiredBySameCharacter == false) {
+//
+//				//Decrease other bullet resistance by the amount of force that hits
+//				int newOtherBulletResistance = bullets[otherBulletIndex].getResistance() - force;
+//				bullets[otherBulletIndex].setResistance(newOtherBulletResistance);
+//
+//				//Decrease bullet resistance
+//				params.resistance -= force;
+//
+//				int resistanceTolerance = (newOtherBulletResistance * bullets[otherBulletIndex].getStuckTolerancePercentage()) / 100;
+//
+//				//If bullet force is lower than other bullet resistance - resitance tolerance then bullet ricochet
+//				if (force < newOtherBulletResistance - resistanceTolerance) {
+//
+//					//Bullet ricochets
+//					ricochet(tableCollisionData);
+//
+//				}
+//				else if (force >= newOtherBulletResistance - resistanceTolerance && force <= newOtherBulletResistance + resistanceTolerance) {
+//
+//					//If bullet force is within range of stuck tolerance percentage of other bullet resistance then bullet stays stuck
+//					params.stuck = true;
+//
+//				}
+//				//else if (force > newTableResistance + resistanceTolerance) {
+//				//	
+//				//	//If bullet force is greater than table resistance + resistance tolerance then bullet penetrates
+//				//	
+//				//}
+//
+//				//If resistance of other bullet <= 0 then explode
+//				if (newOtherBulletResistance <= 0) {
+//					explosionParamsStruct newExplosionParams;
+//					newExplosionParams.ID = getFreeID(getExplosionIDs());
+//					newExplosionParams.overworldGridLayer = params.layer;
+//					newExplosionParams.sprite.spriteSheetIndex = bullets[otherBulletIndex].getBulletSpriteSheetIndex();
+//					newExplosionParams.sprite.areas = {
+//						{
+//							{
+//								bullets[otherBulletIndex].getSpriteSheetArea()
+//							}
+//						}
+//					};
+//					newExplosionParams.sprite.angle = params.sprite.angle;
+//					newExplosionParams.collisionData = tableCollisionData;
+//					newExplosionParams.force = force;
+//					int otherBulletHeight = bullets[otherBulletIndex].getSize().h;
+//					newExplosionParams.shadowHeightRandRange = { otherBulletHeight / 2, otherBulletHeight };
+//					//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
+//					newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
+//					initExplosion(newExplosionParams);
+//
+//					//Disable other bullet sprite display
+//					bullets[otherBulletIndex].setDisplaySprite(false);
+//					//bullets[otherBulletIndex].setDestroy(true);
+//
+//				}
+//
+//			}
+//		}
+//
+//	}
+//}
+//
+//void Bullet::explode() {
+//	if (params.resistance <= 0 && params.destroy == false) {
+//		explosionParamsStruct newExplosionParams;
+//		newExplosionParams.ID = getFreeID(getExplosionIDs());
+//		newExplosionParams.overworldGridLayer = params.layer;
+//		newExplosionParams.sprite = params.sprite;
+//		newExplosionParams.force = params.damage - params.totalDistanceTravelled;
+//		newExplosionParams.shadowHeightRandRange = { params.size.h / 2, params.size.h };
+//		newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
+//		//newExplosionParams.totalFragments = { 2, 2 };
+//		newExplosionParams.collisionData.collidePosition = params.position;
+//		newExplosionParams.collisionData.collision = true;
+//		newExplosionParams.collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::none;
+//		newExplosionParams.collisionData.instanceID = params.ID;
+//		initExplosion(newExplosionParams);
+//
+//		params.displaySprite = false;
+//		params.destroy = true;
+//	}
+//}
+//
+//Explosion::Explosion(explosionParamsStruct newParams) {
+//	params = newParams;
+//}
+//
+//int Explosion::getID() {
+//	return params.ID;
+//}
+//
+//int Explosion::getOverworldGridLayer() {
+//	return params.overworldGridLayer;
+//}
+//
+//XYStruct Explosion::getFragmentPosition(int fragmentIndex) {
+//	return params.fragments[fragmentIndex].position;
+//}
+//
+//int Explosion::getTotalFragments() {
+//	return (int)params.fragments.size();
+//}
+//
+//vector<explosionParamsStruct::fragmentStruct> Explosion::getFragments() {
+//	return params.fragments;
+//}
+//
+//delayStruct Explosion::getFadeOut() {
+//	return params.fadeOut;
+//}
+//
+//void Explosion::setFadeOut(delayStruct newFadeOut) {
+//	params.fadeOut = newFadeOut;
+//}
+//
+//void Explosion::createFragments() {
+//	if ((int)params.fragments.size() == 0) {
+//		WHStruct fragmentSize = { -1, -1 };
+//		if (params.fragmentIsEntireSprite == false) {
+//			fragmentSize = { params.sprite.areas[0][0].w / params.totalFragments.x, params.sprite.areas[0][0].h / params.totalFragments.y };
+//		}
+//		else {
+//			fragmentSize = { params.sprite.areas[0][0].w, params.sprite.areas[0][0].h };
+//		}
+//
+//		areaStruct fragmentArea = { params.sprite.areas[0][0].x, params.sprite.areas[0][0].y, fragmentSize.w, fragmentSize.h };
+//
+//		for (int totalFragmentsXCnt = 0; totalFragmentsXCnt < params.totalFragments.x; ++totalFragmentsXCnt) {
+//			if (params.fragmentIsEntireSprite == false) {
+//				fragmentArea.y = params.sprite.areas[0][0].y;
+//			}
+//			
+//			for (int totalFragmentsYCnt = 0; totalFragmentsYCnt < params.totalFragments.y; ++totalFragmentsYCnt) {
+//				explosionParamsStruct::fragmentStruct fragment;
+//
+//				//Offset collide position to give each fragment a different starting position
+//				fragment.position = { params.collisionData.collidePosition.x + (fragmentSize.w * totalFragmentsXCnt) - fragmentSize.w, params.collisionData.collidePosition.y + (fragmentSize.h * totalFragmentsYCnt) - fragmentSize.h };
+//
+//				fragment.originalPosition = fragment.position;
+//				fragment.size = fragmentSize;
+//				
+//				fragment.shadowHeight = randInt(params.shadowHeightRandRange.min, params.shadowHeightRandRange.max);
+//				
+//				//fragment.maxDistance = randInt(fragment.size.w * 4, fragment.size.w * 8);
+//				fragment.maxDistance = randInt(params.force / 2, params.force);
+//				
+//				fragment.sprite.spriteSheetIndex = params.sprite.spriteSheetIndex;
+//				fragment.sprite.areas = {
+//					{
+//						{
+//							{ fragmentArea.x, fragmentArea.y, fragmentArea.w, fragmentArea.h }
+//						}
+//					}
+//				};
+//				
+//				if (params.randomizeFragmentAngle == false) {
+//					int angleTolerance = (params.sprite.angle * 10) / 100;
+//					fragment.sprite.angle = randInt(params.sprite.angle - angleTolerance, params.sprite.angle + angleTolerance);
+//				}
+//				else {
+//					fragment.sprite.angle = randInt(0, 360);
+//				}
+//				if (fragment.sprite.angle > 180) {
+//					fragment.sprite.angle = -(180 - (fragment.sprite.angle - 180));
+//				}
+//
+//				fragment.sprite.center = { randInt(0, fragmentSize.w), randInt(0, fragmentSize.h) };
+//				
+//				/*int randomFlip = randInt(1, 3);
+//				if (randomFlip == 1) {
+//					fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
+//				}
+//				else if (randomFlip == 2) {
+//					fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_HORIZONTAL;
+//				}
+//				else if (randomFlip == 3) {
+//					fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
+//				}*/
+//				fragment.sprite.flip = randFlip({ { 0, 33 }, { 34, 66 }, { 67, 100 } });
+//
+//				fragment.speed.startTicks = SDL_GetTicks();
+//				fragment.speed.delay = 1;
+//				fragment.pixelIncrement = 2;
+//
+//				params.fragments.push_back(fragment);
+//
+//				if (params.fragmentIsEntireSprite == false) {
+//					fragmentArea.y += fragmentArea.h;
+//				}
+//			}
+//
+//			if (params.fragmentIsEntireSprite == false) {
+//				fragmentArea.x += fragmentArea.w;
+//			}
+//		}
+//	}
+//}
+//
+//void Explosion::render() {
+//
+//	//Render all fragments
+//	for (int fragmentsCnt = 0; fragmentsCnt < (int)params.fragments.size(); ++fragmentsCnt) {
+//		if (areaWithinCameraView({ params.fragments[fragmentsCnt].position.x, params.fragments[fragmentsCnt].position.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h }) == true) {
+//			SDL_Rect sRect = convertAreaToSDLRect(params.fragments[fragmentsCnt].sprite.areas[0][0]);
+//			SDL_Rect dRect = { params.fragments[fragmentsCnt].position.x - camera.area.x, params.fragments[fragmentsCnt].position.y - camera.area.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h };
+//
+//			//Set transparency
+//			int percentageTimePassed = 0;
+//			if (params.fadeOut.delay > 0) {
+//				percentageTimePassed = ((SDL_GetTicks() - params.fadeOut.startTicks) * 100) / params.fadeOut.delay;
+//				setSDLTextureTransparency(spriteSheets[params.fragments[fragmentsCnt].sprite.spriteSheetIndex].texture, 100 - percentageTimePassed);
+//			}
+//
+//			//Render shadow
+//			if (params.enableShadows == true) {
+//				renderShadow({ dRect.x, dRect.y + params.fragments[fragmentsCnt].shadowHeight, dRect.w, dRect.h / 5 }, 50 - (percentageTimePassed / 2));
+//			}
+//
+//			//Render fragment
+//			SDLRenderCopyEx(sRect, dRect, params.fragments[fragmentsCnt].sprite);
+//
+//			//Reset transparency
+//			if (params.fadeOut.delay > 0) {
+//				setSDLTextureTransparency(spriteSheets[params.fragments[fragmentsCnt].sprite.spriteSheetIndex].texture, 100);
+//			}
+//
+//		}
+//	}
+//
+//}
+//
+//void Explosion::explode() {
+//	for (int fragmentsCnt = 0; fragmentsCnt < (int)params.fragments.size(); ++fragmentsCnt) {
+//		if (SDL_GetTicks() - params.fragments[fragmentsCnt].speed.startTicks >= params.fragments[fragmentsCnt].speed.delay / FPSTimerMod) {
+//			params.fragments[fragmentsCnt].speed.startTicks = SDL_GetTicks();
+//
+//			if (params.fragments[fragmentsCnt].distanceTravelled < params.fragments[fragmentsCnt].maxDistance) {
+//
+//				//Update fragment position
+//				params.fragments[fragmentsCnt].distanceTravelled += params.fragments[fragmentsCnt].pixelIncrement;
+//				params.fragments[fragmentsCnt].position = { lround((double)params.fragments[fragmentsCnt].originalPosition.x + (params.fragments[fragmentsCnt].distanceTravelled * cos(((params.fragments[fragmentsCnt].sprite.angle) * M_PI) / 180))), lround((double)params.fragments[fragmentsCnt].originalPosition.y + (params.fragments[fragmentsCnt].distanceTravelled * sin(((params.fragments[fragmentsCnt].sprite.angle) * M_PI) / 180))) };
+//
+//				//Rotate fragment
+//				params.fragments[fragmentsCnt].sprite.angle += params.fragments[fragmentsCnt].pixelIncrement;
+//				if (params.fragments[fragmentsCnt].sprite.angle > 180) {
+//					params.fragments[fragmentsCnt].sprite.angle = -(180 - (params.fragments[fragmentsCnt].sprite.angle - 180));
+//				}
+//
+//				//Update shadow height
+//				params.fragments[fragmentsCnt].shadowHeight -= params.fragments[fragmentsCnt].pixelIncrement;
+//
+//			}
+//			else {
+//				
+//				//Update shadow height
+//				params.fragments[fragmentsCnt].shadowHeight = params.fragments[fragmentsCnt].size.h / 2;
+//
+//			}
+//		}
+//	}
+//}
+//
+//void Explosion::markForDestruction() {
+//	if (params.fadeOut.delay > 0 && SDL_GetTicks() - params.fadeOut.startTicks >= params.fadeOut.delay) {
+//		explosionsToDestroyIDs.push_back(params.ID);
+//	}
+//}
+//
+//Area::Area(areaParamsStruct newParams) {
+//	params = newParams;
+//}
+//
+//int Area::getID() {
+//	return params.ID;
+//}
+//
+//void Area::render() {
+//	if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h }) == true) {
+//		SDL_Rect sRect = convertAreaToSDLRect(areaSprite.spriteSheetArea);
+//		SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h };
+//
+//		SDL_RenderCopy(renderer, spriteSheets[areaSprite.spriteSheetIndex].texture, &sRect, &dRect);
+//	}
+//}
+
+Character::Character(characterParamsStruct newParams) {
 	params = newParams;
-};
-
-int Character::getLayer() {
-	return params.layer;
-}
-
-XYStruct Character::getPosition() {
-	return params.position;
-}
-
-WHStruct Character::getSize() {
-	return params.size;
-}
-
-int Character::getCurrentHeight() {
-	return params.jump.currentHeight;
-}
-
-directionEnum Character::getDirection() {
-	return params.direction;
-}
-
-int Character::getFrame() {
-	return params.frame;
-}
-
-characterParams::rangedWeaponStruct::magazineStruct Character::getMagazine() {
-	return params.equippedRangedWeapon.magazine;
-}
-
-string Character::getEquippedWeaponName() {
-	return params.equippedRangedWeapon.name;
 }
 
 int Character::getID() {
 	return params.ID;
-}
-
-int Character::getResistance() {
-	return params.resistance;
-}
-
-void Character::setResistance(int newResistance) {
-	params.resistance = newResistance;
-}
-
-int Character::getStuckTolerancePercentage() {
-	return params.stuckTolerancePercentage;
-}
-
-int Character::getCharacterSpriteSheetIndex() {
-	return params.sprites.spriteSheetIndex;
-}
-
-areaStruct Character::getSpriteSheetArea(directionEnum direction, int frame) {
-	return params.sprites.areas[(int)direction][frame];
-}
-
-bool Character::getDisplaySprites() {
-	return params.displaySprites;
-}
-
-void Character::setDisplaySprites(bool newDisplaySprites) {
-	params.displaySprites = newDisplaySprites;
-}
-
-void Character::setDestroy(bool newDestroy) {
-	params.destroy = newDestroy;
-}
-
-vector<int> Character::getBulletsFiredIDs() {
-	return params.bulletsFiredIDs;
-}
-
-void Character::render() {
-	if (params.displaySprites == true) {
-
-		//Render shadow
-		WHStruct shadowSize = { params.size.w, params.size.h / 5 };
-		XYStruct shadowPosition = { params.position.x - camera.area.x, ((params.position.y - camera.area.y) + params.size.h - 1) - shadowSize.h - params.shadowHeight };
-		if (areaWithinCameraView({ shadowPosition.x + camera.area.x, shadowPosition.y + camera.area.y, shadowSize.w, shadowSize.h }) == true) {
-			renderShadow({ shadowPosition.x, shadowPosition.y, shadowSize.w, shadowSize.h }, 50);
-		}
-
-		//Render character
-		if (areaWithinCameraView({ params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h }) == true) {
-			SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
-			SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.jump.currentHeight, params.size.w, params.size.h };
-			SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
-		}
-
-	}
-}
-
-void Character::updateEquippedWeaponAngle() {
-	switch (params.equippedWeaponType) {
-		case characterParams::equippedWeaponTypeEnum::ranged: {
-			if (rightStickXDir != 0 || rightStickYDir != 0) {
-				params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
-			}
-			else if (xDir != 0 || yDir != 0) {
-				params.equippedRangedWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
-			}
-			break;
-		}
-		case characterParams::equippedWeaponTypeEnum::melee: {
-			if (params.equippedMeleeWeapon.swing.swinging == false) {
-				if (rightStickXDir != 0 || rightStickYDir != 0) {
-					params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
-				}
-				else if (xDir != 0 || yDir != 0) {
-					params.equippedMeleeWeapon.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
-				}
-			}
-			break;
-		}
-		case characterParams::equippedWeaponTypeEnum::throwable: {
-			if (rightStickXDir != 0 || rightStickYDir != 0) {
-				params.equippedThrowableWeapon.aimIndicator.sprite.angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
-			}
-			else if (xDir != 0 || yDir != 0) {
-				params.equippedThrowableWeapon.aimIndicator.sprite.angle = convertCoordinatesToAngle(xDir, yDir);
-			}
-			break;
-		}
-	}
-}
-
-void Character::renderEquippedWeapon() {
-	if (params.displaySprites == true) {
-		switch (params.equippedWeaponType) {
-			case characterParams::equippedWeaponTypeEnum::ranged: {
-
-				//Update position
-				params.equippedRangedWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedRangedWeapon.sprite.areas[0][0].h / 2) };
-
-				//Flip weapon and adjust position
-				if (params.equippedRangedWeapon.sprite.angle >= -90 && params.equippedRangedWeapon.sprite.angle <= 90) {
-
-					//Weapon is facing right
-					params.equippedRangedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
-
-				}
-				else {
-
-					//Weapon is facing left
-					params.equippedRangedWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
-
-				}
-
-				//Render
-				SDL_Rect sRect = convertAreaToSDLRect(params.equippedRangedWeapon.sprite.areas[0][0]);
-				SDL_Rect dRect = { params.equippedRangedWeapon.position.x - camera.area.x, params.equippedRangedWeapon.position.y - camera.area.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h };
-				if (areaWithinCameraView({ params.equippedRangedWeapon.position.x, params.equippedRangedWeapon.position.y, params.equippedRangedWeapon.size.w, params.equippedRangedWeapon.size.h }) == true) {
-					SDLRenderCopyEx(sRect, dRect, params.equippedRangedWeapon.sprite);
-				}
-
-				break;
-			}
-			case characterParams::equippedWeaponTypeEnum::melee: {
-
-				//Update position
-				params.equippedMeleeWeapon.position = { params.position.x + (params.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedMeleeWeapon.sprite.areas[0][0].h / 2) };
-
-				//Flip weapon and adjust position
-				if (params.equippedMeleeWeapon.sprite.angle >= -90 && params.equippedMeleeWeapon.sprite.angle <= 90) {
-
-					//Weapon is facing right
-					params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
-
-				}
-				else {
-
-					//Weapon is facing left
-					params.equippedMeleeWeapon.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
-
-				}
-
-				//Render
-				SDL_Rect sRect = convertAreaToSDLRect(params.equippedMeleeWeapon.sprite.areas[0][0]);
-				SDL_Rect dRect = { params.equippedMeleeWeapon.position.x - camera.area.x, params.equippedMeleeWeapon.position.y - camera.area.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h };
-				if (areaWithinCameraView({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - params.jump.currentHeight, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }) == true) {
-
-					//Update weapon angle
-					if (params.equippedMeleeWeapon.swing.swinging == true) {
-						params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.currentAngle;
-					}
-
-					SDLRenderCopyEx(sRect, dRect, params.equippedMeleeWeapon.sprite);
-				}
-
-				break;
-			}
-			case characterParams::equippedWeaponTypeEnum::throwable: {
-				if (params.equippedThrowableWeapon.throwableThrow.thrown == false) {
-					if (params.equippedThrowableWeapon.readied == false) {
-
-						//Update position for when throwable is not readied
-						switch (params.direction) {
-						case directionEnum::down: {
-							params.equippedThrowableWeapon.position = { params.position.x, params.position.y + (params.size.h / 2) };
-							break;
-						}
-						case directionEnum::up: {
-							params.equippedThrowableWeapon.position = { params.position.x + params.size.w, params.position.y + (params.size.h / 2) };
-							break;
-						}
-						case directionEnum::left: {
-							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
-							break;
-						}
-						case directionEnum::right: {
-							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
-							break;
-						}
-						case directionEnum::upRight: {
-							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
-							break;
-						}
-						case directionEnum::upLeft: {
-							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
-							break;
-						}
-						case directionEnum::downRight: {
-							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
-							break;
-						}
-						case directionEnum::downLeft: {
-							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) };
-							break;
-						}
-						}
-
-					}
-					else {
-
-						//Update position for when throwable is readied
-						switch (params.direction) {
-						case directionEnum::down: {
-							params.equippedThrowableWeapon.position = { params.position.x, params.position.y };
-							break;
-						}
-						case directionEnum::up: {
-							params.equippedThrowableWeapon.position = { params.position.x + params.size.w, params.position.y };
-							break;
-						}
-						case directionEnum::left: {
-							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
-							break;
-						}
-						case directionEnum::right: {
-							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
-							break;
-						}
-						case directionEnum::upRight: {
-							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
-							break;
-						}
-						case directionEnum::upLeft: {
-							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
-							break;
-						}
-						case directionEnum::downRight: {
-							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
-							break;
-						}
-						case directionEnum::downLeft: {
-							params.equippedThrowableWeapon.position = { params.position.x + (params.size.w / 2), params.position.y };
-							break;
-						}
-						}
-
-					}
-
-					//Render throwable
-					/*if (areaWithinCameraView({ params.equippedThrowableWeapon.position.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h }) == true) {
-						SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.sprite.areas[0][0]);
-						SDL_Rect dRect = { params.equippedThrowableWeapon.position.x - camera.area.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight - camera.area.y, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h };
-						SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.sprite);
-					}*/
-
-					if (params.equippedThrowableWeapon.readied == true) {
-
-						//Update throwable aim indicator position
-						params.equippedThrowableWeapon.aimIndicator.position = { params.position.x + (params.size.w / 2) - (params.equippedThrowableWeapon.aimIndicator.size.w / 2), params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedThrowableWeapon.aimIndicator.size.h / 2) };
-
-						//Flip throwable aim indicator and adjust position
-						if (params.equippedThrowableWeapon.aimIndicator.sprite.angle >= -90 && params.equippedThrowableWeapon.aimIndicator.sprite.angle <= 90) {
-
-							//Throwable aim indicator is facing right
-							params.equippedThrowableWeapon.aimIndicator.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
-
-						}
-						else {
-
-							//Throwable aim indicator is facing left
-							params.equippedThrowableWeapon.aimIndicator.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
-
-						}
-
-						//Render throwable aim indicator
-						if (areaWithinCameraView({ params.equippedThrowableWeapon.aimIndicator.position.x, params.equippedThrowableWeapon.aimIndicator.position.y, params.equippedThrowableWeapon.aimIndicator.size.w, params.equippedThrowableWeapon.aimIndicator.size.h }) == true) {
-							SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.aimIndicator.sprite.areas[0][0]);
-							SDL_Rect dRect = { params.equippedThrowableWeapon.aimIndicator.position.x - camera.area.x, params.equippedThrowableWeapon.aimIndicator.position.y - camera.area.y, params.equippedThrowableWeapon.aimIndicator.size.w, params.equippedThrowableWeapon.aimIndicator.size.h };
-							SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.aimIndicator.sprite);
-						}
-
-						//Update throwable throw indicator size
-						if (SDL_GetTicks() - params.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.startTicks >= params.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.delay) {
-							params.equippedThrowableWeapon.throwIndicator.sizeUpdateDelay.startTicks = SDL_GetTicks();
-
-							if ((params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier == -1 && params.equippedThrowableWeapon.throwIndicator.indicator.size.w > params.equippedThrowableWeapon.throwIndicator.maxSize.w / 2)
-								|| (params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier == 1 && params.equippedThrowableWeapon.throwIndicator.indicator.size.w < params.equippedThrowableWeapon.throwIndicator.maxSize.w)) {
-								params.equippedThrowableWeapon.throwIndicator.indicator.size.w += params.equippedThrowableWeapon.throwIndicator.sizePixelIncrement * params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier;
-								params.equippedThrowableWeapon.throwIndicator.indicator.size.h += params.equippedThrowableWeapon.throwIndicator.sizePixelIncrement * params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier;
-							}
-							else {
-								if (params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier == -1) {
-									params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier = 1;
-								}
-								else {
-									params.equippedThrowableWeapon.throwIndicator.sizeIncrementMultiplier = -1;
-								}
-							}
-						}
-
-						//Get current throw distance
-						int rightJoystickTilt = -1;
-						if (abs(rightJoystickAxisY) > abs(rightJoystickAxisX)) {
-							rightJoystickTilt = abs(rightJoystickAxisY);
-						}
-						else {
-							rightJoystickTilt = abs(rightJoystickAxisX);
-						}
-						int tiltPercentage = (rightJoystickTilt * 100) / (joystickAxisMaxValue - deadZone);
-						params.equippedThrowableWeapon.throwDistance.current = (tiltPercentage * params.equippedThrowableWeapon.throwDistance.max) / 100;
-
-						//Update throwable throw indicator position
-						XYStruct throwIndicatorPositionOffset = convertAngleToCoordinates(params.equippedThrowableWeapon.aimIndicator.sprite.angle, (params.size.w / 2) + params.equippedThrowableWeapon.throwDistance.current);
-						params.equippedThrowableWeapon.throwIndicator.indicator.position = { params.position.x + (params.size.w / 2) - (params.equippedThrowableWeapon.throwIndicator.indicator.size.w / 2) + throwIndicatorPositionOffset.x, params.position.y - params.jump.currentHeight + (params.size.h / 2) - (params.equippedThrowableWeapon.throwIndicator.indicator.size.h / 2) + throwIndicatorPositionOffset.y };
-
-						if (areaWithinCameraView({ params.equippedThrowableWeapon.throwIndicator.indicator.position.x, params.equippedThrowableWeapon.throwIndicator.indicator.position.y, params.equippedThrowableWeapon.throwIndicator.indicator.size.w, params.equippedThrowableWeapon.throwIndicator.indicator.size.h }) == true) {
-
-							//Render throwable throw indicator
-							SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.throwIndicator.indicator.sprite.areas[0][params.equippedThrowableWeapon.throwIndicator.frame]);
-							SDL_Rect dRect = { params.equippedThrowableWeapon.throwIndicator.indicator.position.x - camera.area.x, params.equippedThrowableWeapon.throwIndicator.indicator.position.y - camera.area.y, params.equippedThrowableWeapon.throwIndicator.indicator.size.w, params.equippedThrowableWeapon.throwIndicator.indicator.size.h };
-							SDL_RenderCopy(renderer, spriteSheets[params.equippedThrowableWeapon.throwIndicator.indicator.sprite.spriteSheetIndex].texture, &sRect, &dRect);
-
-							//Update throwable throw indicator frame
-							if (SDL_GetTicks() - params.equippedThrowableWeapon.throwIndicator.frameSwapDelay.startTicks >= params.equippedThrowableWeapon.throwIndicator.frameSwapDelay.delay) {
-								params.equippedThrowableWeapon.throwIndicator.frameSwapDelay.startTicks = SDL_GetTicks();
-
-								if (params.equippedThrowableWeapon.throwIndicator.frame < (int)params.equippedThrowableWeapon.throwIndicator.indicator.sprite.areas[0].size() - 1) {
-									++params.equippedThrowableWeapon.throwIndicator.frame;
-								}
-								else {
-									params.equippedThrowableWeapon.throwIndicator.frame = 0;
-								}
-							}
-
-						}
-
-						//Update throw arc indicator angle and flip
-						params.equippedThrowableWeapon.throwArcIndicator.sprite.angle = params.equippedThrowableWeapon.aimIndicator.sprite.angle;
-						params.equippedThrowableWeapon.throwArcIndicator.sprite.flip = params.equippedThrowableWeapon.aimIndicator.sprite.flip;
-
-						//Update throw arc indicator position and size
-						params.equippedThrowableWeapon.throwArcIndicator.position = params.equippedThrowableWeapon.position;
-						//params.equippedThrowableWeapon.throwArcIndicator.size = { abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.x - params.equippedThrowableWeapon.throwArcIndicator.position.x), tileSize.h };
-						/*if ((params.equippedThrowableWeapon.throwArcIndicator.sprite.angle >= (double)-45 && params.equippedThrowableWeapon.throwArcIndicator.sprite.angle <= (double)45)
-							|| (params.equippedThrowableWeapon.throwArcIndicator.sprite.angle >= (double)-180 && params.equippedThrowableWeapon.throwArcIndicator.sprite.angle <= (double)-180 + 45)
-							|| (params.equippedThrowableWeapon.throwArcIndicator.sprite.angle >= (double)180 - 45 && params.equippedThrowableWeapon.throwArcIndicator.sprite.angle <= (double)180)) {
-							params.equippedThrowableWeapon.throwArcIndicator.size = { abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.x - params.equippedThrowableWeapon.throwArcIndicator.position.x), tileSize.h };
-						}
-						else {
-							params.equippedThrowableWeapon.throwArcIndicator.size = { abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.y - params.equippedThrowableWeapon.throwArcIndicator.position.y), tileSize.h };
-						}*/
-						if (abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.x - params.equippedThrowableWeapon.throwArcIndicator.position.x) > abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.y - params.equippedThrowableWeapon.throwArcIndicator.position.y)) {
-							params.equippedThrowableWeapon.throwArcIndicator.size = { abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.x - params.equippedThrowableWeapon.throwArcIndicator.position.x), tileSize.h };
-						}
-						else {
-							params.equippedThrowableWeapon.throwArcIndicator.size = { abs(params.equippedThrowableWeapon.throwIndicator.indicator.position.y - params.equippedThrowableWeapon.throwArcIndicator.position.y), tileSize.h };
-						}
-
-						//Render throw arc indicator
-						if (areaWithinCameraView({ params.equippedThrowableWeapon.throwArcIndicator.position.x, params.equippedThrowableWeapon.throwArcIndicator.position.y - params.jump.currentHeight, params.equippedThrowableWeapon.throwArcIndicator.size.w, params.equippedThrowableWeapon.throwArcIndicator.size.h }) == true) {
-							SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.throwArcIndicator.sprite.areas[0][0]);
-							SDL_Rect dRect = { params.equippedThrowableWeapon.throwArcIndicator.position.x - camera.area.x, params.equippedThrowableWeapon.throwArcIndicator.position.y - params.jump.currentHeight - camera.area.y, params.equippedThrowableWeapon.throwArcIndicator.size.w, params.equippedThrowableWeapon.throwArcIndicator.size.h };
-							SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.throwArcIndicator.sprite);
-						}
-
-					}
-				}
-
-				//Render throwable
-				if (areaWithinCameraView({ params.equippedThrowableWeapon.position.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h }) == true) {
-					SDL_Rect sRect = convertAreaToSDLRect(params.equippedThrowableWeapon.sprite.areas[0][0]);
-					SDL_Rect dRect = { params.equippedThrowableWeapon.position.x - camera.area.x, params.equippedThrowableWeapon.position.y - params.jump.currentHeight - camera.area.y, params.equippedThrowableWeapon.size.w, params.equippedThrowableWeapon.size.h };
-					SDLRenderCopyEx(sRect, dRect, params.equippedThrowableWeapon.sprite);
-					//printSDLRectL({ sRect, dRect }); --;;
-					//printIntL({ params.position.x, params.position.y, params.size.w, params.size.h });
-				}
-
-				break;
-			}
-		}
-	}
-}
-
-void Character::renderReloadAnimation() {
-	if (params.equippedRangedWeapon.reload.reloading == true) {
-
-		//Position animation on top of character
-		areaStruct reloadAnimationArea = { params.position.x, params.position.y - params.jump.currentHeight, params.size.w, params.size.h / 6 };
-		if (areaWithinCameraView(reloadAnimationArea) == true) {
-
-			//Render background bar
-			SDL_Rect backgroundSRect = { convertAreaToSDLRect(params.equippedRangedWeapon.reload.sprite.areas[0][0]) };
-			SDL_Rect backgroundDRect = { reloadAnimationArea.x - camera.area.x, reloadAnimationArea.y - camera.area.y, reloadAnimationArea.w, 3 };
-			//SDL_RenderCopy(renderer, spriteSheets[params.equippedRangedWeapon.reload.sprite.spriteSheetIndex].texture, &backgroundSRect, &backgroundDRect);
-			colourStruct newColour = { 255, 255, 255, 255 };
-			setSDLDrawColour(newColour);
-			SDL_RenderDrawLine(renderer, backgroundDRect.x, backgroundDRect.y - 1, backgroundDRect.x, backgroundDRect.y + 1); //left vertical bar
-			SDL_RenderDrawLine(renderer, backgroundDRect.x, backgroundDRect.y, backgroundDRect.x + backgroundDRect.w - 1, backgroundDRect.y); //horizontal bar
-			SDL_RenderDrawLine(renderer, backgroundDRect.x + backgroundDRect.w, backgroundDRect.y - 1, backgroundDRect.x + backgroundDRect.w, backgroundDRect.y + 1); //right vertical bar
-
-			//Render foreground bar
-			SDL_Rect foregroundSRect = { convertAreaToSDLRect(params.equippedRangedWeapon.reload.sprite.areas[0][1]) };
-			int delayPercentage = (int)(((SDL_GetTicks() - params.equippedRangedWeapon.reload.delay.startTicks) * 100) / params.equippedRangedWeapon.reload.delay.delay);
-			SDL_Rect foregroundDRect = { reloadAnimationArea.x - camera.area.x, reloadAnimationArea.y + 1 - camera.area.y, (reloadAnimationArea.w * delayPercentage) / 100, 1 };
-			//SDL_RenderCopy(renderer, spriteSheets[params.equippedRangedWeapon.reload.sprite.spriteSheetIndex].texture, &foregroundSRect, &foregroundDRect);
-			SDL_RenderDrawLine(renderer, foregroundDRect.x + foregroundDRect.w - 1, foregroundDRect.y - 3, foregroundDRect.x + foregroundDRect.w - 1, foregroundDRect.y + 1);
-
-		}
-
-	}
-}
-
-void Character::renderEquippedMeleeWeaponArea() {
-	if (params.renderEquippedMeleeWeaponAreaBool == true && areaWithinCameraView({ params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.h }) == true) {
-		SDL_Rect sRect = convertAreaToSDLRect(areaSprite.spriteSheetArea);
-
-		SDL_Rect dRect = { params.equippedMeleeWeapon.attackArea.x - camera.area.x, params.equippedMeleeWeapon.attackArea.y - camera.area.y, params.equippedMeleeWeapon.attackArea.w, params.equippedMeleeWeapon.attackArea.h };
-
-		SDL_RenderCopy(renderer, spriteSheets[areaSprite.spriteSheetIndex].texture, &sRect, &dRect);
-	}
-}
-
-void Character::renderMeleeRecoilSparkAnimation() {
-	if (params.meleeRecoilSparkAnimation.active == true && areaWithinCameraView(params.equippedMeleeWeapon.attackArea) == true) {
-		SDL_Rect sRect = convertAreaToSDLRect(params.meleeRecoilSparkAnimation.sprites.areas[0][params.meleeRecoilSparkAnimation.currentFrame]);
-		SDL_Rect dRect = { params.meleeRecoilSparkAnimation.position.x - camera.area.x, params.meleeRecoilSparkAnimation.position.y - camera.area.y, params.meleeRecoilSparkAnimation.size.w, params.meleeRecoilSparkAnimation.size.h };
-
-		SDL_RenderCopy(renderer, spriteSheets[params.meleeRecoilSparkAnimation.sprites.spriteSheetIndex].texture, &sRect, &dRect);
-	}
-}
-
-void Character::swapFrame() {
-	if (SDL_GetTicks() - params.move.frameSwap.startTicks >= params.move.frameSwap.delay / FPSTimerMod) {
-		params.move.frameSwap.startTicks = SDL_GetTicks();
-		if (params.frame < (int)params.sprites.areas[(int)params.direction].size() - 1) {
-			++params.frame;
-		}
-		else {
-			params.frame = 0;
-		}
-	}
-}
-
-void Character::recoil() {
-	params.equippedMeleeWeapon.swing.recoil = true;
-	params.equippedMeleeWeapon.swing.swingBack = false;
-	params.equippedMeleeWeapon.swing.endAngle = params.equippedMeleeWeapon.swing.startAngle + abs(params.equippedMeleeWeapon.swing.endAngle - params.equippedMeleeWeapon.swing.startAngle) / 2;
-
-	//Init melee recoil spark
-	params.meleeRecoilSparkAnimation.active = true;
-	params.meleeRecoilSparkAnimation.size = { tileSize.w * 2, tileSize.h * 2 };
-	params.meleeRecoilSparkAnimation.position = { params.equippedMeleeWeapon.attackArea.x + (params.equippedMeleeWeapon.size.w / 2) - (params.meleeRecoilSparkAnimation.size.w / 2), params.equippedMeleeWeapon.attackArea.y + (params.equippedMeleeWeapon.size.h / 2) - (params.meleeRecoilSparkAnimation.size.h / 2) };
-
-	params.meleeRecoilSparkAnimation.sprites.spriteSheetIndex = getSpriteSheetIndex("spark");
-	params.meleeRecoilSparkAnimation.sprites.areas = {
-		{
-			{ 47, 40, 112, 112 },
-			{ 205, 40, 112, 112 },
-			{ 363, 40, 112, 112 },
-			{ 522, 40, 112, 112 }
-		}
-	};
-	params.meleeRecoilSparkAnimation.frameDelay.delay = 100;
-	params.meleeRecoilSparkAnimation.currentFrame = 0;
-}
-
-void Character::move() {
-	if (SDL_GetTicks() - params.move.speed.startTicks >= params.move.speed.delay / FPSTimerMod) {
-		params.move.speed.startTicks = SDL_GetTicks();
-
-		//Define move pixel increment based on how far left stick is tilted
-		if (abs(joystickAxisX) > ((joystickAxisMaxValue - deadZone) / 6) * 5 || abs(joystickAxisY) > ((joystickAxisMaxValue - deadZone) / 6) * 5) {
-			params.move.pixelIncrement = 2;
-		}
-		else {
-			params.move.pixelIncrement = 1;
-		}
-
-		bool positionUpdated = false;
-
-		//Left
-		if (xDir == -1) {
-			params.direction = directionEnum::left;
-			params.position.x -= params.move.pixelIncrement;
-
-			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), { -1, -1, -1 -1 }, params.layer, params.jump.currentHeight);
-			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
-				params.position.x += params.move.pixelIncrement;
-			}
-
-			positionUpdated = true;
-		}
-
-		//Right
-		if (xDir == 1) {
-			params.direction = directionEnum::right;
-			params.position.x += params.move.pixelIncrement;
-
-			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), { -1, -1, -1 - 1 }, params.layer, params.jump.currentHeight);
-			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
-				params.position.x -= params.move.pixelIncrement;
-			}
-
-			positionUpdated = true;
-		}
-
-		//Up
-		if (yDir == -1) {
-			params.direction = directionEnum::up;
-			params.position.y -= params.move.pixelIncrement;
-			
-			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), { -1, -1, -1 - 1 }, params.layer, params.jump.currentHeight);
-			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
-				params.position.y += params.move.pixelIncrement;
-			}
-
-			positionUpdated = true;
-		}
-
-		//Down
-		if (yDir == 1) {
-			params.direction = directionEnum::down;
-			params.position.y += params.move.pixelIncrement;
-			
-			collisionDataStruct collisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), { -1, -1, -1 - 1 }, params.layer, params.jump.currentHeight);
-			if (collisionData.collision == true || checkCollisionWithCollidableObjectFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer, params.jump.currentHeight) == true) {
-				params.position.y -= params.move.pixelIncrement;
-			}
-
-			positionUpdated = true;
-		}
-
-		//Up-right
-		if (yDir == -1 && xDir == 1) {
-			params.direction = directionEnum::upRight;
-		}
-
-		//Down-right
-		if (yDir == 1 && xDir == 1) {
-			params.direction = directionEnum::downRight;
-		}
-
-		//Down-left
-		if (yDir == 1 && xDir == -1) {
-			params.direction = directionEnum::downLeft;
-		}
-
-		//Up-left
-		if (yDir == -1 && xDir == -1) {
-			params.direction = directionEnum::upLeft;
-		}
-
-		//Face where weapon is aimed if aiming weapon
-		if (params.equippedMeleeWeapon.swing.swinging == false) {
-			if (rightStickYDir != 0 || rightStickXDir != 0) {
-				int angle = 0;
-				switch (params.equippedWeaponType) {
-					case characterParams::equippedWeaponTypeEnum::none: {
-						angle = convertCoordinatesToAngle(rightJoystickAxisY, rightJoystickAxisX);
-						break;
-					}
-					case characterParams::equippedWeaponTypeEnum::ranged: {
-						angle = (int)params.equippedRangedWeapon.sprite.angle;
-						break;
-					}
-					case characterParams::equippedWeaponTypeEnum::melee: {
-						angle = (int)params.equippedMeleeWeapon.sprite.angle;
-						break;
-					}
-					case characterParams::equippedWeaponTypeEnum::throwable: {
-						angle = params.equippedThrowableWeapon.aimIndicator.sprite.angle;
-						break;
-					}
-				}
-				int selectionAngle = 45, halfSelectionAngle = selectionAngle / 2;
-				if (angle >= -90 - halfSelectionAngle && angle <= -90 + halfSelectionAngle) {
-					params.direction = directionEnum::up;
-				}
-				else if (angle >= 90 - halfSelectionAngle && angle <= 90 + halfSelectionAngle) {
-					params.direction = directionEnum::down;
-				}
-				else if ((angle >= -180 && angle <= -180 + halfSelectionAngle) || (angle >= 180 - halfSelectionAngle && angle <= 180)) {
-					params.direction = directionEnum::left;
-				}
-				else if (angle >= -halfSelectionAngle && angle <= halfSelectionAngle) {
-					params.direction = directionEnum::right;
-				}
-				else if (angle >= -90 - halfSelectionAngle - selectionAngle && angle <= -90 - halfSelectionAngle) {
-					params.direction = directionEnum::upLeft;
-				}
-				else if (angle >= -90 + halfSelectionAngle && angle <= -90 + halfSelectionAngle + selectionAngle) {
-					params.direction = directionEnum::upRight;
-				}
-				else if (angle >= 90 + halfSelectionAngle && angle <= 90 + halfSelectionAngle + selectionAngle) {
-					params.direction = directionEnum::downLeft;
-				}
-				else if (angle >= 90 - halfSelectionAngle - selectionAngle && angle <= 90 - halfSelectionAngle) {
-					params.direction = directionEnum::downRight;
-				}
-			}
-		}
-
-		//Swap frame and centre camera
-		if (positionUpdated == true) {
-			if (params.jump.jumping == false) {
-				swapFrame();
-			}
-			//centreCamera({ params.position.x, params.position.y, params.size.w, params.size.h }, params.layer);
-		}
-
-		//Reset 
-		if (xDir != 0 || yDir != 0) {
-			params.idleAnimation.animationRunning = false;
-			params.idleAnimation.delayBeforeAnimation.startTicks = SDL_GetTicks();
-		}
-
-	}
-}
-
-void Character::idleAnimation() {
-	
-	//Check if need to run idle animation
-	if (xDir == 0 && yDir == 0 && params.idleAnimation.animationRunning == false && SDL_GetTicks() - params.idleAnimation.delayBeforeAnimation.startTicks >= params.idleAnimation.delayBeforeAnimation.delay / FPSTimerMod) {
-		params.idleAnimation.animationRunning = true;
-		params.idleAnimation.frameDuration.startTicks = SDL_GetTicks();
-		params.idleAnimation.frameDuration.delay = randInt(1, 2) * 1000;
-
-		//Get random direction
-		params.direction = (directionEnum)randInt(0, 7);
-
-	}
-
-	//Run idle animation
-	if (params.idleAnimation.animationRunning == true && SDL_GetTicks() - params.idleAnimation.frameDuration.startTicks >= params.idleAnimation.frameDuration.delay / FPSTimerMod) {
-		params.idleAnimation.frameDuration.startTicks = SDL_GetTicks();
-		params.idleAnimation.frameDuration.delay = randInt(1, 2) * 1000;
-
-		//Get random direction
-		params.direction = (directionEnum)randInt(0, 7);
-
-	}
-
-}
-
-void Character::jump() {
-	if (controllerButtons.A == true && params.jump.jumping == false) {
-		params.jump.jumping = true;
-		params.jump.move.startTicks = SDL_GetTicks();
-		params.jump.direction = directionEnum::up;
-		params.jump.jumpButtonPress.startTicks = SDL_GetTicks();
-		params.jump.maxHeight = (params.size.h / 2) + params.jump.currentHeight;
-	}
-
-	//If A is pressed for longer the character jumps higher
-	if (controllerButtons.A == true && SDL_GetTicks() - params.jump.jumpButtonPress.startTicks > params.jump.jumpButtonPress.delay / FPSTimerMod) {
-		params.jump.jumpButtonPress.startTicks = SDL_GetTicks();
-		params.jump.addedMaxHeight = params.size.h / 2;
-	}
-
-	//Reset added max height
-	if (controllerButtons.A == false && params.jump.addedMaxHeight > 0) {
-		params.jump.addedMaxHeight = 0;
-	}
-
-	if (params.jump.jumping == true && SDL_GetTicks() - params.jump.move.startTicks > params.jump.move.delay / FPSTimerMod) {
-		params.jump.move.startTicks = SDL_GetTicks();
-		
-		switch (params.jump.direction) {
-			case directionEnum::up: {
-				if (params.jump.currentHeight < params.jump.maxHeight + params.jump.addedMaxHeight) {
-					params.jump.currentHeight += params.jump.pixelIncrement;
-					if (params.jump.currentHeight > params.jump.maxHeight + params.jump.addedMaxHeight) {
-						params.jump.currentHeight = params.jump.maxHeight + params.jump.addedMaxHeight;
-					}
-				}
-				else {
-					params.jump.direction = directionEnum::down;
-				}
-				break;
-			}
-			case directionEnum::down: {
-				if (params.jump.currentHeight > 0) {
-					params.jump.currentHeight -= params.jump.pixelIncrement;
-					if (params.jump.currentHeight < 0) {
-						params.jump.currentHeight = 0;
-					}
-				}
-				else {
-					params.jump.jumping = false;
-					controllerButtons.A = false;
-				}
-				break;
-			}
-		}
-	}
-}
-
-void Character::jumpOnCollidableObject() {
-	if (params.jump.onTileObject == false) {
-
-		//Check if character in collision with jumpable object
-		params.jump.onObject = false;
-		bool collidedWithObject = false;
-		for (int collidableObjectsCnt = 0; collidableObjectsCnt < (int)collidableObjects.size(); ++collidableObjectsCnt) {
-
-			//If character is on top of object
-			if (checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer) == true) {
-				if (params.jump.direction == directionEnum::down && params.jump.currentHeight > 0 && params.jump.currentHeight <= collidableObjects[collidableObjectsCnt].height) {
-
-					//Stop jumping
-					params.jump.jumping = false;
-
-					params.jump.currentHeight = collidableObjects[collidableObjectsCnt].height;
-					params.jump.onObject = true;
-					params.shadowHeight = params.jump.currentHeight;
-					break;
-				}
-				else {
-					collidedWithObject = true;
-				}
-			}
-
-			//Set shadow height to 0 if no collision with tile object underneath character
-			if (checkCollisionWithCollidableObject(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2) + params.jump.currentHeight, params.size.w, params.size.h / 2 }), params.layer) == false && params.shadowHeight > 0) {
-				params.shadowHeight = 0;
-			}
-
-		}
-
-		//Fall
-		if (params.jump.onObject == false && params.jump.jumping == false && params.jump.currentHeight > 0 && collidedWithObject == false) {
-			params.jump.jumping = true;
-			params.shadowHeight = 0;
-		}
-
-	}
-}
-
-void Character::jumpOnTile() {
-	if (params.jump.onObject == false) {
-
-		//If character in collision with tile object and on top of object
-		params.jump.onTileObject = false;
-		bool collidedWithObject = false;
-		collisionDataStruct collisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2), params.size.w, params.size.h / 2 }), params.layer);
-		if (collisionData.collision == true) {
-			if (params.jump.direction == directionEnum::down && params.jump.currentHeight > 0 && params.jump.currentHeight <= overworldGrid.gridTile[params.layer][collisionData.collidePosition.x][collisionData.collidePosition.y].height) {
-
-				//Stop jumping
-				params.jump.jumping = false;
-
-				params.jump.currentHeight = overworldGrid.gridTile[params.layer][collisionData.collidePosition.x][collisionData.collidePosition.y].height;
-				params.jump.onTileObject = true;
-				params.shadowHeight = params.jump.currentHeight;
-			}
-			else {
-				collidedWithObject = true;
-			}
-		}
-
-		//Fall
-		if (params.jump.onTileObject == false && params.jump.jumping == false && params.jump.currentHeight > 0 && collidedWithObject == false) {
-			params.jump.jumping = true;
-			params.shadowHeight = 0;
-		}
-
-		//Set shadow height to 0 if no collision with tile object underneath character
-		collisionDataStruct underCharacterCollisionData = checkCollisionWithOverworldGrid(getGridAreaFromPixelArea({ params.position.x, params.position.y + (params.size.h / 2) + params.jump.currentHeight, params.size.w, params.size.h / 2 }), params.layer);
-		if (underCharacterCollisionData.collision == false && params.shadowHeight > 0) {
-			params.shadowHeight = 0;
-		}
-
-	}
-}
-
-void Character::useEquippedWeapon() {
-
-	//Use equipped weapon
-	if (controllerButtons.RB == true) {
-		if (params.equippedRangedWeapon.fireMode == characterParams::rangedWeaponStruct::fireModeEnum::semiAuto) {
-			controllerButtons.RB = false;
-		}
-
-		switch (params.equippedWeaponType) {
-			case characterParams::equippedWeaponTypeEnum::ranged: {
-				if (params.equippedRangedWeapon.magazine.currentLoad > 0 && params.equippedRangedWeapon.reload.reloading == false) {
-
-					if (params.equippedRangedWeapon.fireMode != characterParams::rangedWeaponStruct::fireModeEnum::burst || (params.equippedRangedWeapon.fireMode == characterParams::rangedWeaponStruct::fireModeEnum::burst && params.equippedRangedWeapon.burst.pause == false)) {
-						
-						//Fire bullet
-						bulletParamsStruct bulletParams;
-						bulletParams.ID = getFreeID(getBulletIDs());
-						bulletParams.layer = params.layer;
-						bulletParams.height = params.jump.currentHeight;
-						bulletParams.position = { params.position.x + (params.size.w / 2), params.position.y + (params.size.h / 2) - params.jump.currentHeight };
-						bulletParams.originalPosition = bulletParams.position;
-						int characterIndex = getCharacterIndexByID(params.ID);
-						XYStruct characterPosition = characters[characterIndex].getPosition();
-						WHStruct characterSize = characters[characterIndex].getSize();
-						bulletParams.shadowHeight = (characterPosition.y + characterSize.h) - bulletParams.position.y;
-						//bulletParams.size = { tileSize.w / 2, tileSize.h / 2 };
-						bulletParams.size = tileSize;
-						bulletParams.sprite.spriteSheetIndex = getSpriteSheetIndex("bullets");
-						bulletParams.sprite.areas = {
-							{
-								{ 11, 360, 16, 16 }
-							}
-						};
-						bulletParams.sprite.angle = params.equippedRangedWeapon.sprite.angle;
-						bulletParams.speed.startTicks = SDL_GetTicks();
-						bulletParams.speed.delay = 1;
-						bulletParams.movePixelIncrement = 6;
-						bulletParams.damage = 90;
-						bulletParams.resistance = 100;
-						bulletParams.characterID = params.ID;
-						initBullet(bulletParams);
-
-						params.bulletsFiredIDs.push_back(bulletParams.ID);
-
-						//Update magazin current load
-						if (params.equippedRangedWeapon.magazine.currentLoad > 0) {
-							--params.equippedRangedWeapon.magazine.currentLoad;
-						}
-
-					}
-
-					//Make weapon fire in bursts
-					if (params.equippedRangedWeapon.fireMode == characterParams::rangedWeaponStruct::fireModeEnum::burst) {
-						if (params.equippedRangedWeapon.burst.pause == false) {
-							if (params.equippedRangedWeapon.burst.bulletsFired < params.equippedRangedWeapon.burst.maxBulletsBeforePause) {
-								++params.equippedRangedWeapon.burst.bulletsFired;
-							}
-							else {
-								params.equippedRangedWeapon.burst.pause = true;
-								params.equippedRangedWeapon.burst.delay.startTicks = SDL_GetTicks();
-							}
-						}
-						else if (SDL_GetTicks() - params.equippedRangedWeapon.burst.delay.startTicks >= params.equippedRangedWeapon.burst.delay.delay / FPSTimerMod) {
-							params.equippedRangedWeapon.burst.pause = false;
-							params.equippedRangedWeapon.burst.bulletsFired = 0;
-						}
-					}
-
-				}
-				break;
-			}
-			case characterParams::equippedWeaponTypeEnum::melee: {
-				if (params.equippedMeleeWeapon.swing.swinging == false) {
-					params.equippedMeleeWeapon.swing.swinging = true;
-					params.equippedMeleeWeapon.swing.originalAngle = params.equippedMeleeWeapon.sprite.angle;
-					params.equippedMeleeWeapon.swing.startAngle = (int)params.equippedMeleeWeapon.sprite.angle - (params.equippedMeleeWeapon.swing.angle / 2);
-					params.equippedMeleeWeapon.swing.endAngle = params.equippedMeleeWeapon.swing.startAngle + params.equippedMeleeWeapon.swing.angle;
-					params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.startAngle;
-					params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
-				}
-				break;
-			}
-			case characterParams::equippedWeaponTypeEnum::throwable: {
-				if (params.equippedThrowableWeapon.readied == true && params.equippedThrowableWeapon.throwableThrow.thrown == false) {
-					
-					//Throw weapon
-					params.equippedThrowableWeapon.throwableThrow.thrown = true;
-					params.equippedThrowableWeapon.throwableThrow.target = params.equippedThrowableWeapon.throwIndicator.indicator.position;
-					params.equippedThrowableWeapon.throwableThrow.delay.startTicks = SDL_GetTicks();
-					params.equippedThrowableWeapon.throwableThrow.delay.delay = 1;
-
-					//Unequip weapon
-					params.equippedWeaponType = characterParams::equippedWeaponTypeEnum::none;
-
-				}
-				break;
-			}
-		}
-	}
-
-	//Reload equipped ranged weapon
-	if (controllerButtons.X == true && params.equippedRangedWeapon.reload.reloading == false && params.equippedRangedWeapon.magazine.currentLoad < params.equippedRangedWeapon.magazine.capacity) {
-		controllerButtons.X = false;
-		params.equippedRangedWeapon.reload.reloading = true;
-		params.equippedRangedWeapon.reload.delay.startTicks = SDL_GetTicks();
-	}
-	if (params.equippedRangedWeapon.reload.reloading == true && SDL_GetTicks() - params.equippedRangedWeapon.reload.delay.startTicks >= params.equippedRangedWeapon.reload.delay.delay / FPSTimerMod) {
-		params.equippedRangedWeapon.reload.reloading = false;
-		params.equippedRangedWeapon.magazine.currentLoad = params.equippedRangedWeapon.magazine.capacity;
-	}
-
-	//Swing equipped melee weapon
-	if (params.equippedMeleeWeapon.swing.swinging == true && SDL_GetTicks() - params.equippedMeleeWeapon.swing.delay.startTicks >= params.equippedMeleeWeapon.swing.delay.delay / FPSTimerMod) {
-		params.equippedMeleeWeapon.swing.delay.startTicks = SDL_GetTicks();
-		
-		if (params.equippedMeleeWeapon.swing.swingBack == false) {
-			if (params.equippedMeleeWeapon.swing.currentAngle < params.equippedMeleeWeapon.swing.endAngle) {
-				params.equippedMeleeWeapon.swing.currentAngle += params.equippedMeleeWeapon.swing.pixelIncrement;
-
-				if (params.equippedMeleeWeapon.swing.currentAngle > params.equippedMeleeWeapon.swing.endAngle) {
-					params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.endAngle;
-				}
-			}
-			else {
-				if (params.equippedMeleeWeapon.swing.recoil == false) {
-					params.equippedMeleeWeapon.swing.swinging = false;
-					params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.originalAngle;
-				}
-				else {
-					params.equippedMeleeWeapon.swing.swingBack = true;
-				}
-			}
-		}
-		else {
-
-			//Swing back
-			if (params.equippedMeleeWeapon.swing.currentAngle > params.equippedMeleeWeapon.swing.startAngle) {
-				params.equippedMeleeWeapon.swing.currentAngle -= params.equippedMeleeWeapon.swing.pixelIncrement;
-
-				if (params.equippedMeleeWeapon.swing.currentAngle <= params.equippedMeleeWeapon.swing.startAngle) {
-					params.equippedMeleeWeapon.swing.currentAngle = params.equippedMeleeWeapon.swing.startAngle;
-					params.equippedMeleeWeapon.swing.swingBack = false;
-					params.equippedMeleeWeapon.swing.swinging = false;
-					params.equippedMeleeWeapon.swing.recoil = false;
-					params.equippedMeleeWeapon.sprite.angle = params.equippedMeleeWeapon.swing.originalAngle;
-				}
-			}
-
-		}
-	}
-
-}
-
-void Character::markForDestruction() {
-	if (params.destroy == true) {
-		charactersToDestroyIDs.push_back(params.ID);
-	}
-}
-
-void Character::detectEquippedMeleeWeaponHit() {
-	if (params.equippedMeleeWeapon.swing.swinging == true && params.equippedMeleeWeapon.swing.recoil == false) {
-
-		//Update previous attack area
-		if (params.equippedMeleeWeapon.attackArea.x != -1) {
-			params.equippedMeleeWeapon.previousAttackArea = params.equippedMeleeWeapon.attackArea;
-		}
-
-		//Set source pixel area and melee recoil spark position based on character direction
-		switch (params.direction) {
-			case directionEnum::up: {
-				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
-				break;
-			}
-			case directionEnum::down: {
-				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
-				break;
-			}
-			case directionEnum::left: {
-				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
-				break;
-			}
-			case directionEnum::right: {
-				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - (params.equippedMeleeWeapon.size.w / 2), params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
-				break;
-			}
-			case directionEnum::upRight: {
-				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
-				break;
-			}
-			case directionEnum::downRight: {
-				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
-				break;
-			}
-			case directionEnum::downLeft: { 
-				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
-				break;
-			}
-			case directionEnum::upLeft: {
-				params.equippedMeleeWeapon.attackArea = { params.equippedMeleeWeapon.position.x - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.position.y - params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w, params.equippedMeleeWeapon.size.w };
-				break;
-			}
-		}
-
-		//Set previous attack area
-		if (params.equippedMeleeWeapon.previousAttackArea.x == -1) {
-			params.equippedMeleeWeapon.previousAttackArea = params.equippedMeleeWeapon.attackArea;
-		}
-
-		//Check collision with characters
-		collisionDataStruct characterCollisionData = checkCollisionWithCharacter(params.equippedMeleeWeapon.attackArea, params.equippedMeleeWeapon.previousAttackArea, params.ID);
-		
-		int characterIndex = getCharacterIndexByID(characterCollisionData.instanceID);
-
-		if (characterCollisionData.collision == true && characters[characterIndex].getDisplaySprites() == true && characterCollisionData.instanceID != params.ID) {
-
-			//Update equipped melee weapon resistance
-			--params.equippedMeleeWeapon.resistance;
-
-			//Update target character resistance
-			int characterResistance = characters[characterIndex].getResistance() - params.equippedMeleeWeapon.damage;
-			characters[characterIndex].setResistance(characterResistance);
-
-			//If equipped melee weapon damage < character resistance then melee weapon recoils
-			if (params.equippedMeleeWeapon.damage < characterResistance) {
-				recoil();
-			}
-			else {
-
-				//Character explodes
-				explosionParamsStruct characterExplosion;
-				characterExplosion.ID = getFreeID(getExplosionIDs());
-				characterExplosion.overworldGridLayer = characters[characterIndex].getLayer();
-				characterExplosion.sprite.spriteSheetIndex = characters[characterIndex].getCharacterSpriteSheetIndex();
-				characterExplosion.sprite.areas = {
-					{
-						{
-							characters[characterIndex].getSpriteSheetArea(characters[characterIndex].getDirection(), characters[characterIndex].getFrame())
-						}
-					}
-				};
-				characterExplosion.sprite.angle = params.equippedMeleeWeapon.sprite.angle;
-				characterExplosion.sprite.center = { randInt(0, characterExplosion.sprite.areas[0][0].w), randInt(0, characterExplosion.sprite.areas[0][0].h) };
-
-				characterExplosion.sprite.flip = randFlip({ { 0, 33 }, { 34, 66 }, { 67, 100 } });
-				characterExplosion.collisionData = characterCollisionData;
-				characterExplosion.force = params.equippedMeleeWeapon.damage;
-				int characterHeight = characters[characterIndex].getSize().h;
-				characterExplosion.shadowHeightRandRange = { characterHeight / 2, characterHeight };
-				//characterExplosion.totalFragments = { randInt(1, characterExplosion.sprite.areas[0][0].w), randInt(1, characterExplosion.sprite.areas[0][0].h) };
-				characterExplosion.totalFragments = { characterExplosion.sprite.areas[0][0].w / 4, characterExplosion.sprite.areas[0][0].h / 4 };
-				initExplosion(characterExplosion);
-
-				characters[characterIndex].setDisplaySprites(false);
-			}
-
-		}
-
-		//Check collision with wall
-		collisionDataStruct wallCollisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea(params.equippedMeleeWeapon.attackArea), getGridAreaFromPixelArea(params.equippedMeleeWeapon.previousAttackArea), params.layer, params.jump.currentHeight);
-
-		if (wallCollisionData.collision == true) {
-
-			//Update equipped melee weapon resistance
-			--params.equippedMeleeWeapon.resistance;
-
-			//Update wall resistance
-			overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].resistance -= params.equippedMeleeWeapon.damage;
-
-			//If wall resistance > 0 then recoil
-			if (overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].resistance > 0) {
-				recoil();
-			}
-			else {
-
-				//Wall explodes
-				explosionParamsStruct wallExplosion;
-				wallExplosion.ID = getFreeID(getExplosionIDs());
-				wallExplosion.overworldGridLayer = params.layer;
-				wallExplosion.sprite.spriteSheetIndex = tiles[overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].tileIndex].spriteSheetIndex;
-				wallExplosion.sprite.areas = {
-					{
-						{
-							tiles[overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y].tileIndex].spriteSheetArea
-						}
-					}
-				};
-				wallExplosion.sprite.angle = params.equippedMeleeWeapon.sprite.angle;
-				wallExplosion.sprite.center = { randInt(0, wallExplosion.sprite.areas[0][0].w), randInt(0, wallExplosion.sprite.areas[0][0].h) };
-				wallExplosion.sprite.flip = randFlip({ { 0, 33 }, { 34, 66 }, { 67, 100 } });
-				wallExplosion.collisionData = wallCollisionData;
-				wallExplosion.collisionData.collidePosition = getPixelPosition(wallCollisionData.collidePosition);
-				//wallExplosion.force = params.equippedMeleeWeapon.damage;
-				wallExplosion.force = 10;
-				wallExplosion.shadowHeightRandRange = { tileSize.h / 2, tileSize.h };
-				wallExplosion.totalFragments = { wallExplosion.sprite.areas[0][0].w / 4, wallExplosion.sprite.areas[0][0].h / 4 };
-				initExplosion(wallExplosion);
-
-				//Remove wall from overworld grid
-				gridTileStruct blankTile;
-				overworldGrid.gridTile[params.layer][wallCollisionData.collidePosition.x][wallCollisionData.collidePosition.y] = blankTile;
-
-			}
-
-		}
-
-		//Check collision with object
-		collisionDataStruct tableCollisionData = checkCollisionWithTable(params.equippedMeleeWeapon.attackArea, params.equippedMeleeWeapon.previousAttackArea);
-
-		if (tableCollisionData.collision == true) {
-
-			//If table has not already exploded
-			int tableIndex = getTableIndexByID(tableCollisionData.instanceID);
-			if (tables[tableIndex].getDisplaySprite() == true) {
-
-				//Update equipped melee weapon resistance
-				--params.equippedMeleeWeapon.resistance;
-
-				//Update table resistance
-				int newTableResistance = tables[tableIndex].getResistance() - params.equippedMeleeWeapon.damage;
-				tables[tableIndex].setResistance(newTableResistance);
-
-				//If table resistance > 0 then recoil
-				if (newTableResistance > 0) {
-					recoil();
-				}
-				else {
-
-					//Table explodes
-					explosionParamsStruct tableExplosion;
-					tableExplosion.ID = getFreeID(getExplosionIDs());
-					tableExplosion.overworldGridLayer = tables[tableIndex].getLayer();
-					tableExplosion.sprite.spriteSheetIndex = tables[tableIndex].getTableSpriteSheetIndex();
-					tableExplosion.sprite.areas = {
-						{
-							{
-								tables[tableIndex].getSpriteSheetArea()
-							}
-						}
-					};
-					tableExplosion.sprite.angle = params.equippedMeleeWeapon.sprite.angle;
-					tableExplosion.sprite.center = { randInt(0, tableExplosion.sprite.areas[0][0].w), randInt(0, tableExplosion.sprite.areas[0][0].h) };
-					tableExplosion.sprite.flip = randFlip({ { 0, 33 }, { 34, 66 }, { 67, 100 } });
-					tableExplosion.collisionData = tableCollisionData;
-					tableExplosion.force = 10;
-					int tableHeight = tables[tableIndex].getHeight();
-					tableExplosion.shadowHeightRandRange = { tableHeight / 2, tableHeight };
-					tableExplosion.totalFragments = { tableExplosion.sprite.areas[0][0].w / 4, tableExplosion.sprite.areas[0][0].h / 4 };
-					initExplosion(tableExplosion);
-
-					tables[tableIndex].setDisplaySprite(false);
-				}
-
-			}
-
-		}
-
-		//Check collision with bullet
-		collisionDataStruct bulletCollision = checkCollisionWithBullet(params.equippedMeleeWeapon.attackArea, params.equippedMeleeWeapon.previousAttackArea);
-
-		if (bulletCollision.collision == true) {
-
-			//If bullet has not already exploded
-			int bulletIndex = getBulletIndexByID(bulletCollision.instanceID);
-			if (bullets[bulletIndex].getDisplaySprite() == true) {
-
-				//Update equipped melee weapon resistance
-				--params.equippedMeleeWeapon.resistance;
-
-				//Update bullet resistance
-				int newBulletResistance = bullets[bulletIndex].getResistance() - params.equippedMeleeWeapon.damage;
-				bullets[bulletIndex].setResistance(newBulletResistance);
-
-				//If bullet resistance > 0 then recoil
-				if (newBulletResistance > 0) {
-					recoil();
-				}
-				else {
-
-					//Bullet explodes
-					explosionParamsStruct bulletExplosion;
-					bulletExplosion.ID = getFreeID(getExplosionIDs());
-					bulletExplosion.overworldGridLayer = params.layer;
-					bulletExplosion.sprite.spriteSheetIndex = bullets[bulletIndex].getBulletSpriteSheetIndex();
-					bulletExplosion.sprite.areas = {
-						{
-							{
-								bullets[bulletIndex].getSpriteSheetArea()
-							}
-						}
-					};
-					bulletExplosion.sprite.angle = params.equippedMeleeWeapon.sprite.angle;
-					bulletExplosion.collisionData = tableCollisionData;
-					bulletExplosion.force = 10;
-					int otherBulletHeight = bullets[bulletIndex].getSize().h;
-					bulletExplosion.shadowHeightRandRange = { otherBulletHeight / 2, otherBulletHeight };
-					bulletExplosion.totalFragments = { bulletExplosion.sprite.areas[0][0].w / 4, bulletExplosion.sprite.areas[0][0].h / 4 };
-					initExplosion(bulletExplosion);
-
-					//Disable other bullet sprite display
-					bullets[bulletIndex].setDisplaySprite(false);
-
-				}
-			}
-
-		}
-	}
-}
-
-void Character::animateMeleeRecoilSpark() {
-	if (params.meleeRecoilSparkAnimation.active == true && SDL_GetTicks() - params.meleeRecoilSparkAnimation.frameDelay.startTicks >= params.meleeRecoilSparkAnimation.frameDelay.delay / FPSTimerMod) {
-		params.meleeRecoilSparkAnimation.frameDelay.startTicks = SDL_GetTicks();
-
-		if (params.meleeRecoilSparkAnimation.currentFrame < (int)params.meleeRecoilSparkAnimation.sprites.areas[0].size() - 1) {
-			++params.meleeRecoilSparkAnimation.currentFrame;
-		}
-		else {
-			params.meleeRecoilSparkAnimation.active = false;
-		}
-	}
-}
-
-void Character::readyEquippedThrowable() {
-	if (params.equippedWeaponType == characterParams::equippedWeaponTypeEnum::throwable) {
-		params.equippedThrowableWeapon.readied = controllerButtons.LB;
-	}
-}
-
-void Character::throwEquippedThrowable() {
-	if (params.equippedThrowableWeapon.throwableThrow.thrown == true && SDL_GetTicks() - params.equippedThrowableWeapon.throwableThrow.delay.startTicks >= params.equippedThrowableWeapon.throwableThrow.delay.delay) {
-		params.equippedThrowableWeapon.throwableThrow.delay.startTicks = SDL_GetTicks();
-		
-		if (params.equippedThrowableWeapon.position.x != params.equippedThrowableWeapon.throwableThrow.target.x || params.equippedThrowableWeapon.position.y != params.equippedThrowableWeapon.throwableThrow.target.y) {
-			
-			if (params.equippedThrowableWeapon.position.x < params.equippedThrowableWeapon.throwableThrow.target.x) {
-				params.equippedThrowableWeapon.position.x += params.equippedThrowableWeapon.throwableThrow.pixelIncrement;
-				if (params.equippedThrowableWeapon.position.x > params.equippedThrowableWeapon.throwableThrow.target.x) {
-					params.equippedThrowableWeapon.position.x = params.equippedThrowableWeapon.throwableThrow.target.x;
-				}
-			}
-			else {
-				params.equippedThrowableWeapon.position.x -= params.equippedThrowableWeapon.throwableThrow.pixelIncrement;
-				if (params.equippedThrowableWeapon.position.x < params.equippedThrowableWeapon.throwableThrow.target.x) {
-					params.equippedThrowableWeapon.position.x = params.equippedThrowableWeapon.throwableThrow.target.x;
-				}
-			}
-			
-			if (params.equippedThrowableWeapon.position.y < params.equippedThrowableWeapon.throwableThrow.target.y) {
-				params.equippedThrowableWeapon.position.y += params.equippedThrowableWeapon.throwableThrow.pixelIncrement;
-				if (params.equippedThrowableWeapon.position.y > params.equippedThrowableWeapon.throwableThrow.target.y) {
-					params.equippedThrowableWeapon.position.y = params.equippedThrowableWeapon.throwableThrow.target.y;
-				}
-			}
-			else {
-				params.equippedThrowableWeapon.position.y -= params.equippedThrowableWeapon.throwableThrow.pixelIncrement;
-				if (params.equippedThrowableWeapon.position.y < params.equippedThrowableWeapon.throwableThrow.target.y) {
-					params.equippedThrowableWeapon.position.y = params.equippedThrowableWeapon.throwableThrow.target.y;
-				}
-			}
-
-		}
-		else {
-			params.equippedThrowableWeapon.throwableThrow.thrown = false;
-			if (params.equippedThrowableWeapon.canExplode == true && params.equippedThrowableWeapon.exploding == false) {
-				params.equippedThrowableWeapon.exploding = true;
-			}
-		}
-
-	}
-}
-
-Table::Table(tableParamsStruct newParams) {
-	params = newParams;
-}
-
-void Table::render() {
-	if (params.displaySprite == true) {
-		SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
-		SDL_Rect dRect = convertAreaToSDLRect({ params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h });
-
-		if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h }) == true) {
-			SDL_RenderCopy(renderer, spriteSheets[params.sprite.spriteSheetIndex].texture, &sRect, &dRect);
-		}
-	}
-}
-
-int Table::getLayer() {
-	return params.layer;
-}
-
-XYStruct Table::getPosition() {
-	return params.position;
-}
-
-WHStruct Table::getSize() {
-	return params.size;
-}
-
-int Table::getID() {
-	return params.ID;
-}
-
-int Table::getHeight() {
-	return params.height;
-}
-
-int Table::getResistance() {
-	return params.resistance;
-}
-
-void Table::setResistance(int newResistance) {
-	params.resistance = newResistance;
-}
-
-int Table::getStuckTolerancePercentage() {
-	return params.stuckTolerancePercentage;
-}
-
-int Table::getTableSpriteSheetIndex() {
-	return params.sprite.spriteSheetIndex;
-}
-
-areaStruct Table::getSpriteSheetArea() {
-	return params.sprite.areas[0][0];
-}
-
-bool Table::getDisplaySprite() {
-	return params.displaySprite;
-}
-
-void Table::setDisplaySprite(bool newDisplaySprite) {
-	params.displaySprite = newDisplaySprite;
-}
-
-void Table::setDestroy(bool newDestroy) {
-	params.destroy = newDestroy;
-}
-
-void Table::markForDestruction() {
-	if (params.destroy == true) {
-		tablesToDestroyIDs.push_back(params.ID);
-	}
-}
-
-Bullet::Bullet(bulletParamsStruct newParams) {
-	params = newParams;
-}
-
-int Bullet::getID() {
-	return params.ID;
-}
-
-int Bullet::getLayer() {
-	return params.layer;
-}
-
-XYStruct Bullet::getPosition() {
-	return params.position;
-}
-
-WHStruct Bullet::getSize() {
-	return params.size;
-}
-
-int Bullet::getResistance() {
-	return params.resistance;
-}
-
-void Bullet::setResistance(int newResistance) {
-	params.resistance = newResistance;
-}
-
-int Bullet::getStuckTolerancePercentage() {
-	return params.stuckTolerancePercentage;
-}
-
-int Bullet::getBulletSpriteSheetIndex() {
-	return params.sprite.spriteSheetIndex;
-}
-
-areaStruct Bullet::getSpriteSheetArea() {
-	return params.sprite.areas[0][0];
-}
-
-bool Bullet::getDisplaySprite() {
-	return params.displaySprite;
-}
-
-void Bullet::setDisplaySprite(bool newDisplaySprite) {
-	params.displaySprite = newDisplaySprite;
-}
-
-void Bullet::setDestroy(bool newDestroy) {
-	params.destroy = newDestroy;
-}
-
-int Bullet::getCharacterID() {
-	return params.characterID;
-}
-
-delayStruct Bullet::getFadeOut() {
-	return params.fadeOut;
-}
-
-void Bullet::setFadeOut(delayStruct newFadeOut) {
-	params.fadeOut = newFadeOut;
-}
-
-bool Bullet::getStuck() {
-	return params.stuck;
-}
-
-void Bullet::render() {
-	if (params.displaySprite == true) {
-		SDL_Rect sRect = convertAreaToSDLRect(params.sprite.areas[0][0]);
-		SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y - params.height, params.size.w, params.size.h };
-
-		if (areaWithinCameraView({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }) == true && params.displaySprite == true) {
-			
-			//Set transparency
-			int percentageTimePassed = 0;
-			if (params.fadeOut.delay > 0) {
-				percentageTimePassed = ((SDL_GetTicks() - params.fadeOut.startTicks) * 100) / params.fadeOut.delay;
-				setSDLTextureTransparency(spriteSheets[params.sprite.spriteSheetIndex].texture, 100 - percentageTimePassed);
-			}
-
-			//Render shadow
-			renderShadow({ dRect.x, dRect.y + params.shadowHeight, dRect.w, dRect.h / 5 }, 50 - (percentageTimePassed / 2));
-
-			SDLRenderCopyEx(sRect, dRect, params.sprite);
-
-			//Remove transparency
-			if (params.fadeOut.delay > 0) {
-				setSDLTextureTransparency(spriteSheets[params.sprite.spriteSheetIndex].texture, 100);
-			}
-
-		}
-	}
-}
-
-void Bullet::move() {
-	if (params.stuck == false && SDL_GetTicks() - params.speed.startTicks >= params.speed.delay / FPSTimerMod) {
-		params.speed.startTicks = SDL_GetTicks();
-		params.distanceTravelled += params.movePixelIncrement;
-		params.totalDistanceTravelled += params.movePixelIncrement;
-		params.previousPosition = params.position;
-		params.position = { lround((double)params.originalPosition.x + ((params.distanceTravelled * cos(((params.sprite.angle) * M_PI) / 180)) * params.directionMods.x)), lround((double)params.originalPosition.y + ((params.distanceTravelled * sin(((params.sprite.angle) * M_PI) / 180)) * params.directionMods.y )) };
-	}
-}
-
-void Bullet::markForDestruction() {
-
-	//If bullet goes outside of overworld grid or destroy = true then destroy it
-	/*if (areaWithinArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { 0, 0, ((int)overworldGrid.gridTile[params.layer].size() - 1) * tileSize.w, ((int)overworldGrid.gridTile[params.layer][0].size() - 1) * tileSize.h }) == false || params.destroy == true) {
-		bulletsToDestroyIDs.push_back(params.ID);
-	}*/
-
-	if (params.fadeOut.delay > 0 && SDL_GetTicks() - params.fadeOut.startTicks >= params.fadeOut.delay) {
-		bulletsToDestroyIDs.push_back(params.ID);
-	}
-
-}
-
-void Bullet::ricochet(collisionDataStruct& collisionData) {
-	params.originalPosition = params.position;
-	params.distanceTravelled = 0;
-	if (collisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::left || collisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::right) {
-		params.directionMods.x = -1;
-	}
-	else {
-		params.directionMods.y = -1;
-	}
-}
-
-void Bullet::ricochetPenetrateOrStayStuck() {
-	if (params.stuck == false) {
-
-		//Calculate bullet force (the farther the bullet travels, the less damage it does
-		int force = params.damage - params.totalDistanceTravelled;
-		if (force < 0) {
-			force = 0;
-		}
-
-		//Check for collision with wall
-		collisionDataStruct overworldGridCollisionData = checkCollisionWithOverworldGridFactoringHeight(getGridAreaFromPixelArea({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }), { -1, -1, -1 - 1 }, params.layer, params.height);
-
-		//Check for collision with characters
-		collisionDataStruct characterCollisionData = checkCollisionWithCharacter({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h }, params.characterID);
-
-		//Check for collision with tables
-		collisionDataStruct tableCollisionData = checkCollisionWithTable({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h });
-
-		//Check for collision with other bullets
-		collisionDataStruct otherBulletCollisionData = checkCollisionWithBullet({ params.position.x, params.position.y - params.height, params.size.w, params.size.h }, { params.previousPosition.x, params.previousPosition.y, params.size.w, params.size.h });
-
-		//Overworld grid collision
-		if (overworldGridCollisionData.collision == true) {
-
-			//Decrease wall resistance by the amount of force that hits it
-			overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance -= force;
-
-			//Decrease bullet resistance
-			params.resistance -= force;
-
-			int resistanceTolerance = (overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance * overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].stuckTolerancePercentage) / 100;
-
-			//If bullet force is lower than wall resistance - resitance tolerance then bullet ricochet
-			if (force < overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance - resistanceTolerance) {
-
-				//Bullet ricochets
-				/*params.originalPosition = params.position;
-				params.distanceTravelled = 0;
-				if (overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::left || overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::right) {
-					params.directionMods.x = -1;
-				}
-				else {
-					params.directionMods.y = -1;
-				}*/
-				ricochet(overworldGridCollisionData);
-
-			}
-			else if (force >= overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance - resistanceTolerance && force <= overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance + resistanceTolerance) {
-
-				//If bullet force is within range of stuck tolerance percentage of wall resistance then bullet stays stuck
-				params.stuck = true;
-
-			}
-			//else if (force > overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance + resistanceTolerance) {
-			//	
-			//	//If bullet force is greater than wall resistance + resistance tolerance then bullet penetrates
-			//	
-			//}
-
-			//If resistance of wall <= 0 then explode
-			if (overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].resistance <= 0) {
-				explosionParamsStruct newExplosionParams;
-				newExplosionParams.ID = getFreeID(getExplosionIDs());
-				newExplosionParams.overworldGridLayer = params.layer;
-				newExplosionParams.sprite.spriteSheetIndex = tiles[overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].tileIndex].spriteSheetIndex;
-				newExplosionParams.sprite.areas = {
-					{
-						{
-							tiles[overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y].tileIndex].spriteSheetArea
-						}
-					}
-				};
-				newExplosionParams.sprite.angle = params.sprite.angle;
-				newExplosionParams.collisionData = overworldGridCollisionData;
-				newExplosionParams.collisionData.collidePosition = getPixelPosition(newExplosionParams.collisionData.collidePosition);
-				newExplosionParams.force = force;
-				newExplosionParams.shadowHeightRandRange = { tileSize.h / 2, tileSize.h };
-				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
-				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
-				initExplosion(newExplosionParams);
-
-				//Remove tile from overworld grid
-				gridTileStruct blankTile;
-				overworldGrid.gridTile[params.layer][overworldGridCollisionData.collidePosition.x][overworldGridCollisionData.collidePosition.y] = blankTile;
-
-			}
-
-		}
-
-		//Character collision
-		if (characterCollisionData.collision == true /*&& characterCollisionData.instanceID != params.characterID*/ && characters[getCharacterIndexByID(characterCollisionData.instanceID)].getDisplaySprites() == true) {
-
-			//Decrease character resistance by the amount of force that hits
-			int characterIndex = getCharacterIndexByID(characterCollisionData.instanceID);
-			int characterNewResistance = characters[characterIndex].getResistance() - force;
-			characters[characterIndex].setResistance(characterNewResistance);
-
-			//Decrease bullet resistance
-			params.resistance -= force;
-
-			int resistanceTolerance = (characterNewResistance * characters[characterIndex].getStuckTolerancePercentage()) / 100;
-
-			//If bullet force is lower than character resistance - resitance tolerance then bullet ricochet
-			if (force < characterNewResistance - resistanceTolerance) {
-
-				//Bullet ricochets
-				/*params.originalPosition = params.position;
-				params.distanceTravelled = 0;
-				if (overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::left || overworldGridCollisionData.hitCorner == collisionDataStruct::tileHitCornerEnum::right) {
-					params.directionMods.x = -1;
-				}
-				else {
-					params.directionMods.y = -1;
-				}*/
-				ricochet(characterCollisionData);
-
-			}
-			else if (force >= characterNewResistance - resistanceTolerance && force <= characterNewResistance + resistanceTolerance) {
-
-				//If bullet force is within range of stuck tolerance percentage of character resistance then bullet stays stuck
-				params.stuck = true;
-
-			}
-			//else if (force > characterNewResistance + resistanceTolerance) {
-			//	
-			//	//If bullet force is greater than character resistance + resistance tolerance then bullet penetrates
-			//	
-			//}
-
-			//If resistance of character <= 0 then explode
-			if (characterNewResistance <= 0) {
-				explosionParamsStruct newExplosionParams;
-				newExplosionParams.ID = getFreeID(getExplosionIDs());
-				newExplosionParams.overworldGridLayer = params.layer;
-				newExplosionParams.sprite.spriteSheetIndex = characters[characterIndex].getCharacterSpriteSheetIndex();
-				newExplosionParams.sprite.areas = {
-					{
-						{
-							characters[characterIndex].getSpriteSheetArea(characters[characterIndex].getDirection(), characters[characterIndex].getFrame())
-						}
-					}
-				};
-				newExplosionParams.sprite.angle = params.sprite.angle;
-				newExplosionParams.collisionData = characterCollisionData;
-				newExplosionParams.force = force;
-				int characterHeight = characters[characterIndex].getSize().h;
-				newExplosionParams.shadowHeightRandRange = { characterHeight / 2, characterHeight };
-				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
-				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
-				initExplosion(newExplosionParams);
-				initSplatter(newExplosionParams, bloodSplatterSprite, { params.position.x, params.position.y, params.size.w, params.size.h });
-
-				//Disable character sprite display
-				characters[characterIndex].setDisplaySprites(false);
-				characters[characterIndex].setDestroy(true);
-
-			}
-
-		}
-
-		//Table collision
-		if (tableCollisionData.collision == true) {
-
-			//Decrease table resistance by the amount of force that hits
-			int tableIndex = getTableIndexByID(tableCollisionData.instanceID);
-			int newTableResistance = tables[tableIndex].getResistance() - force;
-			tables[tableIndex].setResistance(newTableResistance);
-
-			//Decrease bullet resistance
-			params.resistance -= force;
-
-			int resistanceTolerance = (newTableResistance * tables[tableIndex].getStuckTolerancePercentage()) / 100;
-
-			//If bullet force is lower than table resistance - resitance tolerance then bullet ricochet
-			if (force < newTableResistance - resistanceTolerance) {
-
-				//Bullet ricochets
-				ricochet(tableCollisionData);
-
-			}
-			else if (force >= newTableResistance - resistanceTolerance && force <= newTableResistance + resistanceTolerance) {
-
-				//If bullet force is within range of stuck tolerance percentage of table resistance then bullet stays stuck
-				params.stuck = true;
-
-			}
-			//else if (force > newTableResistance + resistanceTolerance) {
-			//	
-			//	//If bullet force is greater than table resistance + resistance tolerance then bullet penetrates
-			//	
-			//}
-
-			//If resistance of table <= 0 then explode
-			if (newTableResistance <= 0) {
-				explosionParamsStruct newExplosionParams;
-				newExplosionParams.ID = getFreeID(getExplosionIDs());
-				newExplosionParams.overworldGridLayer = params.layer;
-				newExplosionParams.sprite.spriteSheetIndex = tables[tableIndex].getTableSpriteSheetIndex();
-				newExplosionParams.sprite.areas = {
-					{
-						{
-							tables[tableIndex].getSpriteSheetArea()
-						}
-					}
-				};
-				newExplosionParams.sprite.angle = params.sprite.angle;
-				newExplosionParams.collisionData = tableCollisionData;
-				newExplosionParams.force = force;
-				int tableHeight = tables[tableIndex].getSize().h;
-				newExplosionParams.shadowHeightRandRange = { tableHeight / 2, tableHeight };
-				//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
-				newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
-				initExplosion(newExplosionParams);
-
-				//Disable table sprite display
-				tables[tableIndex].setDisplaySprite(false);
-				tables[tableIndex].setDestroy(true);
-
-				//Remove table collision from overworld grid
-				XYStruct tablePosition = tables[tableIndex].getPosition();
-				WHStruct tableSize = tables[tableIndex].getSize();
-				setOverworldGridCollision(overworldGrid.gridTile, params.layer, getGridAreaFromPixelArea({ tablePosition.x, tablePosition.y, tableSize.w, tableSize.h }), false);
-
-			}
-
-		}
-
-		//Other bullet collision
-		if (otherBulletCollisionData.collision == true) {
-			int otherBulletIndex = getBulletIndexByID(otherBulletCollisionData.instanceID);
-			
-			//Check if other bullet was fired by same character who fired current bullet
-			vector<int> bulletsFiredIDs = characters[bullets[otherBulletIndex].getCharacterID()].getBulletsFiredIDs();
-			bool bulletFiredBySameCharacter = false;
-			for (int bulletsFiredIDsCnt = 0; bulletsFiredIDsCnt < (int)bulletsFiredIDs.size(); ++bulletsFiredIDsCnt) {
-				if (bullets[otherBulletIndex].getID() == bulletsFiredIDs[bulletsFiredIDsCnt]) {
-					bulletFiredBySameCharacter = true;
-					break;
-				}
-			}
-
-			//If bullet is not the same as current bullet and is not a bullet that has been fired by same character who fired current bullet
-			if (otherBulletIndex > -1 && otherBulletIndex != params.ID && bulletFiredBySameCharacter == false) {
-
-				//Decrease other bullet resistance by the amount of force that hits
-				int newOtherBulletResistance = bullets[otherBulletIndex].getResistance() - force;
-				bullets[otherBulletIndex].setResistance(newOtherBulletResistance);
-
-				//Decrease bullet resistance
-				params.resistance -= force;
-
-				int resistanceTolerance = (newOtherBulletResistance * bullets[otherBulletIndex].getStuckTolerancePercentage()) / 100;
-
-				//If bullet force is lower than other bullet resistance - resitance tolerance then bullet ricochet
-				if (force < newOtherBulletResistance - resistanceTolerance) {
-
-					//Bullet ricochets
-					ricochet(tableCollisionData);
-
-				}
-				else if (force >= newOtherBulletResistance - resistanceTolerance && force <= newOtherBulletResistance + resistanceTolerance) {
-
-					//If bullet force is within range of stuck tolerance percentage of other bullet resistance then bullet stays stuck
-					params.stuck = true;
-
-				}
-				//else if (force > newTableResistance + resistanceTolerance) {
-				//	
-				//	//If bullet force is greater than table resistance + resistance tolerance then bullet penetrates
-				//	
-				//}
-
-				//If resistance of other bullet <= 0 then explode
-				if (newOtherBulletResistance <= 0) {
-					explosionParamsStruct newExplosionParams;
-					newExplosionParams.ID = getFreeID(getExplosionIDs());
-					newExplosionParams.overworldGridLayer = params.layer;
-					newExplosionParams.sprite.spriteSheetIndex = bullets[otherBulletIndex].getBulletSpriteSheetIndex();
-					newExplosionParams.sprite.areas = {
-						{
-							{
-								bullets[otherBulletIndex].getSpriteSheetArea()
-							}
-						}
-					};
-					newExplosionParams.sprite.angle = params.sprite.angle;
-					newExplosionParams.collisionData = tableCollisionData;
-					newExplosionParams.force = force;
-					int otherBulletHeight = bullets[otherBulletIndex].getSize().h;
-					newExplosionParams.shadowHeightRandRange = { otherBulletHeight / 2, otherBulletHeight };
-					//newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
-					newExplosionParams.totalFragments = { newExplosionParams.sprite.areas[0][0].w / 4, newExplosionParams.sprite.areas[0][0].h / 4 };
-					initExplosion(newExplosionParams);
-
-					//Disable other bullet sprite display
-					bullets[otherBulletIndex].setDisplaySprite(false);
-					//bullets[otherBulletIndex].setDestroy(true);
-
-				}
-
-			}
-		}
-
-	}
-}
-
-void Bullet::explode() {
-	if (params.resistance <= 0 && params.destroy == false) {
-		explosionParamsStruct newExplosionParams;
-		newExplosionParams.ID = getFreeID(getExplosionIDs());
-		newExplosionParams.overworldGridLayer = params.layer;
-		newExplosionParams.sprite = params.sprite;
-		newExplosionParams.force = params.damage - params.totalDistanceTravelled;
-		newExplosionParams.shadowHeightRandRange = { params.size.h / 2, params.size.h };
-		newExplosionParams.totalFragments = { randInt(1, newExplosionParams.sprite.areas[0][0].w), randInt(1, newExplosionParams.sprite.areas[0][0].h) };
-		//newExplosionParams.totalFragments = { 2, 2 };
-		newExplosionParams.collisionData.collidePosition = params.position;
-		newExplosionParams.collisionData.collision = true;
-		newExplosionParams.collisionData.hitCorner = collisionDataStruct::tileHitCornerEnum::none;
-		newExplosionParams.collisionData.instanceID = params.ID;
-		initExplosion(newExplosionParams);
-
-		params.displaySprite = false;
-		params.destroy = true;
-	}
-}
-
-Explosion::Explosion(explosionParamsStruct newParams) {
-	params = newParams;
-}
-
-int Explosion::getID() {
-	return params.ID;
-}
-
-int Explosion::getOverworldGridLayer() {
-	return params.overworldGridLayer;
-}
-
-XYStruct Explosion::getFragmentPosition(int fragmentIndex) {
-	return params.fragments[fragmentIndex].position;
-}
-
-int Explosion::getTotalFragments() {
-	return (int)params.fragments.size();
-}
-
-vector<explosionParamsStruct::fragmentStruct> Explosion::getFragments() {
-	return params.fragments;
-}
-
-delayStruct Explosion::getFadeOut() {
-	return params.fadeOut;
-}
-
-void Explosion::setFadeOut(delayStruct newFadeOut) {
-	params.fadeOut = newFadeOut;
-}
-
-void Explosion::createFragments() {
-	if ((int)params.fragments.size() == 0) {
-		WHStruct fragmentSize = { -1, -1 };
-		if (params.fragmentIsEntireSprite == false) {
-			fragmentSize = { params.sprite.areas[0][0].w / params.totalFragments.x, params.sprite.areas[0][0].h / params.totalFragments.y };
-		}
-		else {
-			fragmentSize = { params.sprite.areas[0][0].w, params.sprite.areas[0][0].h };
-		}
-
-		areaStruct fragmentArea = { params.sprite.areas[0][0].x, params.sprite.areas[0][0].y, fragmentSize.w, fragmentSize.h };
-
-		for (int totalFragmentsXCnt = 0; totalFragmentsXCnt < params.totalFragments.x; ++totalFragmentsXCnt) {
-			if (params.fragmentIsEntireSprite == false) {
-				fragmentArea.y = params.sprite.areas[0][0].y;
-			}
-			
-			for (int totalFragmentsYCnt = 0; totalFragmentsYCnt < params.totalFragments.y; ++totalFragmentsYCnt) {
-				explosionParamsStruct::fragmentStruct fragment;
-
-				//Offset collide position to give each fragment a different starting position
-				fragment.position = { params.collisionData.collidePosition.x + (fragmentSize.w * totalFragmentsXCnt) - fragmentSize.w, params.collisionData.collidePosition.y + (fragmentSize.h * totalFragmentsYCnt) - fragmentSize.h };
-
-				fragment.originalPosition = fragment.position;
-				fragment.size = fragmentSize;
-				
-				fragment.shadowHeight = randInt(params.shadowHeightRandRange.min, params.shadowHeightRandRange.max);
-				
-				//fragment.maxDistance = randInt(fragment.size.w * 4, fragment.size.w * 8);
-				fragment.maxDistance = randInt(params.force / 2, params.force);
-				
-				fragment.sprite.spriteSheetIndex = params.sprite.spriteSheetIndex;
-				fragment.sprite.areas = {
-					{
-						{
-							{ fragmentArea.x, fragmentArea.y, fragmentArea.w, fragmentArea.h }
-						}
-					}
-				};
-				
-				if (params.randomizeFragmentAngle == false) {
-					int angleTolerance = (params.sprite.angle * 10) / 100;
-					fragment.sprite.angle = randInt(params.sprite.angle - angleTolerance, params.sprite.angle + angleTolerance);
-				}
-				else {
-					fragment.sprite.angle = randInt(0, 360);
-				}
-				if (fragment.sprite.angle > 180) {
-					fragment.sprite.angle = -(180 - (fragment.sprite.angle - 180));
-				}
-
-				fragment.sprite.center = { randInt(0, fragmentSize.w), randInt(0, fragmentSize.h) };
-				
-				/*int randomFlip = randInt(1, 3);
-				if (randomFlip == 1) {
-					fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_NONE;
-				}
-				else if (randomFlip == 2) {
-					fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_HORIZONTAL;
-				}
-				else if (randomFlip == 3) {
-					fragment.sprite.flip = SDL_RendererFlip::SDL_FLIP_VERTICAL;
-				}*/
-				fragment.sprite.flip = randFlip({ { 0, 33 }, { 34, 66 }, { 67, 100 } });
-
-				fragment.speed.startTicks = SDL_GetTicks();
-				fragment.speed.delay = 1;
-				fragment.pixelIncrement = 2;
-
-				params.fragments.push_back(fragment);
-
-				if (params.fragmentIsEntireSprite == false) {
-					fragmentArea.y += fragmentArea.h;
-				}
-			}
-
-			if (params.fragmentIsEntireSprite == false) {
-				fragmentArea.x += fragmentArea.w;
-			}
-		}
-	}
-}
-
-void Explosion::render() {
-
-	//Render all fragments
-	for (int fragmentsCnt = 0; fragmentsCnt < (int)params.fragments.size(); ++fragmentsCnt) {
-		if (areaWithinCameraView({ params.fragments[fragmentsCnt].position.x, params.fragments[fragmentsCnt].position.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h }) == true) {
-			SDL_Rect sRect = convertAreaToSDLRect(params.fragments[fragmentsCnt].sprite.areas[0][0]);
-			SDL_Rect dRect = { params.fragments[fragmentsCnt].position.x - camera.area.x, params.fragments[fragmentsCnt].position.y - camera.area.y, params.fragments[fragmentsCnt].size.w, params.fragments[fragmentsCnt].size.h };
-
-			//Set transparency
-			int percentageTimePassed = 0;
-			if (params.fadeOut.delay > 0) {
-				percentageTimePassed = ((SDL_GetTicks() - params.fadeOut.startTicks) * 100) / params.fadeOut.delay;
-				setSDLTextureTransparency(spriteSheets[params.fragments[fragmentsCnt].sprite.spriteSheetIndex].texture, 100 - percentageTimePassed);
-			}
-
-			//Render shadow
-			if (params.enableShadows == true) {
-				renderShadow({ dRect.x, dRect.y + params.fragments[fragmentsCnt].shadowHeight, dRect.w, dRect.h / 5 }, 50 - (percentageTimePassed / 2));
-			}
-
-			//Render fragment
-			SDLRenderCopyEx(sRect, dRect, params.fragments[fragmentsCnt].sprite);
-
-			//Reset transparency
-			if (params.fadeOut.delay > 0) {
-				setSDLTextureTransparency(spriteSheets[params.fragments[fragmentsCnt].sprite.spriteSheetIndex].texture, 100);
-			}
-
-		}
-	}
-
-}
-
-void Explosion::explode() {
-	for (int fragmentsCnt = 0; fragmentsCnt < (int)params.fragments.size(); ++fragmentsCnt) {
-		if (SDL_GetTicks() - params.fragments[fragmentsCnt].speed.startTicks >= params.fragments[fragmentsCnt].speed.delay / FPSTimerMod) {
-			params.fragments[fragmentsCnt].speed.startTicks = SDL_GetTicks();
-
-			if (params.fragments[fragmentsCnt].distanceTravelled < params.fragments[fragmentsCnt].maxDistance) {
-
-				//Update fragment position
-				params.fragments[fragmentsCnt].distanceTravelled += params.fragments[fragmentsCnt].pixelIncrement;
-				params.fragments[fragmentsCnt].position = { lround((double)params.fragments[fragmentsCnt].originalPosition.x + (params.fragments[fragmentsCnt].distanceTravelled * cos(((params.fragments[fragmentsCnt].sprite.angle) * M_PI) / 180))), lround((double)params.fragments[fragmentsCnt].originalPosition.y + (params.fragments[fragmentsCnt].distanceTravelled * sin(((params.fragments[fragmentsCnt].sprite.angle) * M_PI) / 180))) };
-
-				//Rotate fragment
-				params.fragments[fragmentsCnt].sprite.angle += params.fragments[fragmentsCnt].pixelIncrement;
-				if (params.fragments[fragmentsCnt].sprite.angle > 180) {
-					params.fragments[fragmentsCnt].sprite.angle = -(180 - (params.fragments[fragmentsCnt].sprite.angle - 180));
-				}
-
-				//Update shadow height
-				params.fragments[fragmentsCnt].shadowHeight -= params.fragments[fragmentsCnt].pixelIncrement;
-
-			}
-			else {
-				
-				//Update shadow height
-				params.fragments[fragmentsCnt].shadowHeight = params.fragments[fragmentsCnt].size.h / 2;
-
-			}
-		}
-	}
-}
-
-void Explosion::markForDestruction() {
-	if (params.fadeOut.delay > 0 && SDL_GetTicks() - params.fadeOut.startTicks >= params.fadeOut.delay) {
-		explosionsToDestroyIDs.push_back(params.ID);
-	}
-}
-
-Area::Area(areaParamsStruct newParams) {
-	params = newParams;
-}
-
-int Area::getID() {
-	return params.ID;
-}
-
-void Area::render() {
-	if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h }) == true) {
-		SDL_Rect sRect = convertAreaToSDLRect(areaSprite.spriteSheetArea);
-		SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h };
-
-		SDL_RenderCopy(renderer, spriteSheets[areaSprite.spriteSheetIndex].texture, &sRect, &dRect);
-	}
 }
 
 //class functions end
@@ -5934,25 +5965,25 @@ int main(int argc, char* args[]) {
 
 				//Actions
 				//moveCamera();
-				characterActions();
+				/*characterActions();
 				tableActions();
 				bulletActions();
-				explosionActions();
+				explosionActions();*/
 
 				//Set objects to be removed
-				setStuckBulletsFadeOut();
-				setExplosionsFadeOut();
+				/*setStuckBulletsFadeOut();
+				setExplosionsFadeOut();*/
 
 				//Destroy objects
-				destroyBullets();
+				/*destroyBullets();
 				destroyCharacters();
 				destroyTables();
-				destroyExplosions();
+				destroyExplosions();*/
 
 				//Centre camera on controlled character
-				XYStruct characterPosition = characters[controlledCharacterIndex].getPosition();
+				/*XYStruct characterPosition = characters[controlledCharacterIndex].getPosition();
 				WHStruct characterSize = characters[controlledCharacterIndex].getSize();
-				centreCamera({ characterPosition.x, characterPosition.y, characterSize.w, characterSize.h }, characters[controlledCharacterIndex].getLayer());
+				centreCamera({ characterPosition.x, characterPosition.y, characterSize.w, characterSize.h }, characters[controlledCharacterIndex].getLayer());*/
 
 				//Render
 				renderBackgroundCharactersAndObjects();
