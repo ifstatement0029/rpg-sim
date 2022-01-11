@@ -111,8 +111,8 @@ speed
 abilities (used in combat only):
 each character has abilities - ;;
 only usable in combat (hud shows mapped buttons during combat)
-abilities can be mapped to buttons: A, B, X, Y, RB, RT (press LB to access another set of the same buttons)
-press button (A, B, X, Y, RB, RT) to use ability mapped to it
+abilities can be mapped to buttons: B, X, Y, RB, RT (press LB to access another set of the same buttons)
+press button (B, X, Y, RB, RT) to use ability mapped to it
 abilities have a cooldown, energy cost, item (ammo) cost, range, area of effect, duration
 abilities have animations that play: 
 	- when character is activating the ability
@@ -123,7 +123,7 @@ ability has active effects that are added to target when ability hits target
 
 skills (used on objects in environment only):
 only usable outside of combat (hud shows mapped buttons outside of combat)
-skills can be mapped to buttons: A, B, X, Y, RB, RT (press LB to access another set of the same buttons)
+skills can be mapped to buttons: B, X, Y, RB, RT (press LB to access another set of the same buttons)
 skill is matched against required skill level of object in environment
 using skill has animation on character and object
 skill has a range and needs a target to activate
@@ -135,5 +135,52 @@ have a duration
 resistance:
 against active effects
 can lower duration of active effect or prevent adding of active effect
+
+cybernetic slots:
+can install/remove slots
+
+cybernetics:
+provides abilities and skills when equipped in cybernetic slots on character
+
+gear slots:
+various slots on character in which gear can be equipped (need the right gear type)
+
+gear:
+provides skills when equipped on character in gear slots
+can only equip in correct gear slot
+
+weapon slots:
+equip weapons in them
+
+weapons:
+equip in weapon slots
+provides abilities when equipped
+
+usable items:
+has a quantity
+can be mapped to buttons: B, X, Y, RB, RT (press LB to access another set of the same buttons)
+adds active effects
+has animation on character and target when used
+needs a target to use
+
+crafting items:
+used in crafting
+
+controls:
+LT: swap between mapped types (skills, abilities, usable items)
+A: pause combat (during combat)
+A: activate/talk (outside of combat)
+
+combat: 
+is arpg-like
+can pause with button A and choose next action
+can swap between party members
+
+party:
+characters in your party
+can control any character during combat and outside of it
+
+crafting:
+can craft cybernetics, gear and weapons
 
 
