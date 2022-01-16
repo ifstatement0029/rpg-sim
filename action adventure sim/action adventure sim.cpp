@@ -5942,6 +5942,7 @@ void Character::render() {
 		SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h };
 
 		SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
+		--;;
 	}
 }
 
@@ -6080,5 +6081,4 @@ int main(int argc, char* args[]) {
 		close();
 	}
 	return 0;
-	--;;
 }
