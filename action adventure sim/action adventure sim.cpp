@@ -2832,19 +2832,19 @@ void renderBackgroundCharactersAndObjects() {
 
 	vector<renderOrderStruct> renderOrder;
 
-	////Insert characters in renderOrder vector
-	//for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
-	//	renderOrderStruct currentRenderOrderStruct;
-	//	
-	//	currentRenderOrderStruct.type = renderOrderStruct::typeEnum::character;
-	//	currentRenderOrderStruct.layerIndex = characters[charactersCnt].getLayer();
-	//	currentRenderOrderStruct.index = charactersCnt;
-	//	XYStruct characterPosition = characters[charactersCnt].getPosition();
-	//	currentRenderOrderStruct.position = { characterPosition.x, characterPosition.y + characters[charactersCnt].getSize().h / 2 };
-	//	//currentRenderOrderStruct.height = characters[charactersCnt].getCurrentHeight();
+	//Insert characters in renderOrder vector
+	for (int charactersCnt = 0; charactersCnt < (int)characters.size(); ++charactersCnt) {
+		renderOrderStruct currentRenderOrderStruct;
+		
+		currentRenderOrderStruct.type = renderOrderStruct::typeEnum::character;
+		currentRenderOrderStruct.layerIndex = characters[charactersCnt].getLayer();
+		currentRenderOrderStruct.index = charactersCnt;
+		XYStruct characterPosition = characters[charactersCnt].getPosition();
+		currentRenderOrderStruct.position = { characterPosition.x, characterPosition.y + characters[charactersCnt].getSize().h / 2 };
+		//currentRenderOrderStruct.height = characters[charactersCnt].getCurrentHeight();
 
-	//	renderOrder.push_back(currentRenderOrderStruct);
-	//}
+		renderOrder.push_back(currentRenderOrderStruct);
+	}
 
 	////Insert tables in renderOrder vector
 	//for (int tablesCnt = 0; tablesCnt < (int)tables.size(); ++tablesCnt) {
@@ -2959,7 +2959,7 @@ void renderBackgroundCharactersAndObjects() {
 							//	characters[renderOrder[renderOrderCnt].index].renderEquippedWeapon();
 							//}
 							//
-							//characters[renderOrder[renderOrderCnt].index].render();
+							characters[renderOrder[renderOrderCnt].index].render();
 							//characters[renderOrder[renderOrderCnt].index].renderReloadAnimation();
 							//
 							////If character if facing down then render weapon after character
@@ -3866,8 +3866,41 @@ void initCharacters() {
 		characterParamsStruct newCharacterParams;
 
 		newCharacterParams.ID = getFreeID(getCharacterIDs());
+
+		newCharacterParams.layer = 1;
 		
-		newCharacterParams.position = { --;; };
+		newCharacterParams.position = { randInt(0, camera.area.x), randInt(0, camera.area.y) };
+		newCharacterParams.size = { tileSize.w * 4, tileSize.h * 4 };
+
+		newCharacterParams.sprites.spriteSheetIndex = getSpriteSheetIndex("main character");
+		newCharacterParams.sprites.areas = {
+			{
+				{ 526, 7, 29, 35 }, { 559, 7, 29, 35 }, { 590, 7, 29, 35 }, { 621, 7, 29, 35 } //up
+			},
+			{
+				{ 5, 7, 29, 35 }, { 45, 7, 29, 35 }, { 78, 7, 29, 35 }, { 117, 7, 29, 35 } //down
+			},
+			{
+				{ 147, 159, 29, 35 }, { 174, 159, 29, 35 }, { 199, 159, 29, 35 }, { 228, 159, 29, 35 } //left
+			},
+			{
+				{ 278, 7, 29, 35 }, { 301, 7, 29, 35 }, { 332, 7, 29, 35 }, { 356, 7, 29, 35 } //right
+			},
+			{
+				{ 388, 7, 29, 35 }, { 422, 7, 29, 35 }, { 461, 7, 29, 35 }, { 492, 7, 29, 35 } //up-right
+			},
+			{
+				{ 151, 7, 29, 35 }, { 181, 7, 29, 35 }, { 214, 7, 29, 35 }, { 246, 7, 29, 35 } //down-right
+			},
+			{
+				{ 255, 159, 29, 35 }, { 291, 159, 29, 35 }, { 321, 159, 29, 35 }, { 354, 159, 29, 35 } //down-left
+			},
+			{
+				{ 9, 159, 29, 35 }, { 40, 159, 29, 35 }, { 76, 159, 29, 35 }, { 114, 159, 29, 35 } //up-left
+			}
+		};
+		
+		newCharacterParams.direction = directionEnum(randInt(0, 7));
 
 		Character newCharacter(newCharacterParams);
 		characters.push_back(newCharacter);
@@ -5891,6 +5924,27 @@ int Character::getID() {
 	return params.ID;
 }
 
+XYStruct Character::getPosition() {
+	return params.position;
+}
+
+WHStruct Character::getSize() {
+	return params.size;
+}
+
+int Character::getLayer() {
+	return params.layer;
+}
+
+void Character::render() {
+	if (areaWithinCameraView({ params.position.x, params.position.y, params.size.w, params.size.h }) == true) {
+		SDL_Rect sRect = convertAreaToSDLRect(params.sprites.areas[(int)params.direction][params.frame]);
+		SDL_Rect dRect = { params.position.x - camera.area.x, params.position.y - camera.area.y, params.size.w, params.size.h };
+
+		SDL_RenderCopy(renderer, spriteSheets[params.sprites.spriteSheetIndex].texture, &sRect, &dRect);
+	}
+}
+
 //class functions end
 
 //void test(int& functionNumber) {
@@ -5981,9 +6035,9 @@ int main(int argc, char* args[]) {
 				destroyExplosions();*/
 
 				//Centre camera on controlled character
-				/*XYStruct characterPosition = characters[controlledCharacterIndex].getPosition();
+				XYStruct characterPosition = characters[controlledCharacterIndex].getPosition();
 				WHStruct characterSize = characters[controlledCharacterIndex].getSize();
-				centreCamera({ characterPosition.x, characterPosition.y, characterSize.w, characterSize.h }, characters[controlledCharacterIndex].getLayer());*/
+				centreCamera({ characterPosition.x, characterPosition.y, characterSize.w, characterSize.h }, characters[controlledCharacterIndex].getLayer());
 
 				//Render
 				renderBackgroundCharactersAndObjects();

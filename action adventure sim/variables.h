@@ -146,7 +146,7 @@ namespace game {
 
 	SDL_Texture* preRenderTexture = NULL;
 
-	unsigned int playerSeed = 2;
+	unsigned int playerSeed = 0;
 	//int playerSeed = time(0); //randomize seed
 
 	enum class targetTypeEnum { screen, texture };
@@ -691,12 +691,15 @@ namespace game {
 	//vector<Area> areas;
 
 	struct characterParamsStruct {
-		int ID = -1;
+		int ID = -1, layer = -1;
 		
 		XYStruct position = { -1, -1 };
 		WHStruct size = { -1, -1 };
 
 		spriteStruct sprites;
+
+		directionEnum direction = directionEnum::down;
+		int frame = 0;
 	};
 
 	class Character {
@@ -704,7 +707,11 @@ namespace game {
 		Character(characterParamsStruct newParams);
 
 		int getID();
+		XYStruct getPosition();
+		WHStruct getSize();
+		int getLayer();
 
+		void render();
 	private:
 		characterParamsStruct params;
 	};
